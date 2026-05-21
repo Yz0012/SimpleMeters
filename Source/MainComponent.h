@@ -21,11 +21,13 @@ public:
 	void mouseDrag(const juce::MouseEvent& event) override;
 	void mouseEnter(const juce::MouseEvent&) override;
 	void mouseExit(const juce::MouseEvent&) override;
+	void userTriedToCloseWindow() override;
 
 	void openSpectrumAnalyser(int x, int y);
 	void openWaveformComponent(int x, int y);
 
-	void userTriedToCloseWindow() override;
+	void stopAndCloseWASAPIDevice();
+	void stopWASAPIDevice();
 
 	juce::ComponentDragger dragger;
 private:

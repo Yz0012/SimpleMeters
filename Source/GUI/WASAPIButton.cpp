@@ -3,7 +3,6 @@
 
 WASAPIButton::WASAPIButton()
 {
-	setTooltip("Enable or disable miniaudio WASAPI loopback");
 }
 
 WASAPIButton::~WASAPIButton()

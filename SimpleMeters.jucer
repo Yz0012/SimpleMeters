@@ -5,6 +5,10 @@
   <MAINGROUP id="LAPktj" name="SimpleMeters">
     <GROUP id="{7D5B5DC3-1EC8-72B5-0D8D-111EEF7BB463}" name="Source">
       <GROUP id="{CBAFAF3B-058A-6BB7-DDA1-0AB3F1C79541}" name="GUI">
+        <FILE id="Fm2idL" name="BufferSizeButton.h" compile="0" resource="0"
+              file="Source/GUI/BufferSizeButton.h"/>
+        <FILE id="AD01xT" name="BufferSizeButton.cpp" compile="1" resource="0"
+              file="Source/GUI/BufferSizeButton.cpp"/>
         <FILE id="qgXZb6" name="Header.cpp" compile="1" resource="0" file="Source/GUI/Header.cpp"/>
         <FILE id="yTvoKC" name="Header.h" compile="0" resource="0" file="Source/GUI/Header.h"/>
         <FILE id="khlSiX" name="WASAPIButton.cpp" compile="1" resource="0"
@@ -13,6 +17,10 @@
         <FILE id="K0RUxl" name="WindowControl.cpp" compile="1" resource="0"
               file="Source/GUI/WindowControl.cpp"/>
         <FILE id="O3wnhL" name="WindowControl.h" compile="0" resource="0" file="Source/GUI/WindowControl.h"/>
+        <FILE id="lI1VfE" name="WindowsSizeButton.cpp" compile="1" resource="0"
+              file="Source/GUI/WindowsSizeButton.cpp"/>
+        <FILE id="oN9QIa" name="WindowsSizeButton.h" compile="0" resource="0"
+              file="Source/GUI/WindowsSizeButton.h"/>
       </GROUP>
       <GROUP id="{FC19B1E5-F711-0B13-E801-5D13477013D7}" name="Assets">
         <FILE id="brkXTA" name="closeIcon.png" compile="0" resource="1" file="Source/Assets/closeIcon.png"/>

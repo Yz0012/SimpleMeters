@@ -3,7 +3,7 @@
 
 #include <JuceHeader.h>
 
-class WindowControl : public juce::Component
+class WindowControl : public juce::Component , public juce::SettableTooltipClient
 {
 public:
 	WindowControl();

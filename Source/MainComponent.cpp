@@ -17,17 +17,43 @@ MainComponent::MainComponent()
     centreWithSize(600,400);
     addAndMakeVisible(header.get());
     header->WASAPIButton.setBounds(20,10,30,30);
+    header->windowsSizeButton.setBounds(60,10,30,30);
+    header->windowControl.setTooltip("Close");
     header->WASAPIButton.setTooltip("Enable or disable miniaudio WASAPI loopback");
+    header->windowsSizeButton.setTooltip("Resize Window");
+    header->windowsSizeButton.onClick = [this]
+        {
+            juce::AlertWindow* aw = new juce::AlertWindow(
+                "Resize Window",
+                "Please enter a Width and Height,don't input zero or any number smaller then 200 :)",
+                juce::AlertWindow::QuestionIcon);
+
+            aw->addTextEditor("Width", "", "Width");
+            aw->addTextEditor("Height", "", "Height");
+            aw->getTextEditor("Width")->setInputRestrictions(5,"0123456789");
+            aw->getTextEditor("Height")->setInputRestrictions(5, "0123456789");
+            aw->addButton("OK", 1, juce::KeyPress(juce::KeyPress::returnKey));
+            aw->addButton("Cancel", 0, juce::KeyPress(juce::KeyPress::escapeKey));
+
+            aw->enterModalState(true, juce::ModalCallbackFunction::create(
+                [this,aw](int result)
+                {
+                    if (result == 1)
+                    {
+                        int &&Width = aw->getTextEditorContents("Width").getIntValue();
+                        int &&Height = aw->getTextEditorContents("Height").getIntValue();
+                        if (Width <= 200 && Height <= 200) return;
+                        setSize(aw->getTextEditorContents("Width").getIntValue(), aw->getTextEditorContents("Height").getIntValue());
+                    }
+                    delete aw;
+                }
+            ), true);
+        };
     header->WASAPIButton.onClick = [this]
         {
             if (header->WASAPIButton.isOpen)
             {
-                miniAudioWASAPI->stopDevice();
-                miniAudioWASAPI->pushSampleIntoJuceAudioBuffer->removeAll();
-                miniAudioWASAPI->pushSampleIntoJuceAudioBuffer->removeAllR();
-                miniAudioWASAPI->pushSampleIntoJuceAudioBuffer->removeAllM();
-                miniAudioWASAPI->pushSampleIntoJuceAudioBuffer->removeAllS();
-                miniAudioWASAPI.reset();
+                stopAndCloseWASAPIDevice();
                 header->WASAPIButton.isOpen = false;
                 header->WASAPIButton.repaint();
             }
@@ -46,12 +72,7 @@ MainComponent::~MainComponent()
     if (auto ptr = weakMiniAudioWASAPI.lock())
     {
         DBG("MainComponent uninit");
-        miniAudioWASAPI->pushSampleIntoJuceAudioBuffer->removeAll();
-        miniAudioWASAPI->pushSampleIntoJuceAudioBuffer->removeAllR();
-        miniAudioWASAPI->pushSampleIntoJuceAudioBuffer->removeAllM();
-        miniAudioWASAPI->pushSampleIntoJuceAudioBuffer->removeAllS();
-        miniAudioWASAPI.reset();
-        DBG("miniAudioReset");
+        stopAndCloseWASAPIDevice();
     }
 }
 
@@ -167,4 +188,22 @@ void MainComponent::openWaveformComponent(int x, int y)
 void MainComponent::userTriedToCloseWindow()
 {
     juce::JUCEApplication::getInstance()->systemRequestedQuit();
+}
+
+void MainComponent::stopAndCloseWASAPIDevice()
+{
+    miniAudioWASAPI->stopDevice();
+    DBG("device stop");
+    miniAudioWASAPI->pushSampleIntoJuceAudioBuffer->removeAll();
+    miniAudioWASAPI->pushSampleIntoJuceAudioBuffer->removeAllR();
+    miniAudioWASAPI->pushSampleIntoJuceAudioBuffer->removeAllM();
+    miniAudioWASAPI->pushSampleIntoJuceAudioBuffer->removeAllS();
+    miniAudioWASAPI.reset();
+    DBG("miniAudioReset");
+}
+
+void MainComponent::stopWASAPIDevice()
+{
+    miniAudioWASAPI->stopDevice();
+    DBG("device stop");
 }
