@@ -23,4 +23,5 @@ public:
 
 	bool isOpen = false;
 private:
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(WASAPIButton);
 };

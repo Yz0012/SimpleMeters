@@ -25,7 +25,7 @@ MainComponent::MainComponent()
         {
             juce::AlertWindow* aw = new juce::AlertWindow(
                 "Resize Window",
-                "Please enter a Width and Height,don't input zero or any number smaller then 200 :)",
+                "Enter Width and Height,please don't input zero or any number smaller then 200 :)",
                 juce::AlertWindow::QuestionIcon);
 
             aw->addTextEditor("Width", "", "Width");
@@ -160,10 +160,10 @@ void MainComponent::openSpectrumAnalyser(int x, int y)
                 ptr->getSpectrumAnalyser()->callStopTimer();
                 });
         }
-        addAndMakeVisible(ptr->getSpectrumAnalyser());
-		ptr->getSpectrumAnalyser()->setBounds(x, y, 500, 150);
-        ptr->getSpectrumAnalyser()->drawArea.setBounds(0,0,500,150);
     }
+    addAndMakeVisible(ComponentManagement::getInstance()->getSpectrumAnalyser().get());
+    ComponentManagement::getInstance()->getSpectrumAnalyser().get()->setBounds(x, y, 500, 150);
+    ComponentManagement::getInstance()->getSpectrumAnalyser().get()->drawArea.setBounds(0, 0, 500, 150);
 }
 
 void MainComponent::openWaveformComponent(int x, int y)
@@ -178,11 +178,11 @@ void MainComponent::openWaveformComponent(int x, int y)
                 ptr->getWaveformComponent()->drawWaveform();
                 });
         }
-		addAndMakeVisible(ptr->getWaveformComponent());
-		ptr->getWaveformComponent()->setBounds(x, y, 500, 150);
-		ptr->getWaveformComponent()->tileArea.setBounds(0, 0, 16, 150);
-        ptr->getWaveformComponent()->drawArea.setBounds(0, 0, 500, 150);
 	}
+    addAndMakeVisible(ComponentManagement::getInstance()->getWaveformComponent().get());
+    ComponentManagement::getInstance()->getWaveformComponent().get()->setBounds(x, y, 500, 150);
+    ComponentManagement::getInstance()->getWaveformComponent().get()->tileArea.setBounds(0, 0, 16, 150);
+    ComponentManagement::getInstance()->getWaveformComponent().get()->drawArea.setBounds(0, 0, 500, 150);
 }
 
 void MainComponent::userTriedToCloseWindow()
@@ -192,6 +192,7 @@ void MainComponent::userTriedToCloseWindow()
 
 void MainComponent::stopAndCloseWASAPIDevice()
 {
+    //ComponentManagement::getInstance()->resetAllComponents();
     miniAudioWASAPI->stopDevice();
     DBG("device stop");
     miniAudioWASAPI->pushSampleIntoJuceAudioBuffer->removeAll();

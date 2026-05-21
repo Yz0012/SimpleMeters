@@ -4,6 +4,7 @@
 
 #include "WASAPI/MiniAudioWASAPI.h"
 #include "CreateConfiguration/CreateColoursConfiguration.h"
+#include "Components/ComponentManagement.h"
 #include "LookAndFeel/LookAndFeel.h"
 
 #include "GUI/Header.h"

@@ -6,9 +6,7 @@
 
 #include "../AudioSource/AudioSourceCreatorInterface.h"
 
-#include "../Components/VectorOscilloscopeComponent/VectorOscilloscopeComponent.h"
-#include "../Components/WaveformComponent/WaveformComponent.h"
-#include "../Components/Spectrum/SpectrumAnalyser.h"
+#include "../Components/ComponentManagement.h"
 
 #include "../PushSampleIntoJuceAudioBuffer.h"
 
@@ -28,9 +26,6 @@ public:
     std::unique_ptr<PushSampleIntoJuceAudioBuffer<float>> pushSampleIntoJuceAudioBuffer;
 
 private:
-
-    std::unique_ptr<WaveformComponent> waveformComponent;
-    std::unique_ptr<SpectrumAnalyser> spectrumAnalyser;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MiniAudioWASAPI);
 };

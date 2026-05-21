@@ -60,6 +60,10 @@
           <FILE id="OQ2QtS" name="WaveformComponent.h" compile="0" resource="0"
                 file="Source/Components/WaveformComponent/WaveformComponent.h"/>
         </GROUP>
+        <FILE id="hYe14l" name="ComponentManagement.cpp" compile="1" resource="0"
+              file="Source/Components/ComponentManagement.cpp"/>
+        <FILE id="qMXhaM" name="ComponentManagement.h" compile="0" resource="0"
+              file="Source/Components/ComponentManagement.h"/>
       </GROUP>
       <GROUP id="{AC5F6603-B4E9-F962-A86B-44848570E846}" name="LookAndFeel">
         <FILE id="IqBxnD" name="LookAndFeel.h" compile="0" resource="0" file="Source/LookAndFeel/LookAndFeel.h"/>

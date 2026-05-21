@@ -7,10 +7,10 @@
 class VectorOscilloscopes : public juce::Component
 {
 public:
+	VectorOscilloscopes();
+	~VectorOscilloscopes();
 	juce::AudioBuffer<float> stereoBuffer{ 2, 1024 };
 	int bufferWritePosition = 0;
-	VectorOscilloscopes(float,float);
-	~VectorOscilloscopes();
 	void createStereoBufferAndPaint(float L, float R);
 	void paint (juce::Graphics&);
 

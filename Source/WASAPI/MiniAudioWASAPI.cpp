@@ -18,15 +18,12 @@ MiniAudioWASAPI::MiniAudioWASAPI()
     deviceConfig.capture.pDeviceID = NULL;
     deviceConfig.capture.format = ma_format_f32;
     deviceConfig.capture.channels = 2;
-    deviceConfig.sampleRate = device.sampleRate;
+    deviceConfig.sampleRate = 48000;
     deviceConfig.dataCallback = staticCallback;
     deviceConfig.pUserData = this;
 
     ma_device_init(NULL, &deviceConfig, &device);
     ma_device_start(&device);
-
-	waveformComponent = std::make_unique<WaveformComponent>();
-	spectrumAnalyser = std::make_unique<SpectrumAnalyser>();
 
     DBG("WASAPI device started");
 }
@@ -55,12 +52,12 @@ void MiniAudioWASAPI::data_callback(ma_device* pDevice, void* pOutput, const voi
 
 SpectrumAnalyser* MiniAudioWASAPI::getSpectrumAnalyser()
 {
-    return spectrumAnalyser.get();
+    return ComponentManagement::getInstance()->getSpectrumAnalyser().get();
 }
 
 WaveformComponent* MiniAudioWASAPI::getWaveformComponent()
 {
-    return waveformComponent.get();
+    return ComponentManagement::getInstance()->getWaveformComponent().get();
 }
 
 void MiniAudioWASAPI::stopDevice()

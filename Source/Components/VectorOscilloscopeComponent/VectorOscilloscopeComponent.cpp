@@ -1,9 +1,9 @@
 #include "VectorOscilloscopeComponent.h"
 
-VectorOscilloscopes::VectorOscilloscopes(float x, float y)
+VectorOscilloscopes::VectorOscilloscopes()
 {
-	this->x = x; 
-	this->y = y;
+    this->x = getBounds().getWidth();
+    this->x = getBounds().getHeight();
 }
 
 VectorOscilloscopes::~VectorOscilloscopes()
