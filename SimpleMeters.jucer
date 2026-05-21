@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<JUCERPROJECT id="TkEGC8" name="SimpleMeters" projectType="guiapp" useAppConfig="0"
+              addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1">
+  <MAINGROUP id="LAPktj" name="SimpleMeters">
+    <GROUP id="{7D5B5DC3-1EC8-72B5-0D8D-111EEF7BB463}" name="Source">
+      <GROUP id="{CBAFAF3B-058A-6BB7-DDA1-0AB3F1C79541}" name="GUI">
+        <FILE id="qgXZb6" name="Header.cpp" compile="1" resource="0" file="Source/GUI/Header.cpp"/>
+        <FILE id="yTvoKC" name="Header.h" compile="0" resource="0" file="Source/GUI/Header.h"/>
+        <FILE id="khlSiX" name="WASAPIButton.cpp" compile="1" resource="0"
+              file="Source/GUI/WASAPIButton.cpp"/>
+        <FILE id="LlA8eN" name="WASAPIButton.h" compile="0" resource="0" file="Source/GUI/WASAPIButton.h"/>
+        <FILE id="K0RUxl" name="WindowControl.cpp" compile="1" resource="0"
+              file="Source/GUI/WindowControl.cpp"/>
+        <FILE id="O3wnhL" name="WindowControl.h" compile="0" resource="0" file="Source/GUI/WindowControl.h"/>
+      </GROUP>
+      <GROUP id="{FC19B1E5-F711-0B13-E801-5D13477013D7}" name="Assets">
+        <FILE id="brkXTA" name="closeIcon.png" compile="0" resource="1" file="Source/Assets/closeIcon.png"/>
+        <FILE id="ixC5a7" name="closeWASAPIButton.png" compile="0" resource="1"
+              file="Source/Assets/closeWASAPIButton.png"/>
+        <FILE id="Zy1mqf" name="openWASAPIButton.png" compile="0" resource="1"
+              file="Source/Assets/openWASAPIButton.png"/>
+        <FILE id="qaeXQc" name="phaseCorrelationCurveComponent.png" compile="0"
+              resource="1" file="Source/Assets/phaseCorrelationCurveComponent.png"/>
+        <FILE id="xs0h15" name="resizeWindowIcon.png" compile="0" resource="1"
+              file="Source/Assets/resizeWindowIcon.png"/>
+        <FILE id="WB8mMJ" name="RMSComponent.png" compile="0" resource="1"
+              file="Source/Assets/RMSComponent.png"/>
+        <FILE id="F7wIHS" name="spectrumAnalyzerIcon.png" compile="0" resource="1"
+              file="Source/Assets/spectrumAnalyzerIcon.png"/>
+        <FILE id="Nfq6eM" name="VectorOscilloscopeComponent.png" compile="0"
+              resource="1" file="Source/Assets/VectorOscilloscopeComponent.png"/>
+        <FILE id="pgn3Pf" name="WaveformComponent.png" compile="0" resource="1"
+              file="Source/Assets/WaveformComponent.png"/>
+      </GROUP>
+      <GROUP id="{EEE00817-5370-279A-C380-774ED0991585}" name="Components">
+        <GROUP id="{18D4E39F-8650-E045-DBA0-DD4F8F199AED}" name="Spectrum">
+          <FILE id="dRG2bK" name="SpectrumAnalyser.cpp" compile="1" resource="0"
+                file="Source/Components/Spectrum/SpectrumAnalyser.cpp"/>
+          <FILE id="iQtCu7" name="SpectrumAnalyser.h" compile="0" resource="0"
+                file="Source/Components/Spectrum/SpectrumAnalyser.h"/>
+        </GROUP>
+        <GROUP id="{B4A1E825-28E0-A712-9B48-1C6A818C7B1B}" name="VectorOscilloscopeComponent">
+          <FILE id="IVo88h" name="VectorOscilloscopeComponent.cpp" compile="1"
+                resource="0" file="Source/Components/VectorOscilloscopeComponent/VectorOscilloscopeComponent.cpp"/>
+          <FILE id="BvnQ1J" name="VectorOscilloscopeComponent.h" compile="0"
+                resource="0" file="Source/Components/VectorOscilloscopeComponent/VectorOscilloscopeComponent.h"/>
+        </GROUP>
+        <GROUP id="{CCB894DA-40A2-A5A5-6487-E4A125C4574A}" name="WaveformComponent">
+          <FILE id="R9Ir5G" name="WaveformComponent.cpp" compile="1" resource="0"
+                file="Source/Components/WaveformComponent/WaveformComponent.cpp"/>
+          <FILE id="OQ2QtS" name="WaveformComponent.h" compile="0" resource="0"
+                file="Source/Components/WaveformComponent/WaveformComponent.h"/>
+        </GROUP>
+      </GROUP>
+      <GROUP id="{AC5F6603-B4E9-F962-A86B-44848570E846}" name="LookAndFeel">
+        <FILE id="IqBxnD" name="LookAndFeel.h" compile="0" resource="0" file="Source/LookAndFeel/LookAndFeel.h"/>
+      </GROUP>
+      <GROUP id="{6184041F-1C2A-1543-9A17-0C82C1BD59CE}" name="CreateConfiguration">
+        <FILE id="QxVOQr" name="CreateColoursConfiguration.cpp" compile="1"
+              resource="0" file="Source/CreateConfiguration/CreateColoursConfiguration.cpp"/>
+        <FILE id="ihImCL" name="CreateColoursConfiguration.h" compile="0" resource="0"
+              file="Source/CreateConfiguration/CreateColoursConfiguration.h"/>
+        <FILE id="aX1Tjz" name="CreateComponentsConfiguration.cpp" compile="1"
+              resource="0" file="Source/CreateConfiguration/CreateComponentsConfiguration.cpp"/>
+        <FILE id="wnclgp" name="CreateComponentsConfiguration.h" compile="0"
+              resource="0" file="Source/CreateConfiguration/CreateComponentsConfiguration.h"/>
+      </GROUP>
+      <GROUP id="{1158B803-6465-F95A-D409-A757FA613C41}" name="AudioSourceInterface">
+        <FILE id="zQwILh" name="AudioSourceCreatorInterface.h" compile="0"
+              resource="0" file="Source/AudioSource/AudioSourceCreatorInterface.h"/>
+      </GROUP>
+      <FILE id="oKsrfZ" name="PushSampleIntoJuceAudioBuffer.h" compile="0"
+            resource="0" file="Source/PushSampleIntoJuceAudioBuffer.h"/>
+      <FILE id="DKlNfV" name="CircularImageBuffer.h" compile="0" resource="0"
+            file="Source/CircularImageBuffer.h"/>
+      <GROUP id="{B8CD5EC4-3BD8-6C5E-0849-16A7C936AF48}" name="miniaudio">
+        <FILE id="nhKgGA" name="miniaudio.h" compile="0" resource="0" file="Source/WASAPI/miniaudio.h"/>
+        <FILE id="m0PO7i" name="MiniAudioWASAPI.cpp" compile="1" resource="0"
+              file="Source/WASAPI/MiniAudioWASAPI.cpp"/>
+        <FILE id="hFMjm5" name="MiniAudioWASAPI.h" compile="0" resource="0"
+              file="Source/WASAPI/MiniAudioWASAPI.h"/>
+      </GROUP>
+      <FILE id="bQl8IR" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
+      <FILE id="fO4wXy" name="MainComponent.h" compile="0" resource="0" file="Source/MainComponent.h"/>
+      <FILE id="oZzoUv" name="MainComponent.cpp" compile="1" resource="0"
+            file="Source/MainComponent.cpp"/>
+    </GROUP>
+  </MAINGROUP>
+  <MODULES>
+    <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_devices" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_formats" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_processors" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_processors_headless" showAllCode="1" useLocalCopy="0"
+            useGlobalPath="1"/>
+    <MODULE id="juce_audio_utils" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_core" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_data_structures" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_dsp" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_events" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_graphics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_gui_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_gui_extra" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+  </MODULES>
+  <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1"/>
+  <EXPORTFORMATS>
+    <VS2026 targetFolder="Builds/VisualStudio2026">
+      <CONFIGURATIONS>
+        <CONFIGURATION isDebug="1" name="Debug" targetName="NewProject"/>
+        <CONFIGURATION isDebug="0" name="Release" targetName="NewProject"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_audio_basics" path="../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../../JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="../../JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../../JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../../JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="../../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors_headless" path="../../JUCE/modules"/>
+        <MODULEPATH id="juce_dsp" path="../../JUCE/modules"/>
+      </MODULEPATHS>
+    </VS2026>
+  </EXPORTFORMATS>
+</JUCERPROJECT>
