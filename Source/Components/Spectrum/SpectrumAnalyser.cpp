@@ -3,12 +3,12 @@
 
 SpectrumAnalyser::SpectrumAnalyser() : forwardFFT(fftOrder), window(fftSize, juce::dsp::WindowingFunction<float>::hann)
 {
-    createColoursConfiguration = CreateColoursConfiguration::getInstance();
+    CreateColoursConfiguration& createColoursConfiguration = CreateColoursConfiguration::getInstance();
 
-    lineColor = juce::Colour(createColoursConfiguration->colourHexToARGBInt(
-        createColoursConfiguration->currentColourTheme.getChildWithProperty("name", "SpectrumAnalyzerBoundaryLine").getProperty("hex").toString(), false));
-    fillColor = juce::Colour(createColoursConfiguration->colourHexToARGBInt(
-        createColoursConfiguration->currentColourTheme.getChildWithProperty("name", "SpectrumAnalyzerFill").getProperty("hex").toString(), false));
+    lineColor = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
+        createColoursConfiguration.currentColourTheme.getChildWithProperty("name", "SpectrumAnalyzerBoundaryLine").getProperty("hex").toString(), false));
+    fillColor = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
+        createColoursConfiguration.currentColourTheme.getChildWithProperty("name", "SpectrumAnalyzerFill").getProperty("hex").toString(), false));
 
     for (int i = 0; i < scopeSize; ++i)
     {

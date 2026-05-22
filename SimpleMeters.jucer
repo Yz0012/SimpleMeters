@@ -4,6 +4,8 @@
               addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1">
   <MAINGROUP id="LAPktj" name="SimpleMeters">
     <GROUP id="{7D5B5DC3-1EC8-72B5-0D8D-111EEF7BB463}" name="Source">
+      <FILE id="vRjiPQ" name="CreatePushSampleIntoJuceAudioBufferInstance.h"
+            compile="0" resource="0" file="Source/CreatePushSampleIntoJuceAudioBufferInstance.h"/>
       <GROUP id="{CBAFAF3B-058A-6BB7-DDA1-0AB3F1C79541}" name="GUI">
         <FILE id="Fm2idL" name="BufferSizeButton.h" compile="0" resource="0"
               file="Source/GUI/BufferSizeButton.h"/>

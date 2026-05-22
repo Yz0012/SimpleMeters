@@ -38,7 +38,6 @@ public:
     uint16_t callbackIdM = 0;
     uint16_t callbackIdS = 0;
 private:
-    CreateColoursConfiguration* createColoursConfiguration;
     juce::Colour lineColor = juce::Colour(0xFF8400FF);
     juce::Colour fillColor = juce::Colour(0xFF8400FF);
 

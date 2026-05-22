@@ -36,7 +36,6 @@ public:
 
     uint16_t callbackId = 0;
 private:
-    CreateColoursConfiguration* createColoursConfiguration;
     juce::Colour lineColor = juce::Colours::blueviolet;
     juce::Colour fillColor = juce::Colours::blueviolet;
     juce::Colour gradientColorOfLines = juce::Colours::white;

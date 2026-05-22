@@ -14,10 +14,10 @@ public:
 	void saveConfig(const juce::ValueTree& tree);
 	juce::ValueTree loadConfig();
 
-	static CreateColoursConfiguration *getInstance()
+	static CreateColoursConfiguration& getInstance()
 	{
 		static CreateColoursConfiguration instance;
-		return &instance;
+		return instance;
 	}
 
 	juce::ValueTree initColourTheme

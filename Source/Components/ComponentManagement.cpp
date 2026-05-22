@@ -1,9 +1,9 @@
 #include "ComponentManagement.h"
 
-ComponentManagement* ComponentManagement::getInstance()
+ComponentManagement& ComponentManagement::getInstance()
 {
     static ComponentManagement instance;
-    return &instance;
+    return instance;
 }
 
 const std::unique_ptr<WaveformComponent>& ComponentManagement::getWaveformComponent()

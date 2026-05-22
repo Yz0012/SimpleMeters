@@ -10,7 +10,7 @@ class ComponentManagement
 {
 public:
 
-    static ComponentManagement* getInstance();
+    static ComponentManagement& getInstance();
 
     const std::unique_ptr<WaveformComponent>& getWaveformComponent();
 

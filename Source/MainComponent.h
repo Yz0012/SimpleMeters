@@ -4,6 +4,7 @@
 
 #include "WASAPI/MiniAudioWASAPI.h"
 #include "CreateConfiguration/CreateColoursConfiguration.h"
+#include "CreatePushSampleIntoJuceAudioBufferInstance.h"
 #include "Components/ComponentManagement.h"
 #include "LookAndFeel/LookAndFeel.h"
 
@@ -32,12 +33,13 @@ public:
 
 	juce::ComponentDragger dragger;
 private:
+	PushSampleIntoJuceAudioBuffer<float>& pushSampleIntoJuceAudioBuffer = CreatePushSampleIntoJuceAudioBufferInstance::getInstance();
+
 	std::unique_ptr<LookAndFeel> lookAndFeel;
 	std::unique_ptr<Header> header;
 
 	juce::TooltipWindow tooltipWindow;
 
-	CreateColoursConfiguration* createColoursConfiguration;
 	juce::Colour mainComponentBackgroundColour = juce::Colours::black;
 
 	std::shared_ptr<MiniAudioWASAPI> miniAudioWASAPI;

@@ -12,8 +12,6 @@ ma_device device;
 
 MiniAudioWASAPI::MiniAudioWASAPI()
 {
-    pushSampleIntoJuceAudioBuffer = std::make_unique<PushSampleIntoJuceAudioBuffer<float>>(2, 882);
-
     ma_device_config deviceConfig = ma_device_config_init(ma_device_type_loopback);
     deviceConfig.capture.pDeviceID = NULL;
     deviceConfig.capture.format = ma_format_f32;
@@ -45,19 +43,9 @@ void MiniAudioWASAPI::data_callback(ma_device* pDevice, void* pOutput, const voi
 
     for (ma_uint32 frame = 0; frame < frameCount; ++frame)
     {
-		pushSampleIntoJuceAudioBuffer->pushSample(0, inputSamples[frame * channels + 0]);
-		pushSampleIntoJuceAudioBuffer->pushSample(1, inputSamples[frame * channels + 1]);
+		pushSampleIntoJuceAudioBuffer.pushSample(0, inputSamples[frame * channels + 0]);
+		pushSampleIntoJuceAudioBuffer.pushSample(1, inputSamples[frame * channels + 1]);
     }
-}
-
-SpectrumAnalyser* MiniAudioWASAPI::getSpectrumAnalyser()
-{
-    return ComponentManagement::getInstance()->getSpectrumAnalyser().get();
-}
-
-WaveformComponent* MiniAudioWASAPI::getWaveformComponent()
-{
-    return ComponentManagement::getInstance()->getWaveformComponent().get();
 }
 
 void MiniAudioWASAPI::stopDevice()

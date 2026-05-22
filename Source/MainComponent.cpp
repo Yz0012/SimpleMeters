@@ -9,10 +9,10 @@ MainComponent::MainComponent()
 
     juce::LookAndFeel::setDefaultLookAndFeel(lookAndFeel.get());
 
-    createColoursConfiguration = CreateColoursConfiguration::getInstance();
+    CreateColoursConfiguration& createColoursConfiguration = CreateColoursConfiguration::getInstance();
 
-    mainComponentBackgroundColour = juce::Colour(createColoursConfiguration->colourHexToARGBInt(
-        createColoursConfiguration->currentColourTheme.getChildWithProperty("name", "MainComponentBackground").getProperty("hex").toString(), false));
+    mainComponentBackgroundColour = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
+        createColoursConfiguration.currentColourTheme.getChildWithProperty("name", "MainComponentBackground").getProperty("hex").toString(), false));
 
     centreWithSize(600,400);
     addAndMakeVisible(header.get());
@@ -69,6 +69,7 @@ MainComponent::MainComponent()
 
 MainComponent::~MainComponent()
 {
+    ComponentManagement::getInstance().resetAllComponents();
     if (auto ptr = weakMiniAudioWASAPI.lock())
     {
         DBG("MainComponent uninit");
@@ -140,49 +141,43 @@ void MainComponent::mouseExit(const juce::MouseEvent&)
 
 void MainComponent::openSpectrumAnalyser(int x, int y)
 {
-    if(auto ptr = weakMiniAudioWASAPI.lock())
+    if (!(ComponentManagement::getInstance().getSpectrumAnalyser()->callbackId))
     {
-        if (!(ptr->getSpectrumAnalyser()->callbackId))
-        {
-            ptr->getSpectrumAnalyser()->callbackId = ptr->pushSampleIntoJuceAudioBuffer->addR([ptr]() {
-                ptr->getSpectrumAnalyser()->pushNextSampleIntoFifo(ptr->pushSampleIntoJuceAudioBuffer->sample);
-                });
-        }
-        if (!(ptr->getSpectrumAnalyser()->callbackIdS))
-        {
-            ptr->getSpectrumAnalyser()->callbackIdS = ptr->pushSampleIntoJuceAudioBuffer->addS([ptr]() {
-                ptr->getSpectrumAnalyser()->callstartTimerHz(60);
-                });
-        }
-        if (!(ptr->getSpectrumAnalyser()->callbackIdM))
-        {
-            ptr->getSpectrumAnalyser()->callbackIdM = ptr->pushSampleIntoJuceAudioBuffer->addM([ptr]() {
-                ptr->getSpectrumAnalyser()->callStopTimer();
-                });
-        }
+        ComponentManagement::getInstance().getSpectrumAnalyser()->callbackId = pushSampleIntoJuceAudioBuffer.addR([this]() {
+            ComponentManagement::getInstance().getSpectrumAnalyser()->pushNextSampleIntoFifo(pushSampleIntoJuceAudioBuffer.sample);
+            });
     }
-    addAndMakeVisible(ComponentManagement::getInstance()->getSpectrumAnalyser().get());
-    ComponentManagement::getInstance()->getSpectrumAnalyser().get()->setBounds(x, y, 500, 150);
-    ComponentManagement::getInstance()->getSpectrumAnalyser().get()->drawArea.setBounds(0, 0, 500, 150);
+    if (!(ComponentManagement::getInstance().getSpectrumAnalyser()->callbackIdS))
+    {
+        ComponentManagement::getInstance().getSpectrumAnalyser()->callbackIdS = pushSampleIntoJuceAudioBuffer.addS([this]() {
+            ComponentManagement::getInstance().getSpectrumAnalyser()->callstartTimerHz(60);
+            });
+    }
+    if (!(ComponentManagement::getInstance().getSpectrumAnalyser()->callbackIdM))
+    {
+        ComponentManagement::getInstance().getSpectrumAnalyser()->callbackIdM = pushSampleIntoJuceAudioBuffer.addM([this]() {
+            ComponentManagement::getInstance().getSpectrumAnalyser()->callStopTimer();
+            });
+    }
+    addAndMakeVisible(ComponentManagement::getInstance().getSpectrumAnalyser().get());
+    ComponentManagement::getInstance().getSpectrumAnalyser().get()->setBounds(x, y, 500, 150);
+    ComponentManagement::getInstance().getSpectrumAnalyser().get()->drawArea.setBounds(0, 0, 500, 150);
 }
 
 void MainComponent::openWaveformComponent(int x, int y)
 {
-	if (auto ptr = weakMiniAudioWASAPI.lock())
-	{
-        if (!(ptr->getWaveformComponent()->callbackId))
-        {
-            ptr->getWaveformComponent()->callbackId = ptr->pushSampleIntoJuceAudioBuffer->add([ptr]() {
-                ptr->getWaveformComponent()->localAudioBuffer = ptr->pushSampleIntoJuceAudioBuffer->getLocalAudioBufferReadPointer();
-                ptr->getWaveformComponent()->localAudioBufferRMS = ptr->pushSampleIntoJuceAudioBuffer->getLocalAudioBufferRMSReadPointer<float>();
-                ptr->getWaveformComponent()->drawWaveform();
-                });
-        }
-	}
-    addAndMakeVisible(ComponentManagement::getInstance()->getWaveformComponent().get());
-    ComponentManagement::getInstance()->getWaveformComponent().get()->setBounds(x, y, 500, 150);
-    ComponentManagement::getInstance()->getWaveformComponent().get()->tileArea.setBounds(0, 0, 16, 150);
-    ComponentManagement::getInstance()->getWaveformComponent().get()->drawArea.setBounds(0, 0, 500, 150);
+    if (!(ComponentManagement::getInstance().getWaveformComponent()->callbackId))
+    {
+        ComponentManagement::getInstance().getWaveformComponent()->callbackId = pushSampleIntoJuceAudioBuffer.add([this]() {
+            ComponentManagement::getInstance().getWaveformComponent()->localAudioBuffer = pushSampleIntoJuceAudioBuffer.getLocalAudioBufferReadPointer();
+            ComponentManagement::getInstance().getWaveformComponent()->localAudioBufferRMS = pushSampleIntoJuceAudioBuffer.getLocalAudioBufferRMSReadPointer<float>();
+            ComponentManagement::getInstance().getWaveformComponent()->drawWaveform();
+            });
+    }
+    addAndMakeVisible(ComponentManagement::getInstance().getWaveformComponent().get());
+    ComponentManagement::getInstance().getWaveformComponent().get()->setBounds(x, y, 500, 150);
+    ComponentManagement::getInstance().getWaveformComponent().get()->tileArea.setBounds(0, 0, 16, 150);
+    ComponentManagement::getInstance().getWaveformComponent().get()->drawArea.setBounds(0, 0, 500, 150);
 }
 
 void MainComponent::userTriedToCloseWindow()
@@ -192,13 +187,8 @@ void MainComponent::userTriedToCloseWindow()
 
 void MainComponent::stopAndCloseWASAPIDevice()
 {
-    //ComponentManagement::getInstance()->resetAllComponents();
     miniAudioWASAPI->stopDevice();
     DBG("device stop");
-    miniAudioWASAPI->pushSampleIntoJuceAudioBuffer->removeAll();
-    miniAudioWASAPI->pushSampleIntoJuceAudioBuffer->removeAllR();
-    miniAudioWASAPI->pushSampleIntoJuceAudioBuffer->removeAllM();
-    miniAudioWASAPI->pushSampleIntoJuceAudioBuffer->removeAllS();
     miniAudioWASAPI.reset();
     DBG("miniAudioReset");
 }

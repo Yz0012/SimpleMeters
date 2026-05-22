@@ -10,20 +10,18 @@ class LookAndFeel : public juce::LookAndFeel_V4
 public:
     LookAndFeel()
     {
-        createColoursConfiguration = CreateColoursConfiguration::getInstance();
+        CreateColoursConfiguration& createColoursConfiguration = CreateColoursConfiguration::getInstance();
 
-        PopupMenuTextColour = juce::Colour(createColoursConfiguration->colourHexToARGBInt(
-            createColoursConfiguration->currentColourTheme.getChildWithProperty("name", "PopupMenuTextColour").getProperty("hex").toString(), true));
-        PopupMenuBackgroundColour = juce::Colour(createColoursConfiguration->colourHexToARGBInt(
-            createColoursConfiguration->currentColourTheme.getChildWithProperty("name", "PopupMenuBackgroundColour").getProperty("hex").toString(), true));
+        PopupMenuTextColour = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
+            createColoursConfiguration.currentColourTheme.getChildWithProperty("name", "PopupMenuTextColour").getProperty("hex").toString(), true));
+        PopupMenuBackgroundColour = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
+            createColoursConfiguration.currentColourTheme.getChildWithProperty("name", "PopupMenuBackgroundColour").getProperty("hex").toString(), true));
 
         setColour(juce::PopupMenu::backgroundColourId, PopupMenuBackgroundColour);
         setColour(juce::PopupMenu::textColourId, PopupMenuTextColour);
     }
 
 private:
-    CreateColoursConfiguration* createColoursConfiguration;
-
     juce::Colour PopupMenuTextColour = juce::Colours::blue;
     juce::Colour PopupMenuBackgroundColour = juce::Colours::black;
 

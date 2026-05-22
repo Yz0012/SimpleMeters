@@ -2,14 +2,14 @@
 
 WaveformComponent::WaveformComponent()
 {
-    createColoursConfiguration = CreateColoursConfiguration::getInstance();
+    CreateColoursConfiguration& createColoursConfiguration = CreateColoursConfiguration::getInstance();
 
-    lineColor = juce::Colour(createColoursConfiguration->colourHexToARGBInt(
-        createColoursConfiguration->currentColourTheme.getChildWithProperty("name", "WaveformBoundaryLine").getProperty("hex").toString(), true));
-    fillColor = juce::Colour(createColoursConfiguration->colourHexToARGBInt(
-        createColoursConfiguration->currentColourTheme.getChildWithProperty("name", "WaveformFill").getProperty("hex").toString(), true));
-    gradientColorOfLines = juce::Colour(createColoursConfiguration->colourHexToARGBInt(
-        createColoursConfiguration->currentColourTheme.getChildWithProperty("name", "WaveformGradientColorOfLines").getProperty("hex").toString(), true));
+    lineColor = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
+        createColoursConfiguration.currentColourTheme.getChildWithProperty("name", "WaveformBoundaryLine").getProperty("hex").toString(), true));
+    fillColor = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
+        createColoursConfiguration.currentColourTheme.getChildWithProperty("name", "WaveformFill").getProperty("hex").toString(), true));
+    gradientColorOfLines = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
+        createColoursConfiguration.currentColourTheme.getChildWithProperty("name", "WaveformGradientColorOfLines").getProperty("hex").toString(), true));
 }
 
 WaveformComponent::~WaveformComponent()

@@ -9,6 +9,7 @@
 #include "../Components/ComponentManagement.h"
 
 #include "../PushSampleIntoJuceAudioBuffer.h"
+#include "../CreatePushSampleIntoJuceAudioBufferInstance.h"
 
 class MiniAudioWASAPI : public AudioSourceCreatorInterface
 {
@@ -18,14 +19,9 @@ public:
 
     void stopDevice();
 
-    SpectrumAnalyser* getSpectrumAnalyser();
-    WaveformComponent* getWaveformComponent();
-
 	void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount);
 
-    std::unique_ptr<PushSampleIntoJuceAudioBuffer<float>> pushSampleIntoJuceAudioBuffer;
-
 private:
-
+	PushSampleIntoJuceAudioBuffer<float>& pushSampleIntoJuceAudioBuffer = CreatePushSampleIntoJuceAudioBufferInstance::getInstance();
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MiniAudioWASAPI);
 };
