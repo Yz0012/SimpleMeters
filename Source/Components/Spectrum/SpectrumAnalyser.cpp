@@ -17,7 +17,7 @@ SpectrumAnalyser::SpectrumAnalyser() : forwardFFT(fftOrder), window(fftSize, juc
         scopeDataStorage[i] = mindB;
     }
 
-    startTimerHz(60);
+    lastProcessTime = juce::Time::getMillisecondCounterHiRes();
 }
 
 SpectrumAnalyser::~SpectrumAnalyser()
@@ -26,6 +26,13 @@ SpectrumAnalyser::~SpectrumAnalyser()
 
 void SpectrumAnalyser::processAudioBuffer(const juce::AudioBuffer<float>& buffer)
 {
+    lastProcessTime = juce::Time::getMillisecondCounterHiRes();
+
+    if (!isTimerRunning())
+    {
+        startTimerHz(60);
+    }
+
     const int numSamples = buffer.getNumSamples();
     if (numSamples == 0) return;
 
@@ -60,6 +67,7 @@ void SpectrumAnalyser::processAudioBuffer(const juce::AudioBuffer<float>& buffer
         for (int i = 0; i < numSamples; ++i)
         {
             float lrSample = left[i] - right[i];
+            pushNextSampleIntoFifo(left[i], 0);
             pushNextSampleIntoFifo(lrSample, 1);
         }
     }
@@ -117,13 +125,27 @@ void SpectrumAnalyser::drawNextFrameOfSpectrum(int channelIndex)
     window.multiplyWithWindowingTable(fftBlock, fftSize);
     forwardFFT.performFrequencyOnlyForwardTransform(fftBlock);
 
-    for (int i = 0; i < scopeSize; ++i)
+    if (currentMode == Interleaved)
     {
-        auto skewedProportionX = i / (float)scopeSize;
-        auto fftDataIndex = juce::jlimit(0, fftSize / 2, (int)(skewedProportionX * (float)fftSize * 0.25f));
-        auto sourceDecibels = juce::Decibels::gainToDecibels(fftBlock[fftDataIndex]) - juce::Decibels::gainToDecibels((float)fftSize);
-        destScope[i] = juce::jlimit(mindB, maxdB, sourceDecibels + (2.0f * std::log(1.0f * i + std::exp(1.0f)) - 7) * 3.0f);
+        for (int i = 0; i < scopeSize; ++i)
+        {
+            auto skewedProportionX = i / (float)scopeSize;
+            auto fftDataIndex = juce::jlimit(0, fftSize / 2, (int)(skewedProportionX * (float)fftSize * 0.25f));
+            auto sourceDecibels = juce::Decibels::gainToDecibels(fftBlock[fftDataIndex]) - juce::Decibels::gainToDecibels((float)fftSize);
+            destScope[i] = juce::jlimit(mindB, maxdB, sourceDecibels + (2.0f * std::log(1.0f * i + std::exp(1.0f)) - 7) * 3.0f);
+        }
     }
+    else
+    {
+        for (int i = 0; i < scopeSize; ++i)
+        {
+            auto skewedProportionX = i / (float)scopeSize;
+            auto fftDataIndex = juce::jlimit(0, fftSize / 2, (int)(skewedProportionX * (float)fftSize * 0.5f));
+            auto sourceDecibels = juce::Decibels::gainToDecibels(fftBlock[fftDataIndex]) - juce::Decibels::gainToDecibels((float)fftSize);
+            destScope[i] = juce::jlimit(mindB, maxdB, sourceDecibels + (2.0f * std::log(1.0f * i + std::exp(1.0f)) - 7) * 3.0f);
+        }
+    }
+
     if (channelIndex == 0)
         nextFFTBlockReady = false;
     else
@@ -132,16 +154,28 @@ void SpectrumAnalyser::drawNextFrameOfSpectrum(int channelIndex)
 
 void SpectrumAnalyser::drawFrame(juce::Graphics& g, juce::Rectangle<int> bounds)
 {
-    drawSingleCurve(g, bounds, scopeData, scopeDataStorage, gapSmoothedScopeData,
-        lineColor, fillColor);
-
-    if (currentMode == Stereo || currentMode == LR)
+    if (currentMode == Mono || currentMode == Interleaved)
     {
-        juce::Colour line2 = (currentMode == LR) ? juce::Colours::orange : juce::Colours::greenyellow;
+        drawSingleCurve(g, bounds, scopeData, scopeDataStorage, gapSmoothedScopeData,
+            lineColor, fillColor);
+    }
+    else if (currentMode == LR)
+    {
+        juce::Colour line2 = juce::Colours::orange;
         juce::Colour fill2 = line2.withAlpha(0.3f);
         drawSingleCurve(g, bounds, scopeData2, scopeDataStorage2, gapSmoothedScopeData2,
             line2, fill2);
     }
+    else if (currentMode == Stereo)
+    {
+        drawSingleCurve(g, bounds, scopeData, scopeDataStorage, gapSmoothedScopeData,
+            lineColor, fillColor);
+        juce::Colour line2 = juce::Colours::greenyellow;
+        juce::Colour fill2 = line2.withAlpha(0.3f);
+        drawSingleCurve(g, bounds, scopeData2, scopeDataStorage2, gapSmoothedScopeData2,
+            line2, fill2);
+    }
+
 }
 
 void SpectrumAnalyser::drawSingleCurve(juce::Graphics& g,
@@ -251,6 +285,7 @@ void SpectrumAnalyser::paint(juce::Graphics& g)
 
 void SpectrumAnalyser::timerCallback()
 {
+    checkProcessBufferActivity();
 	repaint();
 }
 
@@ -288,5 +323,14 @@ void SpectrumAnalyser::setAnalysisMode(AnalysisMode mode)
         fifoIndex2 = 0;
         nextFFTBlockReady = false;
         nextFFTBlockReady2 = false;
+    }
+}
+
+void SpectrumAnalyser::checkProcessBufferActivity()
+{
+    auto now = juce::Time::getMillisecondCounterHiRes();
+    if (now - lastProcessTime > 2000.0)
+    {
+        stopTimer();
     }
 }

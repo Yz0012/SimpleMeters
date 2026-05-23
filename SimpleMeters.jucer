@@ -25,13 +25,20 @@
               file="Source/GUI/WindowsSizeButton.h"/>
       </GROUP>
       <GROUP id="{FC19B1E5-F711-0B13-E801-5D13477013D7}" name="Assets">
+        <FILE id="NeERhE" name="(L+R)2.png" compile="0" resource="1" file="Source/Assets/(L+R)2.png"/>
         <FILE id="brkXTA" name="closeIcon.png" compile="0" resource="1" file="Source/Assets/closeIcon.png"/>
         <FILE id="ixC5a7" name="closeWASAPIButton.png" compile="0" resource="1"
               file="Source/Assets/closeWASAPIButton.png"/>
+        <FILE id="elpz0r" name="L-R.png" compile="0" resource="1" file="Source/Assets/L-R.png"/>
+        <FILE id="tmab0P" name="LAR.png" compile="0" resource="1" file="Source/Assets/LAR.png"/>
+        <FILE id="HgEQ9E" name="LRLRLRLR.png" compile="0" resource="1" file="Source/Assets/LRLRLRLR.png"/>
         <FILE id="Zy1mqf" name="openWASAPIButton.png" compile="0" resource="1"
               file="Source/Assets/openWASAPIButton.png"/>
         <FILE id="qaeXQc" name="phaseCorrelationCurveComponent.png" compile="0"
               resource="1" file="Source/Assets/phaseCorrelationCurveComponent.png"/>
+        <FILE id="FcICCp" name="pinCloseIcon.png" compile="0" resource="1"
+              file="Source/Assets/pinCloseIcon.png"/>
+        <FILE id="nSr0KN" name="pinIcon.png" compile="0" resource="1" file="Source/Assets/pinIcon.png"/>
         <FILE id="xs0h15" name="resizeWindowIcon.png" compile="0" resource="1"
               file="Source/Assets/resizeWindowIcon.png"/>
         <FILE id="WB8mMJ" name="RMSComponent.png" compile="0" resource="1"

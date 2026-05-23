@@ -48,6 +48,7 @@ public:
 
     void callStopTimer();
     void callstartTimerHz(int hz);
+    void checkProcessBufferActivity();
     void scopeDataReset();
 
     juce::Rectangle<int> drawArea{ 0,0,500,150 };
@@ -57,6 +58,8 @@ public:
     uint16_t callbackIdS = 0;
 
 private:
+    double lastProcessTime = 0;
+
     AnalysisMode currentMode = Interleaved;
 
     juce::Colour lineColor = juce::Colour(0xFF8400FF);
