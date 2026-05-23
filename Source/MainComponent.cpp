@@ -42,7 +42,7 @@ MainComponent::MainComponent()
                     {
                         int &&Width = aw->getTextEditorContents("Width").getIntValue();
                         int &&Height = aw->getTextEditorContents("Height").getIntValue();
-                        if (Width <= 200 && Height <= 200) return;
+                        if (Width <= 200 || Height <= 200) return;
                         setSize(aw->getTextEditorContents("Width").getIntValue(), aw->getTextEditorContents("Height").getIntValue());
                     }
                     delete aw;
@@ -127,7 +127,6 @@ void MainComponent::mouseEnter(const juce::MouseEvent&)
 {
     setMouseCursor(juce::MouseCursor::DraggingHandCursor);
     header->setVisible(true);
-    repaint();
 }
 
 void MainComponent::mouseExit(const juce::MouseEvent&)
@@ -135,7 +134,6 @@ void MainComponent::mouseExit(const juce::MouseEvent&)
     if (!header->isMouseOver())
     {
         header->setVisible(false);
-        repaint();
     }
 }
 
@@ -143,20 +141,28 @@ void MainComponent::openSpectrumAnalyser(int x, int y)
 {
     if (!(ComponentManagement::getInstance().getSpectrumAnalyser()->callbackId))
     {
-        ComponentManagement::getInstance().getSpectrumAnalyser()->callbackId = pushSampleIntoJuceAudioBuffer.addR([this]() {
-            ComponentManagement::getInstance().getSpectrumAnalyser()->pushNextSampleIntoFifo(pushSampleIntoJuceAudioBuffer.sample);
+        ComponentManagement::getInstance().getSpectrumAnalyser()->callbackId = pushSampleIntoJuceAudioBuffer.add([this]() {
+            ComponentManagement::getInstance().getSpectrumAnalyser().get()->processAudioBuffer(pushSampleIntoJuceAudioBuffer.getLocalAudioBufferReference());
             });
     }
     if (!(ComponentManagement::getInstance().getSpectrumAnalyser()->callbackIdS))
     {
         ComponentManagement::getInstance().getSpectrumAnalyser()->callbackIdS = pushSampleIntoJuceAudioBuffer.addS([this]() {
-            ComponentManagement::getInstance().getSpectrumAnalyser()->callstartTimerHz(60);
+            juce::MessageManager::callAsync([]()
+                {
+                    ComponentManagement::getInstance().getSpectrumAnalyser()->callstartTimerHz(60);
+                });
             });
     }
     if (!(ComponentManagement::getInstance().getSpectrumAnalyser()->callbackIdM))
     {
         ComponentManagement::getInstance().getSpectrumAnalyser()->callbackIdM = pushSampleIntoJuceAudioBuffer.addM([this]() {
-            ComponentManagement::getInstance().getSpectrumAnalyser()->callStopTimer();
+            juce::MessageManager::callAsync([]()
+                {
+                    ComponentManagement::getInstance().getSpectrumAnalyser()->callStopTimer();
+                    ComponentManagement::getInstance().getSpectrumAnalyser()->scopeDataReset();
+                    ComponentManagement::getInstance().getSpectrumAnalyser()->repaint();
+                });
             });
     }
     addAndMakeVisible(ComponentManagement::getInstance().getSpectrumAnalyser().get());
@@ -169,9 +175,9 @@ void MainComponent::openWaveformComponent(int x, int y)
     if (!(ComponentManagement::getInstance().getWaveformComponent()->callbackId))
     {
         ComponentManagement::getInstance().getWaveformComponent()->callbackId = pushSampleIntoJuceAudioBuffer.add([this]() {
-            ComponentManagement::getInstance().getWaveformComponent()->localAudioBuffer = pushSampleIntoJuceAudioBuffer.getLocalAudioBufferReadPointer();
-            ComponentManagement::getInstance().getWaveformComponent()->localAudioBufferRMS = pushSampleIntoJuceAudioBuffer.getLocalAudioBufferRMSReadPointer<float>();
-            ComponentManagement::getInstance().getWaveformComponent()->drawWaveform();
+            juce::MessageManager::callAsync([this]() {
+                ComponentManagement::getInstance().getWaveformComponent()->drawWaveform(pushSampleIntoJuceAudioBuffer.getLocalAudioBufferReference(), pushSampleIntoJuceAudioBuffer.getLocalAudioBufferRMSReference<float>());
+                });
             });
     }
     addAndMakeVisible(ComponentManagement::getInstance().getWaveformComponent().get());

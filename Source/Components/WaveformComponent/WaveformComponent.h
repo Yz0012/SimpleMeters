@@ -15,17 +15,14 @@ public:
     void clear();
 
     void drawWaveform(
-        juce::Colour waveformColour = juce::Colours::cyan,
-        float lineThickness = 2.0f,
-        juce::Colour fillColour = juce::Colours::green);
+        const juce::AudioBuffer<float>& localAudioBuffer,
+        const float localAudioBufferRMS);
     void drawAxis(juce::Graphics& g, juce::Rectangle<int> area);
 
     void renderNextFrame(juce::Graphics& g, juce::Rectangle<int> bounds);
 
-    const juce::AudioBuffer<float> *localAudioBuffer;
-    const float* localAudioBufferRMS;
-
     std::shared_ptr<CircularImageBuffer> imageRingBuffer;
+    std::weak_ptr<CircularImageBuffer> weakBuffer;
 
     const std::vector<float> dbValues = {
     -6.f, -12.f
@@ -36,9 +33,13 @@ public:
 
     uint16_t callbackId = 0;
 private:
-    juce::Colour lineColor = juce::Colours::blueviolet;
-    juce::Colour fillColor = juce::Colours::blueviolet;
-    juce::Colour gradientColorOfLines = juce::Colours::white;
+    juce::Colour lineColorL = juce::Colours::blueviolet;
+    juce::Colour fillColorL = juce::Colours::blueviolet;
+    juce::Colour gradientColorOfLinesL = juce::Colours::white;
+
+    juce::Colour lineColorR = juce::Colours::blueviolet;
+    juce::Colour fillColorR = juce::Colours::blueviolet;
+    juce::Colour gradientColorOfLinesR = juce::Colours::white;
 
 	int tileSize = 0;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(WaveformComponent)

@@ -3,7 +3,7 @@
 #include <JuceHeader.h>
 
 template <typename T>
-class PushSampleIntoJuceAudioBuffer : public juce::AsyncUpdater
+class PushSampleIntoJuceAudioBuffer
 {
 public:
 	PushSampleIntoJuceAudioBuffer(int allChannels, int bufferSize);
@@ -11,8 +11,6 @@ public:
 
     using Callback = std::function<void()>;
     using CallbackId = uint16_t;
-
-    T sample;
 
     void pushSample(int channel, T sample)
     {
@@ -22,44 +20,44 @@ public:
 
         if (writeIndexes[channel] >= bufferSize)
         {
-            localAudioBuffer = audioBuffer;
-            localAudioBufferRMS = getLocalAudioBufferRMS(0, 0, localAudioBuffer.getNumSamples());
+            channelReady[channel] = true;
+            bool allReady = true;
+            for (auto ready : channelReady)
+                if (!ready) { allReady = false; break; }
 
-            if (localAudioBufferRMS < rmsSilenceThreshold)
+            if (allReady)
             {
-                if (silentBufferCount < bufferCountThreshold)
+                localAudioBuffer = audioBuffer;
+                localAudioBufferRMS = getLocalAudioBufferRMS(0, 0, localAudioBuffer.getNumSamples());
+
+                if (localAudioBufferRMS < rmsSilenceThreshold)
                 {
-                    ++silentBufferCount;
+                    if (silentBufferCount < bufferCountThreshold)
+                    {
+                        ++silentBufferCount;
+                    }
+                    else
+                    {
+                        for (auto& idx : writeIndexes) idx = 0;
+                        std::fill(channelReady.begin(), channelReady.end(), false);
+                        if (silentBufferCount == bufferCountThreshold)
+                        {
+                            ++silentBufferCount;
+                            muteCallback();
+                        }
+                        return;
+                    }
                 }
                 else
                 {
-                    writeIndexes[channel] = 0;
-                    std::fill(channelReady.begin(), channelReady.end(), false);
-                    if (silentBufferCount == bufferCountThreshold)
-                    {
-                        ++silentBufferCount;
-                        muteCallback();
-                    }
-                    return;
+                    if (silentBufferCount == bufferCountThreshold + 1) startCallback();
+                    silentBufferCount = 0;
                 }
+                fullAudioBufferCallback();
+                for (auto& idx : writeIndexes) idx = 0;
+                std::fill(channelReady.begin(), channelReady.end(), false);
             }
-            else
-            {
-                if (silentBufferCount == bufferCountThreshold + 1) startCallback();
-                silentBufferCount = 0;
-            }
-
-            triggerAsyncUpdate();
-            writeIndexes[channel] = 0;
-            std::fill(channelReady.begin(), channelReady.end(), false);
         }
-        this->sample = sample;
-        pushSampleRealTimeCallback();
-    }
-
-    void handleAsyncUpdate()
-    {
-        fullAudioBufferCallback();
     }
 
     /* Pass in the function pointer to be called,
@@ -92,39 +90,6 @@ public:
         std::lock_guard lock(callbacksMutex);
         callbacks.clear();
         this->nextId = 1;
-    }
-
-    /* Pass in the function pointer to be called,
-    and the method will return an automatically generated id,
-    The function will be called when the pushSample() method is invoked.
-    */
-    CallbackId addR(Callback cb)
-    {
-        std::lock_guard lock(callbacksMutex);
-        CallbackId id = nextIdR++;
-        realTimeCallbacks.push_back({ id, std::move(cb) });
-        return id;
-    }
-
-    /* Remove the method pointer to be called based on the id. */
-    bool removeR(CallbackId id)
-    {
-        std::lock_guard lock(callbacksMutex);
-        auto it = std::find_if(realTimeCallbacks.begin(), realTimeCallbacks.end(),
-            [id](const auto& pair) { return pair.first == id; });
-        if (it != realTimeCallbacks.end()) {
-            realTimeCallbacks.erase(it);
-            return true;
-        }
-        return false;
-    }
-
-    /* Remove all registered callbacks */
-    void removeAllR()
-    {
-        std::lock_guard lock(callbacksMutex);
-        realTimeCallbacks.clear();
-        this->nextIdR = 1;
     }
 
     /* Pass in the function pointer to be called,
@@ -222,6 +187,12 @@ public:
         return &localAudioBuffer;
 	}
 
+    /* Return a Local Audio Buffer reference. */
+    const juce::AudioBuffer<T>& getLocalAudioBufferReference() const
+    {
+        return localAudioBuffer;
+    }
+
     /* The newly added data in the process of calculating the RMS may affect 
     the returned results. */
     T getAudioBufferRMS(int channel, int startSample, int numSamples) const
@@ -241,6 +212,13 @@ public:
     const T* getLocalAudioBufferRMSReadPointer() const
     {
         return &localAudioBufferRMS;
+    }
+
+    /* Return localAudioBuffer RMS reference. */
+    template <typename T>
+    const T& getLocalAudioBufferRMSReference() const
+    {
+        return localAudioBufferRMS;
     }
 
     /* Return number of channels. */
@@ -264,16 +242,6 @@ public:
             if(cb) cb();
         }
     }
-
-    /* Callback when the pushSample method is called. */
-	void pushSampleRealTimeCallback()
-	{
-        std::lock_guard lock(callbacksMutex);
-		auto copy = realTimeCallbacks;
-		for (auto& [id, cb] : copy) {
-            if (cb) cb();
-		}
-	}
 
     /* Called after the specified number of buffered samples 
     are all below the specified RMS threshold. */
@@ -315,7 +283,7 @@ private:
     std::vector<std::pair<CallbackId, Callback>> startCallbacks;
     std::mutex callbacksMutex;
     T localAudioBufferRMS;
-    static constexpr float rmsSilenceThreshold = 0.0001f;
+    static constexpr float rmsSilenceThreshold = 0.00001f;
     int silentBufferCount = 0;
     int bufferCountThreshold = 200;
 
@@ -326,6 +294,7 @@ template <typename T>
 PushSampleIntoJuceAudioBuffer<T>::PushSampleIntoJuceAudioBuffer(int allChannels, int bufferSize)
 {
 	writeIndexes.resize(allChannels, 0);
+    channelReady.resize(allChannels);
 	audioBuffer.setSize(allChannels, bufferSize);
 	this->allChannels = allChannels;
 	this->bufferSize = bufferSize;

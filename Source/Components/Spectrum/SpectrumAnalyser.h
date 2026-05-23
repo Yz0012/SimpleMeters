@@ -4,6 +4,14 @@
 
 #include "../../CreateConfiguration/CreateColoursConfiguration.h"
 
+enum AnalysisMode
+{
+    Mono,
+    Stereo,
+    LR,
+    Interleaved
+};
+
 class SpectrumAnalyser : public juce::Component , juce::Timer
 {
 public:
@@ -21,35 +29,60 @@ public:
 
     float scopeSizeTransformed = std::log((float)scopeSize + std::exp(1.0f)) - 1;
 
-    void pushNextSampleIntoFifo(float sample) noexcept;
-    void drawNextFrameOfSpectrum();
+    void processAudioBuffer(const juce::AudioBuffer<float>& buffer);
+    void pushNextSampleIntoFifo(float sample, int channelIndex) noexcept;
+    void drawNextFrameOfSpectrum(int channelIndex);
     void drawFrame(juce::Graphics& g,juce::Rectangle<int> bounds);
+    void drawSingleCurve(juce::Graphics& g,
+        juce::Rectangle<int> bounds,
+        const float* scopeData,
+        float* scopeDataStorage,
+        float* gapSmoothedScopeData,
+        juce::Colour lineColour,
+        juce::Colour fillColour);
     void drawFrequencyAxis(juce::Graphics& g,juce::Rectangle<int> bounds);
+    void setAnalysisMode(AnalysisMode mode);
 
     void paint(juce::Graphics& g) override;
 	void timerCallback() override;
 
     void callStopTimer();
     void callstartTimerHz(int hz);
+    void scopeDataReset();
 
     juce::Rectangle<int> drawArea{ 0,0,500,150 };
 
     uint16_t callbackId = 0;
     uint16_t callbackIdM = 0;
     uint16_t callbackIdS = 0;
+
 private:
+    AnalysisMode currentMode = Interleaved;
+
     juce::Colour lineColor = juce::Colour(0xFF8400FF);
     juce::Colour fillColor = juce::Colour(0xFF8400FF);
 
     juce::dsp::FFT forwardFFT;
     juce::dsp::WindowingFunction<float> window;
+
     float fifo[fftSize];
     float fftData[2 * fftSize];
     int fifoIndex = 0;
     bool nextFFTBlockReady = false;
+
     float scopeData[scopeSize];
     float gapSmoothedScopeData[scopeSize];
     float scopeDataStorage[scopeSize];
+
+    float fifo2[fftSize];
+    float fftData2[fftSize * 2];
+    int fifoIndex2 = 0;
+    bool nextFFTBlockReady2 = false;
+
+    float scopeData2[scopeSize];
+    float scopeDataStorage2[scopeSize];
+    float gapSmoothedScopeData2[scopeSize];
+
 
     float level = 0.0f;
 

@@ -4,12 +4,18 @@ WaveformComponent::WaveformComponent()
 {
     CreateColoursConfiguration& createColoursConfiguration = CreateColoursConfiguration::getInstance();
 
-    lineColor = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
-        createColoursConfiguration.currentColourTheme.getChildWithProperty("name", "WaveformBoundaryLine").getProperty("hex").toString(), true));
-    fillColor = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
-        createColoursConfiguration.currentColourTheme.getChildWithProperty("name", "WaveformFill").getProperty("hex").toString(), true));
-    gradientColorOfLines = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
-        createColoursConfiguration.currentColourTheme.getChildWithProperty("name", "WaveformGradientColorOfLines").getProperty("hex").toString(), true));
+    lineColorL = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
+        createColoursConfiguration.currentColourTheme.getChildWithProperty("name", "WaveformBoundaryLineL").getProperty("hex").toString(), true));
+    fillColorL = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
+        createColoursConfiguration.currentColourTheme.getChildWithProperty("name", "WaveformFillL").getProperty("hex").toString(), true));
+    gradientColorOfLinesL = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
+        createColoursConfiguration.currentColourTheme.getChildWithProperty("name", "WaveformGradientColorOfLinesL").getProperty("hex").toString(), true));
+    lineColorR = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
+        createColoursConfiguration.currentColourTheme.getChildWithProperty("name", "WaveformBoundaryLineR").getProperty("hex").toString(), true));
+    fillColorR = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
+        createColoursConfiguration.currentColourTheme.getChildWithProperty("name", "WaveformFillR").getProperty("hex").toString(), true));
+    gradientColorOfLinesR = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
+        createColoursConfiguration.currentColourTheme.getChildWithProperty("name", "WaveformGradientColorOfLinesR").getProperty("hex").toString(), true));
 }
 
 WaveformComponent::~WaveformComponent()
@@ -23,10 +29,9 @@ void WaveformComponent::clear()
 }
 
 void WaveformComponent::drawWaveform(
-    juce::Colour waveformColour, float lineThickness,
-    juce::Colour fillColour)
+    const juce::AudioBuffer<float>& localAudioBuffer,
+    const float localAudioBufferRMS)
 {
-    
     const int width = tileArea.getWidth();
     const int height = tileArea.getHeight();
     if (width <= 0 || height <= 0)
@@ -38,16 +43,16 @@ void WaveformComponent::drawWaveform(
     const float midY = tileArea.getY() + height * 0.5f;
     const float leftX = static_cast<float>(tileArea.getX());
 
-    juce::Path waveformPath;
-    for (int i = 0; i < localAudioBuffer->getNumChannels(); i++)
+    for (int i = 0; i < localAudioBuffer.getNumChannels(); i++)
     {
+        juce::Path waveformPath;
         bool firstPoint = true;
-        const float* readPtr = localAudioBuffer->getReadPointer(i);
-        for (int x = 0; x < localAudioBuffer->getNumSamples(); ++x)
+        const float* readPtr = localAudioBuffer.getReadPointer(i);
+        for (int x = 0; x < localAudioBuffer.getNumSamples(); ++x)
         {
 
             float y = midY - (readPtr[x] * (height * 0.5f));
-            float screenX = leftX + ((float)x * width) / localAudioBuffer->getNumSamples();
+            float screenX = leftX + ((float)x * width) / localAudioBuffer.getNumSamples();
 
             if (firstPoint)
             {
@@ -59,12 +64,21 @@ void WaveformComponent::drawWaveform(
                 waveformPath.lineTo(screenX, y);
             }
         }
-
+        if (i)
+        {
+            g.setColour(lineColorR.interpolatedWith(gradientColorOfLinesR, localAudioBufferRMS));
+            g.strokePath(waveformPath, juce::PathStrokeType(2.0f));
+        }
+        else
+        {
+            g.setColour(lineColorL.interpolatedWith(gradientColorOfLinesL, localAudioBufferRMS));
+            g.strokePath(waveformPath, juce::PathStrokeType(2.0f));
+        }
     }
-    g.setColour(lineColor.interpolatedWith(gradientColorOfLines,*localAudioBufferRMS));
-    g.strokePath(waveformPath, juce::PathStrokeType(lineThickness));
 
-    if (imageRingBuffer)
+    weakBuffer = imageRingBuffer;
+
+    if (auto buffer = weakBuffer.lock())
     {
         imageRingBuffer->push(tile);
     }
@@ -88,7 +102,7 @@ void WaveformComponent::renderNextFrame(juce::Graphics& g, juce::Rectangle<int> 
 
 	if (!imageRingBuffer) return;
 
-	std::weak_ptr<CircularImageBuffer> weakBuffer = imageRingBuffer;
+	weakBuffer = imageRingBuffer;
 
     for (int i = 0; i < imageRingBuffer->size(); i++)
     {
