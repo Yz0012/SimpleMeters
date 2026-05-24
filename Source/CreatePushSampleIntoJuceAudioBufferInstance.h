@@ -8,7 +8,7 @@ class CreatePushSampleIntoJuceAudioBufferInstance
 public:
 	static PushSampleIntoJuceAudioBuffer<float>& getInstance()
 	{
-		static PushSampleIntoJuceAudioBuffer<float> instance(2,882);
+		static PushSampleIntoJuceAudioBuffer<float> instance(2,1090);
 		return instance;
 	}
 

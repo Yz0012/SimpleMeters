@@ -102,6 +102,7 @@ void MainComponent::mouseDown(const juce::MouseEvent& event)
         menu.addItem(1, "SpectrumAnalyser");
         menu.addItem(2, "Waveform");
         menu.addItem(3, "VectorOscilloscopeComponent");
+        menu.addItem(4, "WaveformChart");
 
         menu.showMenuAsync(
             juce::PopupMenu::Options(),
@@ -121,6 +122,10 @@ void MainComponent::mouseDown(const juce::MouseEvent& event)
                 else if (result == 3)
                 {
                     openVectorOscilloscopeComponent(event.getMouseDownX(), event.getMouseDownY());
+                }
+                else if (result == 4)
+                {
+                    openWaveformChartComponent(event.getMouseDownX(), event.getMouseDownY());
                 }
             });
     }
@@ -200,13 +205,29 @@ void MainComponent::openVectorOscilloscopeComponent(int x, int y)
     {
         ComponentManagement::getInstance().getVectorOscilloscopes()->pushStereoBuffer(pushSampleIntoJuceAudioBuffer.getLocalAudioBufferReadPointer());
         ComponentManagement::getInstance().getVectorOscilloscopes()->callbackId = pushSampleIntoJuceAudioBuffer.add([this]() {
-            juce::MessageManager::callAsync([this]() {
+            juce::MessageManager::callAsync([]() {
                 ComponentManagement::getInstance().getVectorOscilloscopes()->repaint();
                 });
             });
     }
     addAndMakeVisible(ComponentManagement::getInstance().getVectorOscilloscopes().get());
     ComponentManagement::getInstance().getVectorOscilloscopes()->setBounds(x, y, 300, 300);
+}
+
+void MainComponent::openWaveformChartComponent(int x, int y)
+{
+    if (!(ComponentManagement::getInstance().getWaveformChartComponent()->callbackId))
+    {
+        ComponentManagement::getInstance().getWaveformChartComponent()->pushStereoBuffer(pushSampleIntoJuceAudioBuffer.getLocalAudioBufferReadPointer(), pushSampleIntoJuceAudioBuffer.getLocalAudioBufferRMSReadPointer<float>());
+        ComponentManagement::getInstance().getWaveformChartComponent()->callbackId = pushSampleIntoJuceAudioBuffer.add([this]() {
+            juce::MessageManager::callAsync([]() {
+                ComponentManagement::getInstance().getWaveformChartComponent()->repaint();
+                });
+            });
+    }
+    addAndMakeVisible(ComponentManagement::getInstance().getWaveformChartComponent().get());
+    ComponentManagement::getInstance().getWaveformChartComponent()->setBounds(x, y, 500, 150);
+    ComponentManagement::getInstance().getWaveformChartComponent()->drawArea.setBounds(0, 0, 500, 150);
 }
 
 void MainComponent::userTriedToCloseWindow()

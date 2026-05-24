@@ -33,6 +33,15 @@ const std::unique_ptr<VectorOscilloscopes>& ComponentManagement::getVectorOscill
     return vectorOscilloscopes;
 }
 
+const std::unique_ptr<WaveformChartComponent>& ComponentManagement::getWaveformChartComponent()
+{
+    if (waveformChartComponent == nullptr)
+    {
+        waveformChartComponent = std::make_unique<WaveformChartComponent>();
+    }
+    return waveformChartComponent;
+}
+
 void ComponentManagement::resetWaveformComponent()
 {
     waveformComponent.reset();
@@ -48,9 +57,15 @@ void ComponentManagement::resetVectorOscilloscopes()
     vectorOscilloscopes.reset();
 }
 
+void ComponentManagement::resetWaveformChartComponent()
+{
+    waveformChartComponent.reset();
+}
+
 void ComponentManagement::resetAllComponents()
 {
     resetWaveformComponent();
     resetSpectrumAnalyser();
     resetVectorOscilloscopes();
+    resetWaveformChartComponent();
 }

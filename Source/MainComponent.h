@@ -28,6 +28,7 @@ public:
 	void openSpectrumAnalyser(int x, int y);
 	void openWaveformComponent(int x, int y);
 	void openVectorOscilloscopeComponent(int x, int y);
+	void openWaveformChartComponent(int x, int y);
 
 	void stopAndCloseWASAPIDevice();
 	void stopWASAPIDevice();

@@ -3,6 +3,7 @@
 #include "../Components/VectorOscilloscopeComponent/VectorOscilloscopeComponent.h"
 #include "../Components/WaveformComponent/WaveformComponent.h"
 #include "../Components/Spectrum/SpectrumAnalyser.h"
+#include "../Components/WaveformComponent/WaveformChartComponent.h"
 
 #include <JuceHeader.h>
 
@@ -18,11 +19,15 @@ public:
 
     const std::unique_ptr<VectorOscilloscopes>& getVectorOscilloscopes();
 
+    const std::unique_ptr<WaveformChartComponent>& getWaveformChartComponent();
+
     void resetWaveformComponent();
 
     void resetSpectrumAnalyser();
 
     void resetVectorOscilloscopes();
+
+    void resetWaveformChartComponent();
 
     void resetAllComponents();
 
@@ -35,4 +40,5 @@ private:
     std::unique_ptr<WaveformComponent> waveformComponent;
     std::unique_ptr<SpectrumAnalyser> spectrumAnalyser;
     std::unique_ptr<VectorOscilloscopes> vectorOscilloscopes;
+    std::unique_ptr<WaveformChartComponent> waveformChartComponent;
 };

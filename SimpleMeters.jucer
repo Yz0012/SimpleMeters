@@ -64,6 +64,10 @@
                 resource="0" file="Source/Components/VectorOscilloscopeComponent/VectorOscilloscopeComponent.h"/>
         </GROUP>
         <GROUP id="{CCB894DA-40A2-A5A5-6487-E4A125C4574A}" name="WaveformComponent">
+          <FILE id="Wx9AQ7" name="WaveformChartComponent.cpp" compile="1" resource="0"
+                file="Source/Components/WaveformComponent/WaveformChartComponent.cpp"/>
+          <FILE id="SvruY8" name="WaveformChartComponent.h" compile="0" resource="0"
+                file="Source/Components/WaveformComponent/WaveformChartComponent.h"/>
           <FILE id="R9Ir5G" name="WaveformComponent.cpp" compile="1" resource="0"
                 file="Source/Components/WaveformComponent/WaveformComponent.cpp"/>
           <FILE id="OQ2QtS" name="WaveformComponent.h" compile="0" resource="0"
