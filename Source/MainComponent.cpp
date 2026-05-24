@@ -101,18 +101,26 @@ void MainComponent::mouseDown(const juce::MouseEvent& event)
 
         menu.addItem(1, "SpectrumAnalyser");
         menu.addItem(2, "Waveform");
+        menu.addItem(3, "VectorOscilloscopeComponent");
 
         menu.showMenuAsync(
             juce::PopupMenu::Options(),
             [this,event](int result)
             {
-                if (result == 0) {
+                if (result == 0)
+                {
                 }
-                else if (result == 1) {
+                else if (result == 1)
+                {
 					openSpectrumAnalyser(event.getMouseDownX(), event.getMouseDownY());
                 }
-                else if (result == 2) {
+                else if (result == 2)
+                {
                     openWaveformComponent(event.getMouseDownX(), event.getMouseDownY());
+                }
+                else if (result == 3)
+                {
+                    openVectorOscilloscopeComponent(event.getMouseDownX(), event.getMouseDownY());
                 }
             });
     }
@@ -142,7 +150,7 @@ void MainComponent::openSpectrumAnalyser(int x, int y)
     if (!(ComponentManagement::getInstance().getSpectrumAnalyser()->callbackId))
     {
         ComponentManagement::getInstance().getSpectrumAnalyser()->callbackId = pushSampleIntoJuceAudioBuffer.add([this]() {
-            ComponentManagement::getInstance().getSpectrumAnalyser().get()->processAudioBuffer(pushSampleIntoJuceAudioBuffer.getLocalAudioBufferReference());
+            ComponentManagement::getInstance().getSpectrumAnalyser()->processAudioBuffer(pushSampleIntoJuceAudioBuffer.getLocalAudioBufferReference());
             });
     }
     if (!(ComponentManagement::getInstance().getSpectrumAnalyser()->callbackIdS))
@@ -166,8 +174,8 @@ void MainComponent::openSpectrumAnalyser(int x, int y)
             });
     }
     addAndMakeVisible(ComponentManagement::getInstance().getSpectrumAnalyser().get());
-    ComponentManagement::getInstance().getSpectrumAnalyser().get()->setBounds(x, y, 500, 150);
-    ComponentManagement::getInstance().getSpectrumAnalyser().get()->drawArea.setBounds(0, 0, 500, 150);
+    ComponentManagement::getInstance().getSpectrumAnalyser()->setBounds(x, y, 500, 150);
+    ComponentManagement::getInstance().getSpectrumAnalyser()->drawArea.setBounds(0, 0, 500, 150);
 }
 
 void MainComponent::openWaveformComponent(int x, int y)
@@ -181,9 +189,24 @@ void MainComponent::openWaveformComponent(int x, int y)
             });
     }
     addAndMakeVisible(ComponentManagement::getInstance().getWaveformComponent().get());
-    ComponentManagement::getInstance().getWaveformComponent().get()->setBounds(x, y, 500, 150);
-    ComponentManagement::getInstance().getWaveformComponent().get()->tileArea.setBounds(0, 0, 16, 150);
-    ComponentManagement::getInstance().getWaveformComponent().get()->drawArea.setBounds(0, 0, 500, 150);
+    ComponentManagement::getInstance().getWaveformComponent()->setBounds(x, y, 500, 150);
+    ComponentManagement::getInstance().getWaveformComponent()->tileArea.setBounds(0, 0, 16, 150);
+    ComponentManagement::getInstance().getWaveformComponent()->drawArea.setBounds(0, 0, 500, 150);
+}
+
+void MainComponent::openVectorOscilloscopeComponent(int x, int y)
+{
+    if (!(ComponentManagement::getInstance().getVectorOscilloscopes()->callbackId))
+    {
+        ComponentManagement::getInstance().getVectorOscilloscopes()->pushStereoBuffer(pushSampleIntoJuceAudioBuffer.getLocalAudioBufferReadPointer());
+        ComponentManagement::getInstance().getVectorOscilloscopes()->callbackId = pushSampleIntoJuceAudioBuffer.add([this]() {
+            juce::MessageManager::callAsync([this]() {
+                ComponentManagement::getInstance().getVectorOscilloscopes()->repaint();
+                });
+            });
+    }
+    addAndMakeVisible(ComponentManagement::getInstance().getVectorOscilloscopes().get());
+    ComponentManagement::getInstance().getVectorOscilloscopes()->setBounds(x, y, 300, 300);
 }
 
 void MainComponent::userTriedToCloseWindow()

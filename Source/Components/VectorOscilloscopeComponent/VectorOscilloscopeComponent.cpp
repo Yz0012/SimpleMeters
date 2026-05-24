@@ -2,53 +2,47 @@
 
 VectorOscilloscopes::VectorOscilloscopes()
 {
-    this->x = getBounds().getWidth();
-    this->x = getBounds().getHeight();
 }
 
 VectorOscilloscopes::~VectorOscilloscopes()
 {
 }
 
-void VectorOscilloscopes::createStereoBufferAndPaint(float L , float R)
+void VectorOscilloscopes::pushStereoBuffer(const juce::AudioBuffer<float>* localAudioBuffer)
 {
-    if (bufferWritePosition >= stereoBuffer.getNumSamples()) return;
-    auto* leftChannel = stereoBuffer.getWritePointer(0);
-    auto* rightChannel = stereoBuffer.getWritePointer(1);
-	leftChannel[bufferWritePosition] = L;
-	rightChannel[bufferWritePosition] = R;
-    bufferWritePosition = bufferWritePosition + 1;
+    stereoBuffer = localAudioBuffer;
 }
 
 void VectorOscilloscopes::paint(juce::Graphics& g)
 {
-    if (bufferWritePosition >= stereoBuffer.getNumSamples())
+    if (stereoBuffer == nullptr) return;
+    const int numSamples = stereoBuffer->getNumSamples();
+    if (numSamples == 0) return;
+
+    const int w = getWidth();
+    const int h = getHeight();
+
+    juce::Image img(juce::Image::ARGB, w, h, true);
+
     {
-		bufferWritePosition = 0;
+        juce::Image::BitmapData bitmap(img, juce::Image::BitmapData::writeOnly);
+        auto* leftSamples = stereoBuffer->getReadPointer(0);
+        auto* rightSamples = stereoBuffer->getReadPointer(1);
 
-        juce::Path p;
-        bool firstPoint = true;
+        for (int i = 0; i < numSamples; ++i)
+        {
+            const float mid = (leftSamples[i] + rightSamples[i]) * 0.5f;
+            const float side = (leftSamples[i] - rightSamples[i]) * 0.5f;
 
-        for (int i = 0; i < stereoBuffer.getNumSamples(); ++i) {
-            auto* leftSamples = stereoBuffer.getReadPointer(0);
-            auto* rightSamples = stereoBuffer.getReadPointer(1);
+            int px = (int)((side + 1.0f) * w * 0.5f);
+            int py = (int)((mid + 1.0f) * h * 0.5f);
 
-            float mid = (leftSamples[i] + rightSamples[i]) * 0.5f;
-            float side = (leftSamples[i] - rightSamples[i]) * 0.5f;
-
-            float xMapping = (side + 1.0f) * x * 0.5f;
-            float yMapping = (mid + 1.0f) * y * 0.5f;
-
-            if (firstPoint) {
-                p.startNewSubPath(xMapping, yMapping);
-                firstPoint = false;
-            }
-            else {
-                p.lineTo(xMapping, yMapping);
+            if (px >= 0 && px < w && py >= 0 && py < h)
+            {
+                bitmap.setPixelColour(px, py, juce::Colours::white);
             }
         }
-
-        g.setColour(juce::Colours::green);
-        g.strokePath(p, juce::PathStrokeType(1.0f));
     }
+
+    g.drawImageAt(img, 0, 0);
 }

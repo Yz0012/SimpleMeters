@@ -9,15 +9,13 @@ class VectorOscilloscopes : public juce::Component
 public:
 	VectorOscilloscopes();
 	~VectorOscilloscopes();
-	juce::AudioBuffer<float> stereoBuffer{ 2, 1024 };
 	int bufferWritePosition = 0;
-	void createStereoBufferAndPaint(float L, float R);
-	void paint (juce::Graphics&);
+	void pushStereoBuffer(const juce::AudioBuffer<float>* localAudioBuffer);
+	void paint (juce::Graphics&) override;
 
-	float x;
-	float y;
+	const juce::AudioBuffer<float>* stereoBuffer;
 
-	uint16_t callbackId;
+	uint16_t callbackId = 0;
 private:
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(VectorOscilloscopes);
