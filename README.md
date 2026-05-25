@@ -1,5 +1,7 @@
 # SimpleMeters
 
+<img width="1874" height="750" alt="image" src="https://github.com/user-attachments/assets/5a84ee06-4f50-4896-b887-696275f495fd" />
+
 这是我的第一个c++作品，当前该项目处于开发状态
 
 # 安装
