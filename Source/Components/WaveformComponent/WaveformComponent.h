@@ -3,6 +3,7 @@
 
 #include "../Source/CircularImageBuffer.h"
 #include "../../CreateConfiguration/CreateColoursConfiguration.h"
+#include "../../GUI/Components/ComponentControl.h"
 
 class WaveformComponent : public juce::Component
 {
@@ -11,6 +12,8 @@ public:
     ~WaveformComponent();
 
     void paint(juce::Graphics& g) override;
+    void mouseEnter(const juce::MouseEvent& event) override;
+    void mouseExit(const juce::MouseEvent&) override;
 
     void clear();
 
@@ -32,6 +35,8 @@ public:
     juce::Rectangle<int> drawArea{ 0,0,500,150 };
 
     uint16_t callbackId = 0;
+
+    ComponentControl componentControl;
 private:
     juce::Colour lineColorL = juce::Colours::blueviolet;
     juce::Colour fillColorL = juce::Colours::blueviolet;

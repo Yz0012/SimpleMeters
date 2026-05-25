@@ -27,6 +27,7 @@ public:
 
             if (allReady)
             {
+                //线程安全
                 localAudioBuffer = audioBuffer;
                 localAudioBufferRMS = getLocalAudioBufferRMS(0, 0, localAudioBuffer.getNumSamples());
 

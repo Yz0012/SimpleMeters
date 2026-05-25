@@ -3,6 +3,7 @@
 #include <JuceHeader.h>
 
 #include "../../CreateConfiguration/CreateColoursConfiguration.h"
+#include "../../GUI/Components/ComponentControl.h"
 
 enum AnalysisMode
 {
@@ -45,6 +46,8 @@ public:
 
     void paint(juce::Graphics& g) override;
 	void timerCallback() override;
+    void mouseEnter(const juce::MouseEvent& event) override;
+    void mouseExit(const juce::MouseEvent&) override;
 
     void callStopTimer();
     void callstartTimerHz(int hz);
@@ -57,6 +60,7 @@ public:
     uint16_t callbackIdM = 0;
     uint16_t callbackIdS = 0;
 
+    ComponentControl componentControl;
 private:
     double lastProcessTime = 0;
 

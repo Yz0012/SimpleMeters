@@ -6,38 +6,46 @@ ComponentManagement& ComponentManagement::getInstance()
     return instance;
 }
 
-const std::unique_ptr<WaveformComponent>& ComponentManagement::getWaveformComponent()
+std::shared_ptr<WaveformComponent> ComponentManagement::getWaveformComponent()
 {
+    jassert(juce::MessageManager::getInstance()->isThisTheMessageThread());
+
     if (waveformComponent == nullptr)
     {
-        waveformComponent = std::make_unique<WaveformComponent>();
+        waveformComponent = std::make_shared<WaveformComponent>();
     }
     return waveformComponent;
 }
 
-const std::unique_ptr<SpectrumAnalyser>& ComponentManagement::getSpectrumAnalyser()
+std::shared_ptr<SpectrumAnalyser> ComponentManagement::getSpectrumAnalyser()
 {
+    jassert(juce::MessageManager::getInstance()->isThisTheMessageThread());
+
     if (spectrumAnalyser == nullptr)
     {
-        spectrumAnalyser = std::make_unique<SpectrumAnalyser>();
+        spectrumAnalyser = std::make_shared<SpectrumAnalyser>();
     }
     return spectrumAnalyser;
 }
 
-const std::unique_ptr<VectorOscilloscopes>& ComponentManagement::getVectorOscilloscopes()
+std::shared_ptr<VectorOscilloscopes> ComponentManagement::getVectorOscilloscopes()
 {
+    jassert(juce::MessageManager::getInstance()->isThisTheMessageThread());
+
     if (vectorOscilloscopes == nullptr)
     {
-        vectorOscilloscopes = std::make_unique<VectorOscilloscopes>();
+        vectorOscilloscopes = std::make_shared<VectorOscilloscopes>();
     }
     return vectorOscilloscopes;
 }
 
-const std::unique_ptr<WaveformChartComponent>& ComponentManagement::getWaveformChartComponent()
+std::shared_ptr<WaveformChartComponent> ComponentManagement::getWaveformChartComponent()
 {
+    jassert(juce::MessageManager::getInstance()->isThisTheMessageThread());
+
     if (waveformChartComponent == nullptr)
     {
-        waveformChartComponent = std::make_unique<WaveformChartComponent>();
+        waveformChartComponent = std::make_shared<WaveformChartComponent>();
     }
     return waveformChartComponent;
 }

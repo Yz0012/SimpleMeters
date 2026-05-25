@@ -18,6 +18,8 @@ SpectrumAnalyser::SpectrumAnalyser() : forwardFFT(fftOrder), window(fftSize, juc
     }
 
     lastProcessTime = juce::Time::getMillisecondCounterHiRes();
+
+    addAndMakeVisible(&componentControl);
 }
 
 SpectrumAnalyser::~SpectrumAnalyser()
@@ -28,10 +30,12 @@ void SpectrumAnalyser::processAudioBuffer(const juce::AudioBuffer<float>& buffer
 {
     lastProcessTime = juce::Time::getMillisecondCounterHiRes();
 
-    if (!isTimerRunning())
-    {
-        startTimerHz(60);
-    }
+    juce::MessageManager::callAsync([this] {
+        if (!isTimerRunning())
+        {
+            startTimerHz(60);
+        }
+        });
 
     const int numSamples = buffer.getNumSamples();
     if (numSamples == 0) return;
@@ -332,5 +336,18 @@ void SpectrumAnalyser::checkProcessBufferActivity()
     if (now - lastProcessTime > 2000.0)
     {
         stopTimer();
+    }
+}
+
+void SpectrumAnalyser::mouseEnter(const juce::MouseEvent& event)
+{
+    componentControl.setVisible(true);
+}
+
+void SpectrumAnalyser::mouseExit(const juce::MouseEvent&)
+{
+    if (!componentControl.isMouseOver())
+    {
+        componentControl.setVisible(false);
     }
 }

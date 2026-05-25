@@ -7,6 +7,12 @@
       <FILE id="vRjiPQ" name="CreatePushSampleIntoJuceAudioBufferInstance.h"
             compile="0" resource="0" file="Source/CreatePushSampleIntoJuceAudioBufferInstance.h"/>
       <GROUP id="{CBAFAF3B-058A-6BB7-DDA1-0AB3F1C79541}" name="GUI">
+        <GROUP id="{B3A7E3B0-D44C-ABB5-6A0F-7354290171EA}" name="Components">
+          <FILE id="wu7RwC" name="ComponentControl.cpp" compile="1" resource="0"
+                file="Source/GUI/Components/ComponentControl.cpp"/>
+          <FILE id="lqY9Ed" name="ComponentControl.h" compile="0" resource="0"
+                file="Source/GUI/Components/ComponentControl.h"/>
+        </GROUP>
         <FILE id="Fm2idL" name="BufferSizeButton.h" compile="0" resource="0"
               file="Source/GUI/BufferSizeButton.h"/>
         <FILE id="AD01xT" name="BufferSizeButton.cpp" compile="1" resource="0"
@@ -27,6 +33,8 @@
       <GROUP id="{FC19B1E5-F711-0B13-E801-5D13477013D7}" name="Assets">
         <FILE id="NeERhE" name="(L+R)2.png" compile="0" resource="1" file="Source/Assets/(L+R)2.png"/>
         <FILE id="brkXTA" name="closeIcon.png" compile="0" resource="1" file="Source/Assets/closeIcon.png"/>
+        <FILE id="NRgyu4" name="closeIcon10px.png" compile="0" resource="1"
+              file="Source/Assets/closeIcon10px.png"/>
         <FILE id="ixC5a7" name="closeWASAPIButton.png" compile="0" resource="1"
               file="Source/Assets/closeWASAPIButton.png"/>
         <FILE id="elpz0r" name="L-R.png" compile="0" resource="1" file="Source/Assets/L-R.png"/>

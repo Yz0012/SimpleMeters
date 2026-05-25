@@ -38,6 +38,7 @@ private:
 	PushSampleIntoJuceAudioBuffer<float>& pushSampleIntoJuceAudioBuffer = CreatePushSampleIntoJuceAudioBufferInstance::getInstance();
 
 	std::unique_ptr<LookAndFeel> lookAndFeel;
+	//
 	std::unique_ptr<Header> header;
 
 	juce::TooltipWindow tooltipWindow;

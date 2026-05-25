@@ -2,6 +2,7 @@
 
 VectorOscilloscopes::VectorOscilloscopes()
 {
+    addAndMakeVisible(&componentControl);
 }
 
 VectorOscilloscopes::~VectorOscilloscopes()
@@ -45,4 +46,17 @@ void VectorOscilloscopes::paint(juce::Graphics& g)
     }
 
     g.drawImageAt(img, 0, 0);
+}
+
+void VectorOscilloscopes::mouseEnter(const juce::MouseEvent& event)
+{
+    componentControl.setVisible(true);
+}
+
+void VectorOscilloscopes::mouseExit(const juce::MouseEvent&)
+{
+    if (!componentControl.isMouseOver())
+    {
+        componentControl.setVisible(false);
+    }
 }

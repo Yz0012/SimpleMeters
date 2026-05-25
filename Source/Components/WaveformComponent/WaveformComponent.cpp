@@ -16,6 +16,8 @@ WaveformComponent::WaveformComponent()
         createColoursConfiguration.currentColourTheme.getChildWithProperty("name", "WaveformFillR").getProperty("hex").toString(), true));
     gradientColorOfLinesR = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
         createColoursConfiguration.currentColourTheme.getChildWithProperty("name", "WaveformGradientColorOfLinesR").getProperty("hex").toString(), true));
+
+    addAndMakeVisible(&componentControl);
 }
 
 WaveformComponent::~WaveformComponent()
@@ -46,11 +48,11 @@ void WaveformComponent::drawWaveform(
     for (int i = 0; i < localAudioBuffer.getNumChannels(); i++)
     {
         juce::Path waveformPath;
+        waveformPath.preallocateSpace(localAudioBuffer.getNumSamples());
         bool firstPoint = true;
         const float* readPtr = localAudioBuffer.getReadPointer(i);
         for (int x = 0; x < localAudioBuffer.getNumSamples(); ++x)
         {
-
             float y = midY - (readPtr[x] * (height * 0.5f));
             float screenX = leftX + ((float)x * width) / localAudioBuffer.getNumSamples();
 
@@ -188,4 +190,17 @@ void WaveformComponent::drawAxis(juce::Graphics& g, juce::Rectangle<int> area)
 void WaveformComponent::paint(juce::Graphics& g)
 {
     renderNextFrame(g, drawArea);
+}
+
+void WaveformComponent::mouseEnter(const juce::MouseEvent& event)
+{
+    componentControl.setVisible(true);
+}
+
+void WaveformComponent::mouseExit(const juce::MouseEvent&)
+{
+    if (!componentControl.isMouseOver())
+    {
+        componentControl.setVisible(false);
+    }
 }

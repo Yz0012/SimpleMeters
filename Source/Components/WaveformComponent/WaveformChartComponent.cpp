@@ -17,6 +17,8 @@ WaveformChartComponent::WaveformChartComponent()
         createColoursConfiguration.currentColourTheme.getChildWithProperty("name", "WaveformChartFillR").getProperty("hex").toString(), true));
     gradientColorOfLinesR = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
         createColoursConfiguration.currentColourTheme.getChildWithProperty("name", "WaveformChartGradientColorOfLinesR").getProperty("hex").toString(), true));
+
+    addAndMakeVisible(&componentControl);
 }
 
 WaveformChartComponent::~WaveformChartComponent()
@@ -53,6 +55,10 @@ void WaveformChartComponent::paint(juce::Graphics& g)
     {
         juce::Path waveformPath;
         juce::Path fillPath;
+
+        waveformPath.preallocateSpace(numSamples);
+        fillPath.preallocateSpace(numSamples + 2);
+
         std::vector<juce::Point<float>> points;
         points.reserve(numSamples);
         bool firstPoint = true;
@@ -87,7 +93,7 @@ void WaveformChartComponent::paint(juce::Graphics& g)
                 fillPath.lineTo(leftX, midY);
                 fillPath.closeSubPath();
 
-                g.setColour(fillColorL.withAlpha(0.3f));
+                g.setColour(fillColorR.withAlpha(0.3f));
                 g.fillPath(fillPath);
             }
             g.setColour(lineColorR.interpolatedWith(gradientColorOfLinesR, *localAudioBufferRMS));
@@ -105,11 +111,24 @@ void WaveformChartComponent::paint(juce::Graphics& g)
                 fillPath.lineTo(leftX, midY);
                 fillPath.closeSubPath();
 
-                g.setColour(fillColorR.withAlpha(0.3f));
+                g.setColour(fillColorL.withAlpha(0.3f));
                 g.fillPath(fillPath);
             }
             g.setColour(lineColorL.interpolatedWith(gradientColorOfLinesL, *localAudioBufferRMS));
             g.strokePath(waveformPath, juce::PathStrokeType(2.0f));
         }
+    }
+}
+
+void WaveformChartComponent::mouseEnter(const juce::MouseEvent& event)
+{
+    componentControl.setVisible(true);
+}
+
+void WaveformChartComponent::mouseExit(const juce::MouseEvent&)
+{
+    if (!componentControl.isMouseOver())
+    {
+        componentControl.setVisible(false);
     }
 }
