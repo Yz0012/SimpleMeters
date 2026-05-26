@@ -30,12 +30,10 @@ void SpectrumAnalyser::processAudioBuffer(const juce::AudioBuffer<float>& buffer
 {
     lastProcessTime = juce::Time::getMillisecondCounterHiRes();
 
-    juce::MessageManager::callAsync([this] {
-        if (!isTimerRunning())
-        {
-            startTimerHz(60);
-        }
-        });
+    if (!isTimerRunning())
+    {
+        startTimerHz(60);
+    }
 
     const int numSamples = buffer.getNumSamples();
     if (numSamples == 0) return;

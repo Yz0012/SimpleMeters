@@ -14,8 +14,7 @@ public:
 
     void pushSample(int channel, T sample)
     {
-        T sampleLimited = juce::jlimit(-1.0f, 1.0f, sample);
-        audioBuffer.setSample(channel, writeIndexes[channel], sampleLimited);
+        buffers[currentWriteIdx].setSample(channel, writeIndexes[channel], sample);
         ++writeIndexes[channel];
 
         if (writeIndexes[channel] >= bufferSize)
@@ -27,9 +26,13 @@ public:
 
             if (allReady)
             {
-                //线程安全
-                localAudioBuffer = audioBuffer;
-                localAudioBufferRMS = getLocalAudioBufferRMS(0, 0, localAudioBuffer.getNumSamples());
+                /* Although computation should not be placed in the audio thread, about 1000 float samples will not block the audio thread.
+                The computation process on modern CPUs only takes a few microseconds.
+                Considering that it is possible to implement automatic start and stop callbacks, I think it is worth it. */
+                localAudioBufferRMS = buffers[currentWriteIdx].getRMSLevel(0, 0, bufferSize);
+                // Thread-safe
+                activeReadIndex.store(currentWriteIdx, std::memory_order_release);
+                currentWriteIdx = 1 - currentWriteIdx;
 
                 if (localAudioBufferRMS < rmsSilenceThreshold)
                 {
@@ -44,17 +47,17 @@ public:
                         if (silentBufferCount == bufferCountThreshold)
                         {
                             ++silentBufferCount;
-                            muteCallback();
+                            juce::MessageManager::callAsync([this] { muteCallback(); });
                         }
                         return;
                     }
                 }
                 else
                 {
-                    if (silentBufferCount == bufferCountThreshold + 1) startCallback();
+                    if (silentBufferCount == bufferCountThreshold + 1) juce::MessageManager::callAsync([this] { startCallback(); });;
                     silentBufferCount = 0;
                 }
-                fullAudioBufferCallback();
+                juce::MessageManager::callAsync([this] { fullAudioBufferCallback(); });
                 for (auto& idx : writeIndexes) idx = 0;
                 std::fill(channelReady.begin(), channelReady.end(), false);
             }
@@ -66,7 +69,7 @@ public:
     */
     CallbackId add(Callback cb)
     {
-        std::lock_guard lock(callbacksMutex);
+        std::lock_guard lock(fullCallbacksMutex);
         CallbackId id = nextId++;
         callbacks.push_back({ id, std::move(cb) });
         return id;
@@ -75,7 +78,7 @@ public:
     /* Remove the method pointer to be called based on the id. */
     bool remove(CallbackId id)
     {
-        std::lock_guard lock(callbacksMutex);
+        std::lock_guard lock(fullCallbacksMutex);
         auto it = std::find_if(callbacks.begin(), callbacks.end(),
             [id](const auto& pair) { return pair.first == id; });
         if (it != callbacks.end()) {
@@ -88,7 +91,7 @@ public:
     /* Remove all registered callbacks */
     void removeAll()
     {
-        std::lock_guard lock(callbacksMutex);
+        std::lock_guard lock(fullCallbacksMutex);
         callbacks.clear();
         this->nextId = 1;
     }
@@ -100,7 +103,7 @@ public:
     */
     CallbackId addM(Callback cb)
     {
-        std::lock_guard lock(callbacksMutex);
+        std::lock_guard lock(muteCallbacksMutex);
         CallbackId id = nextIdM++;
         muteCallbacks.push_back({ id, std::move(cb) });
         return id;
@@ -109,7 +112,7 @@ public:
     /* Remove the method pointer to be called based on the id. */
     bool removeM(CallbackId id)
     {
-        std::lock_guard lock(callbacksMutex);
+        std::lock_guard lock(muteCallbacksMutex);
         auto it = std::find_if(muteCallbacks.begin(), muteCallbacks.end(),
             [id](const auto& pair) { return pair.first == id; });
         if (it != muteCallbacks.end()) {
@@ -122,7 +125,7 @@ public:
     /* Remove all registered callbacks */
     void removeAllM()
     {
-        std::lock_guard lock(callbacksMutex);
+        std::lock_guard lock(muteCallbacksMutex);
         muteCallbacks.clear();
         this->nextIdM = 1;
     }
@@ -133,7 +136,7 @@ public:
     */
     CallbackId addS(Callback cb)
     {
-        std::lock_guard lock(callbacksMutex);
+        std::lock_guard lock(startCallbacksMutex);
         CallbackId id = nextIdS++;
         startCallbacks.push_back({ id, std::move(cb) });
         return id;
@@ -142,7 +145,7 @@ public:
     /* Remove the method pointer to be called based on the id. */
     bool removeS(CallbackId id)
     {
-        std::lock_guard lock(callbacksMutex);
+        std::lock_guard lock(startCallbacksMutex);
         auto it = std::find_if(startCallbacks.begin(), startCallbacks.end(),
             [id](const auto& pair) { return pair.first == id; });
         if (it != startCallbacks.end()) {
@@ -155,68 +158,73 @@ public:
     /* Remove all registered callbacks */
     void removeAllS()
     {
-        std::lock_guard lock(callbacksMutex);
+        std::lock_guard lock(startCallbacksMutex);
         startCallbacks.clear();
-        this->nextId = 1;
+        this->nextIdS = 1;
     }
 
-    /* Return audio buffer,But it still being written.
+    /* Return audio buffer,But it may still being written.
     If you want to use a static buffer,use getLocalAudioBuffer().
-    */
-    const juce::AudioBuffer<T> getAudioBuffer() const
+    You'd better not use this thing. */
+    const juce::AudioBuffer<T> getAudioBuffer(int idx) const
     {
-        return audioBuffer;
+        return buffers[idx];
 	}
 
     /* Return audio buffer read pointer,But it still being written.
     If you want to use a static buffer,use getLocalAudioBuffer().
-    */
-    const juce::AudioBuffer<T>* getAudioBufferReadPointer() const
+    You'd better not use this thing. */
+    const juce::AudioBuffer<T>* getAudioBufferReadPointer(int idx) const
     {
-        return &audioBuffer;
+        return &buffers[idx];
     }
 
     /* Return Local Audio Buffer. */
     const juce::AudioBuffer<T> getLocalAudioBuffer() const
     {
-        return localAudioBuffer;
+        int idx = activeReadIndex.load(std::memory_order_acquire);
+        return buffers[idx];
     }
 
     /* Return Local Audio Buffer Read Pointer. */
     const juce::AudioBuffer<T>* getLocalAudioBufferReadPointer() const
     {
-        return &localAudioBuffer;
+        int idx = activeReadIndex.load(std::memory_order_acquire);
+        return &buffers[idx];
 	}
 
     /* Return a Local Audio Buffer reference. */
     const juce::AudioBuffer<T>& getLocalAudioBufferReference() const
     {
-        return localAudioBuffer;
+        int idx = activeReadIndex.load(std::memory_order_acquire);
+        return buffers[idx];
     }
 
     /* The newly added data in the process of calculating the RMS may affect 
-    the returned results. */
-    T getAudioBufferRMS(int channel, int startSample, int numSamples) const
+    the returned results.
+    You'd better not use this thing. */
+    T getAudioBufferRMS(int channel, int startSample, int numSamples, int idx) const
     {
-		return audioBuffer.getRMSLevel(channel, startSample, numSamples);
+		return buffers[idx].getRMSLevel(channel, startSample, numSamples);
     }
 
     /* Return localAudioBuffer RMS,the RMS will calculating when the function 
     called. */
     T getLocalAudioBufferRMS(int channel, int startSample, int numSamples) const
     {
-        return localAudioBuffer.getRMSLevel(channel, startSample, numSamples);
+        int idx = activeReadIndex.load(std::memory_order_acquire);
+        return buffers[idx].getRMSLevel(channel, startSample, numSamples);
     }
 
-    /* Return localAudioBuffer RMS Read Pointer. */
-    template <typename T>
+    /* Return localAudioBuffer RMS Read Pointer. It might read a torn value
+    (although floats are usually atomic, it's not guaranteed), but this will be changed later. */
     const T* getLocalAudioBufferRMSReadPointer() const
     {
         return &localAudioBufferRMS;
     }
 
-    /* Return localAudioBuffer RMS reference. */
-    template <typename T>
+    /* Return localAudioBuffer RMS reference. It might read a torn value
+    (although floats are usually atomic, it's not guaranteed), but this will be changed later. */
     const T& getLocalAudioBufferRMSReference() const
     {
         return localAudioBufferRMS;
@@ -234,21 +242,22 @@ public:
         return bufferSize;
     }
 
-	/* Callback when the buffer is full. */
+private:
+    /* Callback when the buffer is full. */
     void fullAudioBufferCallback()
     {
-        std::lock_guard lock(callbacksMutex);
+        std::lock_guard lock(fullCallbacksMutex);
         auto copy = callbacks;
         for (auto& [id, cb] : copy) {
-            if(cb) cb();
+            if (cb) cb();
         }
     }
 
-    /* Called after the specified number of buffered samples 
+    /* Called after the specified number of buffered samples
     are all below the specified RMS threshold. */
     void muteCallback()
     {
-        std::lock_guard lock(callbacksMutex);
+        std::lock_guard lock(muteCallbacksMutex);
         auto copy = muteCallbacks;
         for (auto& [id, cb] : copy)
         {
@@ -259,7 +268,7 @@ public:
     /* Callback after the sample in the buffer reaches the threshold. */
     void startCallback()
     {
-        std::lock_guard lock(callbacksMutex);
+        std::lock_guard lock(startCallbacksMutex);
         auto copy = startCallbacks;
         for (auto& [id, cb] : copy)
         {
@@ -267,38 +276,38 @@ public:
         }
     }
 
-private:
-	juce::AudioBuffer<T> audioBuffer;
-    juce::AudioBuffer<T> localAudioBuffer;
 	std::vector<int> writeIndexes;
 	std::vector<bool> channelReady;
 	int allChannels = 0;
     int bufferSize = 0;
     CallbackId nextId = 1;
-    CallbackId nextIdR = 1;
     CallbackId nextIdM = 1;
     CallbackId nextIdS = 1;
     std::vector<std::pair<CallbackId, Callback>> callbacks;
-    std::vector<std::pair<CallbackId, Callback>> realTimeCallbacks;
     std::vector<std::pair<CallbackId, Callback>> muteCallbacks;
     std::vector<std::pair<CallbackId, Callback>> startCallbacks;
-    std::mutex callbacksMutex;
+    std::mutex fullCallbacksMutex;
+    std::mutex muteCallbacksMutex;
+    std::mutex startCallbacksMutex;
     T localAudioBufferRMS;
     static constexpr float rmsSilenceThreshold = 0.00001f;
     int silentBufferCount = 0;
     int bufferCountThreshold = 200;
+    std::array<juce::AudioBuffer<T>, 2> buffers;
+    std::atomic<int> activeReadIndex{ 0 };
+    int currentWriteIdx = 1;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PushSampleIntoJuceAudioBuffer);
 };
 
 template <typename T>
 PushSampleIntoJuceAudioBuffer<T>::PushSampleIntoJuceAudioBuffer(int allChannels, int bufferSize)
+    : allChannels(allChannels), bufferSize(bufferSize),
+    writeIndexes(allChannels, 0), channelReady(allChannels, false)
 {
-	writeIndexes.resize(allChannels, 0);
-    channelReady.resize(allChannels);
-	audioBuffer.setSize(allChannels, bufferSize);
-	this->allChannels = allChannels;
-	this->bufferSize = bufferSize;
+    for (auto& buf : buffers) buf.setSize(allChannels, bufferSize);
+    buffers[0].clear();
+    activeReadIndex.store(0, std::memory_order_release);
 }
 
 template <typename T>

@@ -37,7 +37,7 @@ public:
 private:
 	PushSampleIntoJuceAudioBuffer<float>& pushSampleIntoJuceAudioBuffer = CreatePushSampleIntoJuceAudioBufferInstance::getInstance();
 
-	std::unique_ptr<LookAndFeel> lookAndFeel;
+	LookAndFeel lookAndFeel;
 	//
 	std::unique_ptr<Header> header;
 

@@ -4,10 +4,9 @@ MainComponent::MainComponent()
 {
     setOpaque(true);
 
-    lookAndFeel = std::make_unique<LookAndFeel>();
     header = std::make_unique<Header>();
 
-    juce::LookAndFeel::setDefaultLookAndFeel(lookAndFeel.get());
+    juce::LookAndFeel::setDefaultLookAndFeel(&lookAndFeel);
 
     CreateColoursConfiguration& createColoursConfiguration = CreateColoursConfiguration::getInstance();
 
@@ -155,181 +154,153 @@ void MainComponent::mouseExit(const juce::MouseEvent&)
 
 void MainComponent::openSpectrumAnalyser(int x, int y)
 {
-    juce::MessageManager::callAsync([this, x, y]()
+    auto spectrum = ComponentManagement::getInstance().getSpectrumAnalyser();
+
+    if (!spectrum->callbackId)
+    {
+        spectrum->callbackId = pushSampleIntoJuceAudioBuffer.add(
+            [this, spectrum]()
+            {
+                spectrum->processAudioBuffer(
+                    pushSampleIntoJuceAudioBuffer.getLocalAudioBufferReference());
+            });
+    }
+
+    if (!spectrum->callbackIdS)
+    {
+        spectrum->callbackIdS = pushSampleIntoJuceAudioBuffer.addS(
+            [spectrum]()
+            {
+                spectrum->callstartTimerHz(60);
+            });
+    }
+
+    if (!spectrum->callbackIdM)
+    {
+        spectrum->callbackIdM = pushSampleIntoJuceAudioBuffer.addM(
+            [spectrum]()
+            {
+                spectrum->callStopTimer();
+                spectrum->scopeDataReset();
+                spectrum->repaint();
+            });
+    }
+
+    addAndMakeVisible(spectrum.get());
+    spectrum->componentControl.setBounds(480, 10, 10, 10);
+
+    std::weak_ptr<SpectrumAnalyser> weakSpectrum = spectrum;
+    spectrum->componentControl.setCallBackFuntion([this, weakSpectrum]()
         {
-            auto spectrum = ComponentManagement::getInstance().getSpectrumAnalyser();
-
-            if (!spectrum->callbackId)
+            if (auto sp = weakSpectrum.lock())
             {
-                spectrum->callbackId = pushSampleIntoJuceAudioBuffer.add(
-                    [this, spectrum]()
-                    {
-                        spectrum->processAudioBuffer(
-                            pushSampleIntoJuceAudioBuffer.getLocalAudioBufferReference());
-                    });
+                pushSampleIntoJuceAudioBuffer.remove(sp->callbackId);
+                pushSampleIntoJuceAudioBuffer.removeS(sp->callbackIdS);
+                pushSampleIntoJuceAudioBuffer.removeM(sp->callbackIdM);
             }
-
-            if (!spectrum->callbackIdS)
-            {
-                spectrum->callbackIdS = pushSampleIntoJuceAudioBuffer.addS(
-                    [this, spectrum]()
-                    {
-                        juce::MessageManager::callAsync([spectrum]()
-                            {
-                                spectrum->callstartTimerHz(60);
-                            });
-                    });
-            }
-
-            if (!spectrum->callbackIdM)
-            {
-                spectrum->callbackIdM = pushSampleIntoJuceAudioBuffer.addM(
-                    [this, spectrum]()
-                    {
-                        juce::MessageManager::callAsync([spectrum]()
-                            {
-                                spectrum->callStopTimer();
-                                spectrum->scopeDataReset();
-                                spectrum->repaint();
-                            });
-                    });
-            }
-
-            addAndMakeVisible(spectrum.get());
-            spectrum->componentControl.setBounds(480, 10, 10, 10);
-
-            std::weak_ptr<SpectrumAnalyser> weakSpectrum = spectrum;
-            spectrum->componentControl.setCallBackFuntion([this, weakSpectrum]()
-                {
-                    if (auto sp = weakSpectrum.lock())
-                    {
-                        pushSampleIntoJuceAudioBuffer.remove(sp->callbackId);
-                        pushSampleIntoJuceAudioBuffer.removeS(sp->callbackIdS);
-                        pushSampleIntoJuceAudioBuffer.removeM(sp->callbackIdM);
-                    }
-                    ComponentManagement::getInstance().resetSpectrumAnalyser();
-                });
-
-            spectrum->setBounds(x, y, 500, 150);
-            spectrum->drawArea.setBounds(0, 0, 500, 150);
+            ComponentManagement::getInstance().resetSpectrumAnalyser();
         });
+
+    spectrum->setBounds(x, y, 500, 150);
+    spectrum->drawArea.setBounds(0, 0, 500, 150);
 }
 
 void MainComponent::openWaveformComponent(int x, int y)
 {
-    juce::MessageManager::callAsync([this, x, y]()
-        {
-            auto waveform = ComponentManagement::getInstance().getWaveformComponent();
+    auto waveform = ComponentManagement::getInstance().getWaveformComponent();
 
-            if (!waveform->callbackId)
+    if (!waveform->callbackId)
+    {
+        waveform->callbackId = pushSampleIntoJuceAudioBuffer.add(
+            [this, waveform]()
             {
-                waveform->callbackId = pushSampleIntoJuceAudioBuffer.add(
-                    [this, waveform]()
-                    {
-                        juce::MessageManager::callAsync([waveform, this]()
-                            {
-                                waveform->drawWaveform(
-                                    pushSampleIntoJuceAudioBuffer.getLocalAudioBufferReference(),
-                                    pushSampleIntoJuceAudioBuffer.getLocalAudioBufferRMSReference<float>());
-                            });
-                    });
+                waveform->drawWaveform(
+                    pushSampleIntoJuceAudioBuffer.getLocalAudioBufferReference(),
+                    pushSampleIntoJuceAudioBuffer.getLocalAudioBufferRMSReference());
+            });
+    }
+
+    addAndMakeVisible(waveform.get());
+    waveform->componentControl.setBounds(480, 10, 10, 10);
+
+    std::weak_ptr<WaveformComponent> weakWaveform = waveform;
+    waveform->componentControl.setCallBackFuntion([this, weakWaveform]()
+        {
+            if (auto wf = weakWaveform.lock())
+            {
+                pushSampleIntoJuceAudioBuffer.remove(wf->callbackId);
             }
-
-            addAndMakeVisible(waveform.get());
-            waveform->componentControl.setBounds(480, 10, 10, 10);
-
-            std::weak_ptr<WaveformComponent> weakWaveform = waveform;
-            waveform->componentControl.setCallBackFuntion([this, weakWaveform]()
-                {
-                    if (auto wf = weakWaveform.lock())
-                    {
-                        pushSampleIntoJuceAudioBuffer.remove(wf->callbackId);
-                    }
-                    ComponentManagement::getInstance().resetWaveformComponent();
-                });
-
-            waveform->setBounds(x, y, 500, 150);
-            waveform->tileArea.setBounds(0, 0, 16, 150);
-            waveform->drawArea.setBounds(0, 0, 500, 150);
+            ComponentManagement::getInstance().resetWaveformComponent();
         });
+
+    waveform->setBounds(x, y, 500, 150);
+    waveform->tileArea.setBounds(0, 0, 16, 150);
+    waveform->drawArea.setBounds(0, 0, 500, 150);
 }
 
 void MainComponent::openVectorOscilloscopeComponent(int x, int y)
 {
-    juce::MessageManager::callAsync([this, x, y]()
-        {
-            auto vector = ComponentManagement::getInstance().getVectorOscilloscopes();
+    auto vector = ComponentManagement::getInstance().getVectorOscilloscopes();
 
-            if (!vector->callbackId)
+    if (!vector->callbackId)
+    {
+        vector->callbackId = pushSampleIntoJuceAudioBuffer.add(
+            [this, vector]()
             {
                 vector->pushStereoBuffer(
                     pushSampleIntoJuceAudioBuffer.getLocalAudioBufferReadPointer());
+                vector->repaint();
+            });
+    }
 
-                vector->callbackId = pushSampleIntoJuceAudioBuffer.add(
-                    [this, vector]()
-                    {
-                        juce::MessageManager::callAsync([vector]()
-                            {
-                                vector->repaint();
-                            });
-                    });
+    addAndMakeVisible(vector.get());
+    vector->componentControl.setBounds(280, 10, 10, 10);
+
+    std::weak_ptr<VectorOscilloscopes> weakVector = vector;
+    vector->componentControl.setCallBackFuntion([this, weakVector]()
+        {
+            if (auto vec = weakVector.lock())
+            {
+                pushSampleIntoJuceAudioBuffer.remove(vec->callbackId);
             }
-
-            addAndMakeVisible(vector.get());
-            vector->componentControl.setBounds(280, 10, 10, 10);
-
-            std::weak_ptr<VectorOscilloscopes> weakVector = vector;
-            vector->componentControl.setCallBackFuntion([this, weakVector]()
-                {
-                    if (auto vec = weakVector.lock())
-                    {
-                        pushSampleIntoJuceAudioBuffer.remove(vec->callbackId);
-                    }
-                    ComponentManagement::getInstance().resetVectorOscilloscopes();
-                });
-
-            vector->setBounds(x, y, 300, 300);
+            ComponentManagement::getInstance().resetVectorOscilloscopes();
         });
+
+    vector->setBounds(x, y, 300, 300);
 }
 
 void MainComponent::openWaveformChartComponent(int x, int y)
 {
-    juce::MessageManager::callAsync([this, x, y]()
-        {
-            auto chart = ComponentManagement::getInstance().getWaveformChartComponent();
+    auto chart = ComponentManagement::getInstance().getWaveformChartComponent();
 
-            if (!chart->callbackId)
+    if (!chart->callbackId)
+    {
+
+        chart->callbackId = pushSampleIntoJuceAudioBuffer.add(
+            [this, chart]()
             {
                 chart->pushStereoBuffer(
                     pushSampleIntoJuceAudioBuffer.getLocalAudioBufferReadPointer(),
-                    pushSampleIntoJuceAudioBuffer.getLocalAudioBufferRMSReadPointer<float>());
+                    pushSampleIntoJuceAudioBuffer.getLocalAudioBufferRMSReadPointer());
+                chart->repaint();
+            });
+    }
 
-                chart->callbackId = pushSampleIntoJuceAudioBuffer.add(
-                    [this, chart]()
-                    {
-                        juce::MessageManager::callAsync([chart]()
-                            {
-                                chart->repaint();
-                            });
-                    });
+    addAndMakeVisible(chart.get());
+    chart->componentControl.setBounds(480, 10, 10, 10);
+
+    std::weak_ptr<WaveformChartComponent> weakChart = chart;
+    chart->componentControl.setCallBackFuntion([this, weakChart]()
+        {
+            if (auto ch = weakChart.lock())
+            {
+                pushSampleIntoJuceAudioBuffer.remove(ch->callbackId);
             }
-
-            addAndMakeVisible(chart.get());
-            chart->componentControl.setBounds(480, 10, 10, 10);
-
-            std::weak_ptr<WaveformChartComponent> weakChart = chart;
-            chart->componentControl.setCallBackFuntion([this, weakChart]()
-                {
-                    if (auto ch = weakChart.lock())
-                    {
-                        pushSampleIntoJuceAudioBuffer.remove(ch->callbackId);
-                    }
-                    ComponentManagement::getInstance().resetWaveformChartComponent();
-                });
-
-            chart->setBounds(x, y, 500, 150);
-            chart->drawArea.setBounds(0, 0, 500, 150);
+            ComponentManagement::getInstance().resetWaveformChartComponent();
         });
+
+    chart->setBounds(x, y, 500, 150);
+    chart->drawArea.setBounds(0, 0, 500, 150);
 }
 
 void MainComponent::userTriedToCloseWindow()
