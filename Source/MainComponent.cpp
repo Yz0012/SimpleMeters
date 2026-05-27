@@ -281,7 +281,7 @@ void MainComponent::openWaveformChartComponent(int x, int y)
             {
                 chart->pushStereoBuffer(
                     pushSampleIntoJuceAudioBuffer.getLocalAudioBufferReadPointer(),
-                    pushSampleIntoJuceAudioBuffer.getLocalAudioBufferRMSReadPointer());
+                    pushSampleIntoJuceAudioBuffer.getLocalAudioBufferRMS());
                 chart->repaint();
             });
     }

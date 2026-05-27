@@ -216,18 +216,16 @@ public:
         return buffers[idx].getRMSLevel(channel, startSample, numSamples);
     }
 
-    /* Return localAudioBuffer RMS Read Pointer. It might read a torn value
-    (although floats are usually atomic, it's not guaranteed), but this will be changed later. */
-    const T* getLocalAudioBufferRMSReadPointer() const
+    /* Return localAudioBuffer RMS Read Pointer. */
+    const T getLocalAudioBufferRMS() const
     {
-        return &localAudioBufferRMS;
+        return localAudioBufferRMS.load(std::memory_order_acquire);
     }
 
-    /* Return localAudioBuffer RMS reference. It might read a torn value
-    (although floats are usually atomic, it's not guaranteed), but this will be changed later. */
+    /* Return localAudioBuffer RMS reference. */
     const T& getLocalAudioBufferRMSReference() const
     {
-        return localAudioBufferRMS;
+        return localAudioBufferRMS.load(std::memory_order_acquire);
     }
 
     /* Return number of channels. */
@@ -289,7 +287,7 @@ private:
     std::mutex fullCallbacksMutex;
     std::mutex muteCallbacksMutex;
     std::mutex startCallbacksMutex;
-    T localAudioBufferRMS;
+    std::atomic<T> localAudioBufferRMS;
     static constexpr float rmsSilenceThreshold = 0.00001f;
     int silentBufferCount = 0;
     int bufferCountThreshold = 200;

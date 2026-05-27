@@ -17,7 +17,7 @@ public:
 
     void clear();
 
-    void pushStereoBuffer(const juce::AudioBuffer<float>* localAudioBuffer, const float* localAudioBufferRMS);
+    void pushStereoBuffer(const juce::AudioBuffer<float>* localAudioBuffer, const float localAudioBufferRMS);
 
     const std::vector<float> dbValues = {
     -6.f, -12.f
@@ -30,7 +30,8 @@ public:
     ComponentControl componentControl;
 private:
     const juce::AudioBuffer<float>* localAudioBuffer = nullptr;
-    const float* localAudioBufferRMS = nullptr;
+    //消除拷贝
+    float localAudioBufferRMS;
 
     juce::Colour lineColorL = juce::Colours::blueviolet;
     juce::Colour fillColorL = juce::Colours::blueviolet;

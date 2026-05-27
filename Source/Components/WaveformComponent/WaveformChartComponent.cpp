@@ -30,7 +30,7 @@ void WaveformChartComponent::clear()
     DBG("waveformchart buffer clear.");
 }
 
-void WaveformChartComponent::pushStereoBuffer(const juce::AudioBuffer<float>* localAudioBuffer,const float* localAudioBufferRMS)
+void WaveformChartComponent::pushStereoBuffer(const juce::AudioBuffer<float>* localAudioBuffer,const float localAudioBufferRMS)
 {
     this->localAudioBuffer = localAudioBuffer;
     this->localAudioBufferRMS = localAudioBufferRMS;
@@ -39,7 +39,6 @@ void WaveformChartComponent::pushStereoBuffer(const juce::AudioBuffer<float>* lo
 void WaveformChartComponent::paint(juce::Graphics& g)
 {
     if (localAudioBuffer == nullptr) return;
-    if (localAudioBufferRMS == nullptr) return;
     const int numSamples = localAudioBuffer->getNumSamples();
     if (numSamples == 0) return;
 
@@ -96,7 +95,7 @@ void WaveformChartComponent::paint(juce::Graphics& g)
                 g.setColour(fillColorR.withAlpha(0.3f));
                 g.fillPath(fillPath);
             }
-            g.setColour(lineColorR.interpolatedWith(gradientColorOfLinesR, *localAudioBufferRMS));
+            g.setColour(lineColorR.interpolatedWith(gradientColorOfLinesR, localAudioBufferRMS));
             g.strokePath(waveformPath, juce::PathStrokeType(2.0f));
         }
         else
@@ -114,7 +113,7 @@ void WaveformChartComponent::paint(juce::Graphics& g)
                 g.setColour(fillColorL.withAlpha(0.3f));
                 g.fillPath(fillPath);
             }
-            g.setColour(lineColorL.interpolatedWith(gradientColorOfLinesL, *localAudioBufferRMS));
+            g.setColour(lineColorL.interpolatedWith(gradientColorOfLinesL, localAudioBufferRMS));
             g.strokePath(waveformPath, juce::PathStrokeType(2.0f));
         }
     }
