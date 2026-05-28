@@ -32,6 +32,8 @@
       </GROUP>
       <GROUP id="{FC19B1E5-F711-0B13-E801-5D13477013D7}" name="Assets">
         <FILE id="NeERhE" name="(L+R)2.png" compile="0" resource="1" file="Source/Assets/(L+R)2.png"/>
+        <FILE id="lNRPEH" name="CascadiaMono.ttf" compile="0" resource="1"
+              file="Source/Assets/CascadiaMono.ttf"/>
         <FILE id="brkXTA" name="closeIcon.png" compile="0" resource="1" file="Source/Assets/closeIcon.png"/>
         <FILE id="NRgyu4" name="closeIcon10px.png" compile="0" resource="1"
               file="Source/Assets/closeIcon10px.png"/>
@@ -40,6 +42,7 @@
         <FILE id="elpz0r" name="L-R.png" compile="0" resource="1" file="Source/Assets/L-R.png"/>
         <FILE id="tmab0P" name="LAR.png" compile="0" resource="1" file="Source/Assets/LAR.png"/>
         <FILE id="HgEQ9E" name="LRLRLRLR.png" compile="0" resource="1" file="Source/Assets/LRLRLRLR.png"/>
+        <FILE id="sOci6S" name="OFL.txt" compile="0" resource="1" file="Source/Assets/OFL.txt"/>
         <FILE id="Zy1mqf" name="openWASAPIButton.png" compile="0" resource="1"
               file="Source/Assets/openWASAPIButton.png"/>
         <FILE id="qaeXQc" name="phaseCorrelationCurveComponent.png" compile="0"

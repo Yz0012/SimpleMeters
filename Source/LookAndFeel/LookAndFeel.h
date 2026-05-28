@@ -58,6 +58,9 @@ public:
         setColour(juce::TextEditor::highlightColourId, TextEditorHighlightColour);
         setColour(juce::TextEditor::outlineColourId, TextEditorOutlineColour);
         setColour(juce::TextEditor::focusedOutlineColourId, TextEditorFocusedOutlineColour);
+
+        cascadiaTypeface = juce::Typeface::createSystemTypefaceFor(BinaryData::CascadiaMono_ttf, BinaryData::CascadiaMono_ttfSize);
+        setDefaultSansSerifTypeface(cascadiaTypeface);
     }
 
     void drawPopupMenuBackground(juce::Graphics& g, int width, int height) override
@@ -69,11 +72,23 @@ public:
         const juce::Rectangle<int>& textArea,
         juce::TextLayout& textLayout) override
     {
+        auto bounds = alert.getLocalBounds().reduced(1);
+        g.reduceClipRegion(bounds);
+
+        auto iconSpaceUsed = 50;
+
         g.setColour(alert.findColour(juce::AlertWindow::outlineColourId));
         g.drawRect(alert.getLocalBounds());
 
         g.setColour(alert.findColour(juce::AlertWindow::backgroundColourId));
         g.fillRect(alert.getLocalBounds());
+
+        g.setColour(alert.findColour(juce::AlertWindow::textColourId));
+
+        juce::Rectangle<int> alertBounds(bounds.getX() + iconSpaceUsed, 30,
+            bounds.getWidth(), bounds.getHeight() - getAlertWindowButtonHeight() - 20);
+
+        textLayout.draw(g, alertBounds.toFloat());
     }
 
     void drawButtonBackground(juce::Graphics& g,
@@ -105,6 +120,8 @@ public:
     }
 
 private:
+    juce::Typeface::Ptr cascadiaTypeface;
+
     juce::Colour PopupMenuTextColour = juce::Colours::blue;
     juce::Colour PopupMenuBackgroundColour = juce::Colours::black;
     juce::Colour MessageWindowTextColour = juce::Colours::blue;
