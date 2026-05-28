@@ -27,10 +27,12 @@ MainComponent::MainComponent()
                 "Enter Width and Height,please don't input zero or any number smaller then 200 :)",
                 juce::AlertWindow::QuestionIcon);
 
+            aw->setOpaque(false);
+            aw->setDropShadowEnabled(false);
             aw->addTextEditor("Width", "", "Width");
             aw->addTextEditor("Height", "", "Height");
-            aw->getTextEditor("Width")->setInputRestrictions(5,"0123456789");
-            aw->getTextEditor("Height")->setInputRestrictions(5, "0123456789");
+            aw->getTextEditor("Width")->setInputRestrictions(4,"0123456789");
+            aw->getTextEditor("Height")->setInputRestrictions(4, "0123456789");
             aw->addButton("OK", 1, juce::KeyPress(juce::KeyPress::returnKey));
             aw->addButton("Cancel", 0, juce::KeyPress(juce::KeyPress::escapeKey));
 
