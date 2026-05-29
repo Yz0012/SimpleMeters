@@ -1,6 +1,6 @@
 # SimpleMeters
 
-[英文](README.md)
+[English](README.md)
 
 <img width="1874" height="750" alt="image" src="https://github.com/user-attachments/assets/5a84ee06-4f50-4896-b887-696275f495fd" />
 
