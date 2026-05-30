@@ -11,7 +11,6 @@ public:
 
 	void paint(juce::Graphics&) override;
 
-	//void mouseDown(const juce::MouseEvent& event) override;
 	void mouseEnter(const juce::MouseEvent& event) override;
 private:
 

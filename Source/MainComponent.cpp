@@ -17,6 +17,7 @@ MainComponent::MainComponent()
     addAndMakeVisible(header.get());
     header->WASAPIButton.setBounds(20,10,30,30);
     header->windowsSizeButton.setBounds(60,10,30,30);
+    header->headerFixedButton.setBounds(100,10,30,30);
     header->windowControl.setTooltip("Close");
     header->WASAPIButton.setTooltip("Enable or disable miniaudio WASAPI loopback");
     header->windowsSizeButton.setTooltip("Resize Window");
@@ -148,7 +149,7 @@ void MainComponent::mouseEnter(const juce::MouseEvent&)
 
 void MainComponent::mouseExit(const juce::MouseEvent&)
 {
-    if (!header->isMouseOver())
+    if (!header->isMouseOver() && !header->headerFixedButton.getHeaderFixed())
     {
         header->setVisible(false);
     }

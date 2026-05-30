@@ -64,7 +64,7 @@ public:
 private:
     double lastProcessTime = 0;
 
-    AnalysisMode currentMode = Interleaved;
+    AnalysisMode currentMode = Mono;
 
     juce::Colour lineColor = juce::Colour(0xFF8400FF);
     juce::Colour fillColor = juce::Colour(0xFF8400FF);
@@ -85,7 +85,7 @@ private:
     float fftData2[fftSize * 2];
     int fifoIndex2 = 0;
     bool nextFFTBlockReady2 = false;
-
+     
     float scopeData2[scopeSize];
     float scopeDataStorage2[scopeSize];
     float gapSmoothedScopeData2[scopeSize];

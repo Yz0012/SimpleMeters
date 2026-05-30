@@ -7,12 +7,20 @@
       <FILE id="vRjiPQ" name="CreatePushSampleIntoJuceAudioBufferInstance.h"
             compile="0" resource="0" file="Source/CreatePushSampleIntoJuceAudioBufferInstance.h"/>
       <GROUP id="{CBAFAF3B-058A-6BB7-DDA1-0AB3F1C79541}" name="GUI">
+        <FILE id="QEPf9O" name="ThemeConfigurationButton.cpp" compile="1" resource="0"
+              file="Source/GUI/ThemeConfigurationButton.cpp"/>
+        <FILE id="YGNemZ" name="ThemeConfigurationButton.h" compile="0" resource="0"
+              file="Source/GUI/ThemeConfigurationButton.h"/>
+        <FILE id="XPZXsX" name="HeaderFixedButton.cpp" compile="1" resource="0"
+              file="Source/GUI/HeaderFixedButton.cpp"/>
         <GROUP id="{B3A7E3B0-D44C-ABB5-6A0F-7354290171EA}" name="Components">
           <FILE id="wu7RwC" name="ComponentControl.cpp" compile="1" resource="0"
                 file="Source/GUI/Components/ComponentControl.cpp"/>
           <FILE id="lqY9Ed" name="ComponentControl.h" compile="0" resource="0"
                 file="Source/GUI/Components/ComponentControl.h"/>
         </GROUP>
+        <FILE id="Kvpw94" name="HeaderFixedButton.h" compile="0" resource="0"
+              file="Source/GUI/HeaderFixedButton.h"/>
         <FILE id="Fm2idL" name="BufferSizeButton.h" compile="0" resource="0"
               file="Source/GUI/BufferSizeButton.h"/>
         <FILE id="AD01xT" name="BufferSizeButton.cpp" compile="1" resource="0"
@@ -56,6 +64,8 @@
               file="Source/Assets/RMSComponent.png"/>
         <FILE id="F7wIHS" name="spectrumAnalyzerIcon.png" compile="0" resource="1"
               file="Source/Assets/spectrumAnalyzerIcon.png"/>
+        <FILE id="CKL69P" name="themeConfigurationIcon.png" compile="0" resource="1"
+              file="Source/Assets/themeConfigurationIcon.png"/>
         <FILE id="Nfq6eM" name="VectorOscilloscopeComponent.png" compile="0"
               resource="1" file="Source/Assets/VectorOscilloscopeComponent.png"/>
         <FILE id="pgn3Pf" name="WaveformComponent.png" compile="0" resource="1"

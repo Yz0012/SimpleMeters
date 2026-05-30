@@ -209,7 +209,7 @@ void SpectrumAnalyser::drawSingleCurve(juce::Graphics& g,
             linePath.startNewSubPath(bounds.getX(), y);
             firstPoint = false;
 
-            gapSmoothedScopeData[i] = (scopeData[i] - scopeDataStorage[i]) * 0.70f;
+            gapSmoothedScopeData[i] = (scopeData[i] - scopeDataStorage[i]) * 0.50f;
             scopeDataStorage[i] = scopeData[i] - gapSmoothedScopeData[i];
 
             points.emplace_back(bounds.getX(), y);
@@ -219,7 +219,7 @@ void SpectrumAnalyser::drawSingleCurve(juce::Graphics& g,
             float y = juce::jmap(scopeDataStorage[i], mindB, maxdB, bottom, top);
             linePath.lineTo(currentNum, y);
 
-            gapSmoothedScopeData[i] = (scopeData[i] - scopeDataStorage[i]) * 0.70f;
+            gapSmoothedScopeData[i] = (scopeData[i] - scopeDataStorage[i]) * 0.50f;
             scopeDataStorage[i] = scopeData[i] - gapSmoothedScopeData[i];
 
             points.emplace_back(currentNum, y);

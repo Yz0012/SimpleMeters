@@ -40,7 +40,9 @@ void VectorOscilloscopes::paint(juce::Graphics& g)
 
             if (px >= 0 && px < w && py >= 0 && py < h)
             {
-                bitmap.setPixelColour(px, py, juce::Colours::white);
+                float hue = static_cast<float>(i) / static_cast<float>(numSamples);
+                juce::Colour colour = juce::Colour::fromHSV(hue, 1.0f, 1.0f, 1.0f);
+                bitmap.setPixelColour(px, py, colour);
             }
         }
     }
