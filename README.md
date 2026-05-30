@@ -1,66 +1,72 @@
 # SimpleMeters
 
+[中文](README_zh.md)
+
 <img width="1874" height="750" alt="image" src="https://github.com/user-attachments/assets/5a84ee06-4f50-4896-b887-696275f495fd" />
 
-SimpleMeters是一个Windows平台上的音频分析工具
+SimpleMeters is an audio analysis tool for the Windows platform.
 
 > [!NOTE]
-> 当前该项目处于开发状态，正处于较早期开发阶段
+> This project is currently under development and is in an early stage.
 
-# 开发内容
-正在开发的部分和已经完成的部分内容有
+# Development Progress
 
-- [ ] 配置文件
-- [ ] 组件位置配置
-- [ ] 组件大小配置
-- [ ] 组件内点击输入文字
-- [ ] 组件Hover效果
-- [ ] 组件暂停功能
-- [ ] vst3支持
-- [ ] 频谱模式切换
-- [ ] 频谱显示增益曲线
-- [ ] 频谱坐标映射曲线
-- [ ] 频谱柱形图
-- [ ] 频谱瀑布图
-- [ ] 频谱仪参考线
-- [ ] 真峰值显示
-- [ ] 响度显示仪器(LUFS RMS等)
-- [ ] 选择更多的采样缓冲区进行音量分析
-- [ ] 波形图根据左右声道频段能量改变颜色
-- [ ] 改变波形图速度
-- [ ] 优化波形图的环形缓冲区
-- [ ] chart区间选择
-- [ ] 波形图参考线
-- [ ] 立体声分析模式
-- [ ] 立体声分析图旋转
-- [ ] 立体声分析图根据时间改变颜色
-- [ ] 立体声分析图参考线
-- [ ] BPM闪烁
-- [ ] 前置增益
-- [ ] 音频输入识别
-- [ ] 其他组件
+Features currently being developed or already completed include:
 
-新的功能一般会被添加到上面的列表当中
+- [ ] Configuration file
+- [ ] Component position configuration
+- [ ] Component size configuration
+- [ ] In-component text input on click
+- [ ] Component hover effect
+- [ ] Component pause functionality
+- [ ] VST3 support
+- [ ] Spectrum mode switching
+- [ ] Spectrum display with gain curve
+- [ ] Spectrum coordinate mapping curve
+- [ ] Spectrum bar graph
+- [ ] Spectrum waterfall display
+- [ ] Spectrum reference lines
+- [ ] Spectrum fundamental frequency / peak display
+- [ ] True peak display
+- [ ] Loudness metering (LUFS, RMS, etc.)
+- [ ] Select different sample buffers for volume analysis
+- [ ] Waveform color changes based on left/right channel frequency band energy
+- [ ] Adjustable waveform scroll speed
+- [ ] Optimize waveform ring buffer
+- [ ] Chart range selection
+- [ ] Chart range selection based on fundamental frequency
+- [ ] Waveform reference lines
+- [ ] Waveform L-R
+- [ ] Stereo analysis mode
+- [ ] Stereo analysis graph rotation
+- [ ] Stereo analysis graph color change over time
+- [ ] Stereo analysis reference lines
+- [ ] BPM blinking
+- [ ] Pre-gain
+- [ ] Audio input detection
+- [ ] Other components
 
-已经实现的功能会放在文档当中，介绍功能特点和具体实现，目前文档没有被创建
+New features are generally added to the list above.
 
-# 安装
+Already implemented features will be placed in documentation, describing their functionality and specific implementation. Currently, no documentation has been created.
 
-完全不需要安装，因为项目只有单独的exe和vst3文件(准备)
+# Installation
 
-# 使用
-- 对于发布的exe文件
-  - 左上角打开\关闭WASAPI回环，窗口内右键选择对应的组件即可创建组件进行分析
+No installation is required at all, as the project only consists of a standalone .exe and a VST3 file (planned).
 
-# 项目配置 
+# Usage
+- For the released .exe file:
+  - In the top-left corner, turn WASAPI loopback on/off. Right-click inside the window to select the corresponding component for analysis.
 
-项目根目录下有 .jucer 后缀的文件
-用Projucer打开.jucer文件后，在全局设置中指定下载的JUCE库根目录，确保所有模块引用正确
+# Project Configuration
 
-# 鸣谢 💕
+A `.jucer` file is located in the project root directory.  
+After opening the `.jucer` file with Projucer, specify the JUCE library root directory in the global settings to ensure all modules are referenced correctly.
 
-[JUCE](https://github.com/juce-framework/JUCE)
-提供基本框架
+# Acknowledgements 💕
 
-[miniaudio](https://github.com/mackron/miniaudio)
-Windows上的WASAPI回环
+[JUCE](https://github.com/juce-framework/JUCE)  
+Provides the basic framework.
+
+[miniaudio](https://github.com/mackron/miniaudio)  
+Provides WASAPI loopback on Windows.
