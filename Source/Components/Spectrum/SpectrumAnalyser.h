@@ -7,7 +7,8 @@
 
 enum AnalysisMode
 {
-    Mono,
+    Left,
+    Right,
     Stereo,
     LR,
     Interleaved
@@ -22,7 +23,7 @@ public:
     enum {
         fftOrder = 12,
         fftSize = 1 << fftOrder,
-        scopeSize = 512
+        scopeSize = 1024
     };
 
     float mindB = -90.0f;
@@ -64,7 +65,7 @@ public:
 private:
     double lastProcessTime = 0;
 
-    AnalysisMode currentMode = LR;
+    AnalysisMode currentMode = Left;
 
     juce::Colour lineColor = juce::Colour(0xFF8400FF);
     juce::Colour fillColor = juce::Colour(0xFF8400FF);

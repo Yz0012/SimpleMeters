@@ -40,16 +40,20 @@ void SpectrumAnalyser::processAudioBuffer(const juce::AudioBuffer<float>& buffer
 
     const int numChannels = buffer.getNumChannels();
 
-    if (currentMode == Mono)
+    if (currentMode == Left)
     {
         const int channelsToMix = juce::jmin(buffer.getNumChannels(), 2);
         for (int i = 0; i < numSamples; ++i)
         {
-            float mixed = 0.0f;
-            for (int ch = 0; ch < channelsToMix; ++ch)
-                mixed += buffer.getReadPointer(ch)[i];
-            mixed /= static_cast<float>(channelsToMix);
-            pushNextSampleIntoFifo(mixed, 0);
+            pushNextSampleIntoFifo(buffer.getReadPointer(0)[i], 0);
+        }
+    }
+    else if (currentMode == Right)
+    {
+        const int channelsToMix = juce::jmin(buffer.getNumChannels(), 2);
+        for (int i = 0; i < numSamples; ++i)
+        {
+            pushNextSampleIntoFifo(buffer.getReadPointer(1)[i], 0);
         }
     }
     else if (currentMode == Stereo && numChannels >= 2)
@@ -156,7 +160,7 @@ void SpectrumAnalyser::drawNextFrameOfSpectrum(int channelIndex)
 
 void SpectrumAnalyser::drawFrame(juce::Graphics& g, juce::Rectangle<int> bounds)
 {
-    if (currentMode == Mono || currentMode == Interleaved)
+    if (currentMode == Left || currentMode == Right || currentMode == Interleaved)
     {
         drawSingleCurve(g, bounds, scopeData, scopeDataStorage, gapSmoothedScopeData,
             lineColor, fillColor);
