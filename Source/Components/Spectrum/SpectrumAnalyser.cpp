@@ -188,59 +188,85 @@ void SpectrumAnalyser::drawSingleCurve(juce::Graphics& g,
     juce::Colour lineColour,
     juce::Colour fillColour)
 {
-    juce::Path linePath;
-    juce::Path fillPath;
-    std::vector<juce::Point<float>> points;
-    points.reserve(scopeSize);
-
-    bool firstPoint = true;
     const float width = static_cast<float>(bounds.getWidth());
     const float bottom = static_cast<float>(bounds.getBottom());
     const float top = static_cast<float>(bounds.getY());
+    const float leftX = static_cast<float>(bounds.getX());
 
     for (int i = 0; i < scopeSize; ++i)
     {
-        const float f = std::log(static_cast<float>(i) + std::exp(1.0f)) - 1.0f;
-        const float currentNum = (f / scopeSizeTransformed) * width + bounds.getX();
-
-        if (firstPoint)
-        {
-            float y = juce::jmap(scopeDataStorage[i], mindB, maxdB, bottom, top);
-            linePath.startNewSubPath(bounds.getX(), y);
-            firstPoint = false;
-
-            gapSmoothedScopeData[i] = (scopeData[i] - scopeDataStorage[i]) * 0.50f;
-            scopeDataStorage[i] = scopeData[i] - gapSmoothedScopeData[i];
-
-            points.emplace_back(bounds.getX(), y);
-        }
-        else
-        {
-            float y = juce::jmap(scopeDataStorage[i], mindB, maxdB, bottom, top);
-            linePath.lineTo(currentNum, y);
-
-            gapSmoothedScopeData[i] = (scopeData[i] - scopeDataStorage[i]) * 0.50f;
-            scopeDataStorage[i] = scopeData[i] - gapSmoothedScopeData[i];
-
-            points.emplace_back(currentNum, y);
-        }
+        gapSmoothedScopeData[i] = (scopeData[i] - scopeDataStorage[i]) * 0.70f;
+        scopeDataStorage[i] = scopeData[i] - gapSmoothedScopeData[i];
     }
 
-    if (!points.empty())
+    const int numBands = 256;
+    std::vector<juce::Point<float>> points;
+    points.reserve(numBands + 2);
+
+    points.emplace_back(leftX,
+        juce::jmap(scopeDataStorage[0], mindB, maxdB, bottom, top));
+
+    for (int band = 0; band < numBands; ++band)
     {
-        fillPath.startNewSubPath(points[0]);
-        for (size_t i = 1; i < points.size(); ++i)
-            fillPath.lineTo(points[i]);
+        const float fStart = band * scopeSizeTransformed / numBands;
+        const float fEnd = (band + 1) * scopeSizeTransformed / numBands;
 
-        fillPath.lineTo(points.back().x, bottom);
-        fillPath.lineTo(bounds.getX(), bottom);
-        fillPath.closeSubPath();
+        int iStart = static_cast<int>(std::ceil(std::exp(fStart + 1.0f) - std::exp(1.0f)));
+        int iEnd = static_cast<int>(std::floor(std::exp(fEnd + 1.0f) - std::exp(1.0f)));
 
-        g.setGradientFill(juce::ColourGradient::vertical(
-            fillColour.withAlpha(0.9f), top,
-            fillColour.withAlpha(0.3f), bottom));
-        g.fillPath(fillPath);
+        iStart = juce::jlimit(0, scopeSize - 1, iStart);
+        iEnd = juce::jlimit(0, scopeSize - 1, iEnd);
+
+        if (iStart > iEnd)
+            continue;
+
+        float maxVal = scopeDataStorage[iStart];
+        int maxIdx = iStart;
+        for (int i = iStart + 1; i <= iEnd; ++i)
+        {
+            if (scopeDataStorage[i] > maxVal)
+            {
+                maxVal = scopeDataStorage[i];
+                maxIdx = i;
+            }
+        }
+
+        const float f = std::log(static_cast<float>(maxIdx) + std::exp(1.0f)) - 1.0f;
+        const float x = (f / scopeSizeTransformed) * width + leftX;
+        const float y = juce::jmap(maxVal, mindB, maxdB, bottom, top);
+
+        points.emplace_back(x, y);
     }
+
+    if (points.size() < 2)
+        return;
+
+    juce::Path linePath;
+    linePath.startNewSubPath(points[0]);
+
+    for (size_t i = 0; i < points.size() - 1; ++i)
+    {
+        const juce::Point<float> p1 = points[i];
+        const juce::Point<float> p2 = points[i + 1];
+
+        const juce::Point<float> p0 = (i == 0) ? (p1 - (p2 - p1)) : points[i - 1];
+        const juce::Point<float> p3 = (i + 2 >= points.size()) ? (p2 + (p2 - p1)) : points[i + 2];
+
+        const auto cp1 = p1 + (p2 - p0) * (0.5f / 3.0f);
+        const auto cp2 = p2 + (p1 - p3) * (0.5f / 3.0f);
+
+        linePath.cubicTo(cp1, cp2, p2);
+    }
+
+    juce::Path fillPath = linePath;
+    fillPath.lineTo(points.back().x, bottom);
+    fillPath.lineTo(leftX, bottom);
+    fillPath.closeSubPath();
+
+    g.setGradientFill(juce::ColourGradient::vertical(
+        fillColour.withAlpha(0.9f), top,
+        fillColour.withAlpha(0.3f), bottom));
+    g.fillPath(fillPath);
 
     g.setColour(lineColour);
     g.strokePath(linePath, juce::PathStrokeType(1.0f));

@@ -24,8 +24,8 @@ public:
 	{
 		"ColourTheme", {},
 		{
-			{ "Colour", {{ "name", "SpectrumAnalyzerBoundaryLine"}, { "hex", "#8400FF" }}},
-			{ "Colour", {{ "name", "SpectrumAnalyzerFill"}, { "hex", "#8400FF" }}},
+			{ "Colour", {{ "name", "SpectrumAnalyzerBoundaryLine"}, { "hex", "#0091FF" }}},
+			{ "Colour", {{ "name", "SpectrumAnalyzerFill"}, { "hex", "#0091FF" }}},
 
 			{ "Colour", {{ "name", "WaveformBoundaryLineL"}, { "hex", "#0091FF" }}},
 			{ "Colour", {{ "name", "WaveformGradientColorOfLinesL"}, { "hex", "#FFFFFF" }}},
