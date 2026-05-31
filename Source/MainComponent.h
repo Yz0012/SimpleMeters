@@ -10,7 +10,7 @@
 
 #include "GUI/Header.h"
 
-class MainComponent : public juce::Component
+class MainComponent : public juce::Component, public juce::ValueTree::Listener
 {
 public:
     MainComponent();
@@ -35,11 +35,13 @@ public:
 
 	juce::ComponentDragger dragger;
 private:
+	juce::ValueTree appState;
+
 	PushSampleIntoJuceAudioBuffer<float>& pushSampleIntoJuceAudioBuffer = CreatePushSampleIntoJuceAudioBufferInstance::getInstance();
 
 	LookAndFeel lookAndFeel;
-	//
-	std::unique_ptr<Header> header;
+
+	Header header;
 
 	juce::TooltipWindow tooltipWindow;
 

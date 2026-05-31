@@ -1,11 +1,18 @@
-/*
-  ==============================================================================
-
-    ThemeConfigurationButton.h
-    Created: 29 May 2026 11:25:02am
-    Author:  22775
-
-  ==============================================================================
-*/
 
 #pragma once
+
+#include <JuceHeader.h>
+#include "../CreateConfiguration/CreateColoursConfiguration.h"
+
+class ThemeConfigurationButton : public juce::Component
+{
+public:
+	ThemeConfigurationButton();
+	~ThemeConfigurationButton();
+
+	void paint(juce::Graphics&) override;
+	void mouseDown(const juce::MouseEvent& event) override;
+	void mouseEnter(const juce::MouseEvent& event) override;
+private:
+	CreateColoursConfiguration createColoursConfiguration;
+};

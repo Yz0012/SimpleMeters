@@ -46,6 +46,8 @@ public:
 			{ "Colour", {{ "name", "Secondary"}, { "hex", "#FF32D6" }}},
 			{ "Colour", {{ "name", "Accent1"}, { "hex", "#B7ED88" }}},
 
+			{ "Colour", {{ "name", "ComponentBoundsColour"}, { "hex", "#B7ED88" }}},
+
 			{ "Colour", {{ "name", "PopupMenuBackgroundColour"}, { "hex", "#212A32" }}},
 			{ "Colour", {{ "name", "PopupMenuTextColour"}, { "hex", "#6ABD66" }}},
 

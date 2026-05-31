@@ -18,6 +18,8 @@
                 file="Source/GUI/Components/ComponentControl.cpp"/>
           <FILE id="lqY9Ed" name="ComponentControl.h" compile="0" resource="0"
                 file="Source/GUI/Components/ComponentControl.h"/>
+          <FILE id="DfMFhw" name="DrawBounds.cpp" compile="1" resource="0" file="Source/GUI/Components/DrawBounds.cpp"/>
+          <FILE id="jf1tux" name="DrawBounds.h" compile="0" resource="0" file="Source/GUI/Components/DrawBounds.h"/>
         </GROUP>
         <FILE id="Kvpw94" name="HeaderFixedButton.h" compile="0" resource="0"
               file="Source/GUI/HeaderFixedButton.h"/>

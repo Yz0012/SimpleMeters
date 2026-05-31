@@ -4,6 +4,7 @@
 
 #include "../../CreateConfiguration/CreateColoursConfiguration.h"
 #include "../../GUI/Components/ComponentControl.h"
+#include "../../GUI/Components/DrawBounds.h"
 
 enum AnalysisMode
 {
@@ -62,6 +63,7 @@ public:
     uint16_t callbackIdS = 0;
 
     ComponentControl componentControl;
+    DrawBounds drawBounds;
 private:
     double lastProcessTime = 0;
 

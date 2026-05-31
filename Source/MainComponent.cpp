@@ -1,10 +1,8 @@
 #include "MainComponent.h"
 
-MainComponent::MainComponent()
+MainComponent::MainComponent() : appState("AppState")
 {
     setOpaque(true);
-
-    header = std::make_unique<Header>();
 
     juce::LookAndFeel::setDefaultLookAndFeel(&lookAndFeel);
 
@@ -14,14 +12,15 @@ MainComponent::MainComponent()
         createColoursConfiguration.currentColourTheme.getChildWithProperty("name", "MainComponentBackground").getProperty("hex").toString(), false));
 
     centreWithSize(600,400);
-    addAndMakeVisible(header.get());
-    header->WASAPIButton.setBounds(20,10,30,30);
-    header->windowsSizeButton.setBounds(60,10,30,30);
-    header->headerFixedButton.setBounds(100,10,30,30);
-    header->windowControl.setTooltip("Close");
-    header->WASAPIButton.setTooltip("Enable or disable miniaudio WASAPI loopback");
-    header->windowsSizeButton.setTooltip("Resize Window");
-    header->windowsSizeButton.onClick = [this]
+    addAndMakeVisible(header);
+    header.WASAPIButton.setBounds(20,10,30,30);
+    header.windowsSizeButton.setBounds(60,10,30,30);
+    header.headerFixedButton.setBounds(100,10,30,30);
+    header.themeConfigurationButton.setBounds(140,10,30,30);
+    header.windowControl.setTooltip("Close");
+    header.WASAPIButton.setTooltip("Enable or disable miniaudio WASAPI loopback");
+    header.windowsSizeButton.setTooltip("Resize Window");
+    header.windowsSizeButton.onClick = [this]
         {
             juce::AlertWindow* aw = new juce::AlertWindow(
                 "Resize Window",
@@ -51,20 +50,20 @@ MainComponent::MainComponent()
                 }
             ), true);
         };
-    header->WASAPIButton.onClick = [this]
+    header.WASAPIButton.onClick = [this]
         {
-            if (header->WASAPIButton.isOpen)
+            if (header.WASAPIButton.isOpen)
             {
                 stopAndCloseWASAPIDevice();
-                header->WASAPIButton.isOpen = false;
-                header->WASAPIButton.repaint();
+                header.WASAPIButton.isOpen = false;
+                header.WASAPIButton.repaint();
             }
             else
             {
                 miniAudioWASAPI = std::make_shared<MiniAudioWASAPI>();
                 weakMiniAudioWASAPI = miniAudioWASAPI;
-                header->WASAPIButton.isOpen = true;
-                header->WASAPIButton.repaint();
+                header.WASAPIButton.isOpen = true;
+                header.WASAPIButton.repaint();
             }
         };
 }
@@ -84,10 +83,13 @@ MainComponent::~MainComponent()
 
 void MainComponent::paint (juce::Graphics& g)
 {
+    CreateColoursConfiguration& createColoursConfiguration = CreateColoursConfiguration::getInstance();
+    mainComponentBackgroundColour = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
+        createColoursConfiguration.currentColourTheme.getChildWithProperty("name", "MainComponentBackground").getProperty("hex").toString(), false));
     g.fillAll(mainComponentBackgroundColour);
 
-    header->setBounds(0, 0, getBounds().getWidth(), 50);
-    header->windowControl.setBounds(getBounds().getWidth() - 40, 10, 30, 30);
+    header.setBounds(0, 0, getBounds().getWidth(), 50);
+    header.windowControl.setBounds(getBounds().getWidth() - 40, 10, 30, 30);
 }
 
 void MainComponent::resized()
@@ -144,14 +146,14 @@ void MainComponent::mouseDrag(const juce::MouseEvent& event)
 void MainComponent::mouseEnter(const juce::MouseEvent&)
 {
     setMouseCursor(juce::MouseCursor::DraggingHandCursor);
-    header->setVisible(true);
+    header.setVisible(true);
 }
 
 void MainComponent::mouseExit(const juce::MouseEvent&)
 {
-    if (!header->isMouseOver() && !header->headerFixedButton.getHeaderFixed())
+    if (!header.isMouseOver() && !header.headerFixedButton.getHeaderFixed())
     {
-        header->setVisible(false);
+        header.setVisible(false);
     }
 }
 
@@ -191,6 +193,8 @@ void MainComponent::openSpectrumAnalyser(int x, int y)
 
     addAndMakeVisible(spectrum.get());
     spectrum->componentControl.setBounds(480, 10, 10, 10);
+    spectrum->drawBounds.setBounds(0,0,500,150);
+    spectrum->drawBounds.setInterceptsMouseClicks(false, false);
 
     std::weak_ptr<SpectrumAnalyser> weakSpectrum = spectrum;
     spectrum->componentControl.setCallBackFuntion([this, weakSpectrum]()
@@ -225,6 +229,8 @@ void MainComponent::openWaveformComponent(int x, int y)
 
     addAndMakeVisible(waveform.get());
     waveform->componentControl.setBounds(480, 10, 10, 10);
+    waveform->drawBounds.setBounds(0, 0, 500, 150);
+    waveform->drawBounds.setInterceptsMouseClicks(false, false);
 
     std::weak_ptr<WaveformComponent> weakWaveform = waveform;
     waveform->componentControl.setCallBackFuntion([this, weakWaveform]()
@@ -258,6 +264,8 @@ void MainComponent::openVectorOscilloscopeComponent(int x, int y)
 
     addAndMakeVisible(vector.get());
     vector->componentControl.setBounds(280, 10, 10, 10);
+    vector->drawBounds.setBounds(0, 0, 300, 300);
+    vector->drawBounds.setInterceptsMouseClicks(false, false);
 
     std::weak_ptr<VectorOscilloscopes> weakVector = vector;
     vector->componentControl.setCallBackFuntion([this, weakVector]()
@@ -291,6 +299,8 @@ void MainComponent::openWaveformChartComponent(int x, int y)
 
     addAndMakeVisible(chart.get());
     chart->componentControl.setBounds(480, 10, 10, 10);
+    chart->drawBounds.setBounds(0, 0, 500, 150);
+    chart->drawBounds.setInterceptsMouseClicks(false, false);
 
     std::weak_ptr<WaveformChartComponent> weakChart = chart;
     chart->componentControl.setCallBackFuntion([this, weakChart]()

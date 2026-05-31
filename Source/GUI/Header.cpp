@@ -7,6 +7,7 @@ Header::Header()
 	addAndMakeVisible(&WASAPIButton);
 	addAndMakeVisible(&windowsSizeButton);
 	addAndMakeVisible(&headerFixedButton);
+	addAndMakeVisible(&themeConfigurationButton);
 }
 
 Header::~Header()

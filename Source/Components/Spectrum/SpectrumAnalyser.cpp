@@ -20,6 +20,7 @@ SpectrumAnalyser::SpectrumAnalyser() : forwardFFT(fftOrder), window(fftSize, juc
     lastProcessTime = juce::Time::getMillisecondCounterHiRes();
 
     addAndMakeVisible(&componentControl);
+    addAndMakeVisible(&drawBounds);
 }
 
 SpectrumAnalyser::~SpectrumAnalyser()
@@ -326,10 +327,6 @@ void SpectrumAnalyser::callStopTimer()
     stopTimer();
 }
 
-/*
-* Control the refresh rate of the component
-* @param RefreshRate
-*/
 void SpectrumAnalyser::callstartTimerHz(int hz)
 {
     startTimerHz(hz);
@@ -370,6 +367,7 @@ void SpectrumAnalyser::checkProcessBufferActivity()
 void SpectrumAnalyser::mouseEnter(const juce::MouseEvent& event)
 {
     componentControl.setVisible(true);
+    drawBounds.setVisible(true);
 }
 
 void SpectrumAnalyser::mouseExit(const juce::MouseEvent&)
@@ -377,5 +375,6 @@ void SpectrumAnalyser::mouseExit(const juce::MouseEvent&)
     if (!componentControl.isMouseOver())
     {
         componentControl.setVisible(false);
+        drawBounds.setVisible(false);
     }
 }

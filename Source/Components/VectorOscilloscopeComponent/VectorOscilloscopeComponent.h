@@ -4,6 +4,7 @@
 
 #include "../../CreateConfiguration/CreateColoursConfiguration.h"
 #include "../../GUI/Components/ComponentControl.h"
+#include "../../GUI/Components/DrawBounds.h"
 
 class VectorOscilloscopes : public juce::Component
 {
@@ -19,6 +20,7 @@ public:
 	uint16_t callbackId = 0;
 
 	ComponentControl componentControl;
+	DrawBounds drawBounds;
 private:
 	const juce::AudioBuffer<float>* stereoBuffer = nullptr;
 

@@ -4,6 +4,7 @@
 #include "../Source/CircularImageBuffer.h"
 #include "../../CreateConfiguration/CreateColoursConfiguration.h"
 #include "../../GUI/Components/ComponentControl.h"
+#include "../../GUI/Components/DrawBounds.h"
 
 class WaveformComponent : public juce::Component
 {
@@ -37,6 +38,7 @@ public:
     uint16_t callbackId = 0;
 
     ComponentControl componentControl;
+    DrawBounds drawBounds;
 private:
     juce::Colour lineColorL = juce::Colours::blueviolet;
     juce::Colour fillColorL = juce::Colours::blueviolet;

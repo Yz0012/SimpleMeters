@@ -19,6 +19,7 @@ WaveformChartComponent::WaveformChartComponent()
         createColoursConfiguration.currentColourTheme.getChildWithProperty("name", "WaveformChartGradientColorOfLinesR").getProperty("hex").toString(), true));
 
     addAndMakeVisible(&componentControl);
+    addAndMakeVisible(&drawBounds);
 }
 
 WaveformChartComponent::~WaveformChartComponent()
@@ -122,6 +123,7 @@ void WaveformChartComponent::paint(juce::Graphics& g)
 void WaveformChartComponent::mouseEnter(const juce::MouseEvent& event)
 {
     componentControl.setVisible(true);
+    drawBounds.setVisible(true);
 }
 
 void WaveformChartComponent::mouseExit(const juce::MouseEvent&)
@@ -129,5 +131,6 @@ void WaveformChartComponent::mouseExit(const juce::MouseEvent&)
     if (!componentControl.isMouseOver())
     {
         componentControl.setVisible(false);
+        drawBounds.setVisible(false);
     }
 }
