@@ -5,10 +5,12 @@ SpectrumAnalyser::SpectrumAnalyser() : forwardFFT(fftOrder), window(fftSize, juc
 {
     CreateColoursConfiguration& createColoursConfiguration = CreateColoursConfiguration::getInstance();
 
+    auto spectrumCat = createColoursConfiguration.currentColourTheme
+        .getChildWithProperty("name", "SpectrumAnalyzer");
     lineColor = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
-        createColoursConfiguration.currentColourTheme.getChildWithProperty("name", "SpectrumAnalyzerBoundaryLine").getProperty("hex").toString(), false));
+        spectrumCat.getChildWithProperty("name", "BoundaryLine").getProperty("hex").toString(), false));
     fillColor = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
-        createColoursConfiguration.currentColourTheme.getChildWithProperty("name", "SpectrumAnalyzerFill").getProperty("hex").toString(), false));
+        spectrumCat.getChildWithProperty("name", "Fill").getProperty("hex").toString(), false));
 
     for (int i = 0; i < scopeSize; ++i)
     {

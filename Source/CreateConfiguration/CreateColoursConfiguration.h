@@ -20,52 +20,83 @@ public:
 		return instance;
 	}
 
-	juce::ValueTree initColourTheme
-	{
-		"ColourTheme", {},
-		{
-			{ "Colour", {{ "name", "SpectrumAnalyzerBoundaryLine"}, { "hex", "#0091FF" }}},
-			{ "Colour", {{ "name", "SpectrumAnalyzerFill"}, { "hex", "#0091FF" }}},
+    juce::ValueTree initColourTheme
+    {
+        "ColourTheme", {},
+        {
 
-			{ "Colour", {{ "name", "WaveformBoundaryLineL"}, { "hex", "#0091FF" }}},
-			{ "Colour", {{ "name", "WaveformGradientColorOfLinesL"}, { "hex", "#FFFFFF" }}},
-			{ "Colour", {{ "name", "WaveformFillL"}, { "hex", "#0091FF" }}},
-			{ "Colour", {{ "name", "WaveformBoundaryLineR"}, { "hex", "#FF32D6" }}},
-			{ "Colour", {{ "name", "WaveformGradientColorOfLinesR"}, { "hex", "#FFFFFF" }}},
-			{ "Colour", {{ "name", "WaveformFillR"}, { "hex", "#FF32D6" }}},
+            { "Category", {{ "name", "SpectrumAnalyzer" }},
+                {
+                    { "Colour", {{ "name", "BoundaryLine"}, { "hex", "#0091FF" }}},
+                    { "Colour", {{ "name", "Fill"},        { "hex", "#0091FF" }}}
+                }
+            },
 
-			{ "Colour", {{ "name", "WaveformChartBoundaryLineL"}, { "hex", "#0091FF" }}},
-			{ "Colour", {{ "name", "WaveformChartGradientColorOfLinesL"}, { "hex", "#FFFFFF" }}},
-			{ "Colour", {{ "name", "WaveformChartFillL"}, { "hex", "#0091FF" }}},
-			{ "Colour", {{ "name", "WaveformChartBoundaryLineR"}, { "hex", "#FF32D6" }}},
-			{ "Colour", {{ "name", "WaveformChartGradientColorOfLinesR"}, { "hex", "#FFFFFF" }}},
-			{ "Colour", {{ "name", "WaveformChartFillR"}, { "hex", "#FF32D6" }}},
+        { "Category", {{ "name", "Waveform" }},
+            {
+                { "Colour", {{ "name", "BoundaryLineL"},          { "hex", "#0091FF" }}},
+                { "Colour", {{ "name", "GradientColorOfLinesL"},  { "hex", "#FFFFFF" }}},
+                { "Colour", {{ "name", "FillL"},                  { "hex", "#0091FF" }}},
+                { "Colour", {{ "name", "BoundaryLineR"},          { "hex", "#FF32D6" }}},
+                { "Colour", {{ "name", "GradientColorOfLinesR"},  { "hex", "#FFFFFF" }}},
+                { "Colour", {{ "name", "FillR"},                  { "hex", "#FF32D6" }}}
+            }
+        },
 
-			{ "Colour", {{ "name", "MainComponentBackground" }, { "hex", "#172027" }}},
-			{ "Colour", {{ "name", "Header"}, { "hex", "#0091FF" }}},
-			{ "Colour", {{ "name", "Secondary"}, { "hex", "#FF32D6" }}},
-			{ "Colour", {{ "name", "Accent1"}, { "hex", "#B7ED88" }}},
+        { "Category", {{ "name", "WaveformChart" }},
+            {
+                { "Colour", {{ "name", "BoundaryLineL"},          { "hex", "#0091FF" }}},
+                { "Colour", {{ "name", "GradientColorOfLinesL"},  { "hex", "#FFFFFF" }}},
+                { "Colour", {{ "name", "FillL"},                  { "hex", "#0091FF" }}},
+                { "Colour", {{ "name", "BoundaryLineR"},          { "hex", "#FF32D6" }}},
+                { "Colour", {{ "name", "GradientColorOfLinesR"},  { "hex", "#FFFFFF" }}},
+                { "Colour", {{ "name", "FillR"},                  { "hex", "#FF32D6" }}}
+            }
+        },
 
-			{ "Colour", {{ "name", "ComponentBoundsColour"}, { "hex", "#B7ED88" }}},
+        { "Category", {{ "name", "MainComponent" }},
+            {
+                { "Colour", {{ "name", "Background"}, { "hex", "#172027" }}},
+                { "Colour", {{ "name", "Header"},     { "hex", "#0091FF" }}},
+                { "Colour", {{ "name", "Secondary"},  { "hex", "#FF32D6" }}},
+                { "Colour", {{ "name", "Accent1"},    { "hex", "#B7ED88" }}}
+            }
+        },
 
-			{ "Colour", {{ "name", "PopupMenuBackgroundColour"}, { "hex", "#212A32" }}},
-			{ "Colour", {{ "name", "PopupMenuTextColour"}, { "hex", "#6ABD66" }}},
+        { "Category", {{ "name", "PopupMenu" }},
+            {
+                { "Colour", {{ "name", "Background"}, { "hex", "#212A32" }}},
+                { "Colour", {{ "name", "Text"},       { "hex", "#6ABD66" }}}
+            }
+        },
 
-			{ "Colour", {{ "name", "MessageWindowBackgroundColour"}, { "hex", "#212A32" }}},
-			{ "Colour", {{ "name", "MessageWindowTextColour"}, { "hex", "#6ABD66" }}},
+        { "Category", {{ "name", "MessageWindow" }},
+            {
+                { "Colour", {{ "name", "Background"}, { "hex", "#212A32" }}},
+                { "Colour", {{ "name", "Text"},       { "hex", "#6ABD66" }}}
+            }
+        },
 
-			{ "Colour", {{ "name", "ButtonBackgroundColour"}, { "hex", "#212A32" }}},
-			{ "Colour", {{ "name", "ButtonTextColour"}, { "hex", "#B7ED88" }}},
-			{ "Colour", {{ "name", "ButtonPressedBackgroundColour"}, { "hex", "#DEAC47" }}},
-			{ "Colour", {{ "name", "ButtonHoverBackgroundColour"}, { "hex", "#DEAC47" }}},
+        { "Category", {{ "name", "Button" }},
+            {
+                { "Colour", {{ "name", "Background"},        { "hex", "#212A32" }}},
+                { "Colour", {{ "name", "Text"},              { "hex", "#B7ED88" }}},
+                { "Colour", {{ "name", "PressedBackground"}, { "hex", "#DEAC47" }}},
+                { "Colour", {{ "name", "HoverBackground"},   { "hex", "#DEAC47" }}}
+            }
+        },
 
-			{ "Colour", {{ "name", "TextEditorBackgroundColour"}, { "hex", "#172027" }}},
-			{ "Colour", {{ "name", "TextEditorTextColour"}, { "hex", "#B7ED88" }}},
-			{ "Colour", {{ "name", "TextEditorHighlightColour"}, { "hex", "#172027" }}},
-			{ "Colour", {{ "name", "TextEditorOutlineColour"}, { "hex", "#172027" }}},
-			{ "Colour", {{ "name", "TextEditorFocusedOutlineColour"}, { "hex", "#172027" }}}
-		}
-	};
+        { "Category", {{ "name", "TextEditor" }},
+            {
+                { "Colour", {{ "name", "Background"},      { "hex", "#172027" }}},
+                { "Colour", {{ "name", "Text"},            { "hex", "#B7ED88" }}},
+                { "Colour", {{ "name", "Highlight"},       { "hex", "#172027" }}},
+                { "Colour", {{ "name", "Outline"},         { "hex", "#172027" }}},
+                { "Colour", {{ "name", "FocusedOutline"},  { "hex", "#172027" }}}
+            }
+        }
+    }
+    };
 
 	juce::ValueTree currentColourTheme;
 

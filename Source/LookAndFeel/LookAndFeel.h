@@ -12,35 +12,43 @@ public:
     {
         CreateColoursConfiguration& createColoursConfiguration = CreateColoursConfiguration::getInstance();
 
+        auto popupMenuCat = createColoursConfiguration.currentColourTheme
+            .getChildWithProperty("name", "PopupMenu");
         PopupMenuTextColour = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
-            createColoursConfiguration.currentColourTheme.getChildWithProperty("name", "PopupMenuTextColour").getProperty("hex").toString(), true));
+            popupMenuCat.getChildWithProperty("name", "Text").getProperty("hex").toString(), true));
         PopupMenuBackgroundColour = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
-            createColoursConfiguration.currentColourTheme.getChildWithProperty("name", "PopupMenuBackgroundColour").getProperty("hex").toString(), true));
+            popupMenuCat.getChildWithProperty("name", "Background").getProperty("hex").toString(), true));
 
+        auto messageWindowCat = createColoursConfiguration.currentColourTheme
+            .getChildWithProperty("name", "MessageWindow");
         MessageWindowTextColour = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
-            createColoursConfiguration.currentColourTheme.getChildWithProperty("name", "MessageWindowTextColour").getProperty("hex").toString(), true));
+            messageWindowCat.getChildWithProperty("name", "Text").getProperty("hex").toString(), true));
         MessageWindowBackgroundColour = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
-            createColoursConfiguration.currentColourTheme.getChildWithProperty("name", "MessageWindowBackgroundColour").getProperty("hex").toString(), true));
+            messageWindowCat.getChildWithProperty("name", "Background").getProperty("hex").toString(), true));
 
+        auto buttonCat = createColoursConfiguration.currentColourTheme
+            .getChildWithProperty("name", "Button");
         ButtonBackgroundColour = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
-            createColoursConfiguration.currentColourTheme.getChildWithProperty("name", "ButtonBackgroundColour").getProperty("hex").toString(), true));
+            buttonCat.getChildWithProperty("name", "Background").getProperty("hex").toString(), true));
         ButtonTextColour = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
-            createColoursConfiguration.currentColourTheme.getChildWithProperty("name", "ButtonTextColour").getProperty("hex").toString(), true));
+            buttonCat.getChildWithProperty("name", "Text").getProperty("hex").toString(), true));
         ButtonPressedBackgroundColour = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
-            createColoursConfiguration.currentColourTheme.getChildWithProperty("name", "ButtonPressedBackgroundColour").getProperty("hex").toString(), true));
+            buttonCat.getChildWithProperty("name", "PressedBackground").getProperty("hex").toString(), true));
         ButtonHoverBackgroundColour = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
-            createColoursConfiguration.currentColourTheme.getChildWithProperty("name", "ButtonHoverBackgroundColour").getProperty("hex").toString(), true));
+            buttonCat.getChildWithProperty("name", "HoverBackground").getProperty("hex").toString(), true));
 
+        auto textEditorCat = createColoursConfiguration.currentColourTheme
+            .getChildWithProperty("name", "TextEditor");
         TextEditorBackgroundColour = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
-            createColoursConfiguration.currentColourTheme.getChildWithProperty("name", "TextEditorBackgroundColour").getProperty("hex").toString(), true));
+            textEditorCat.getChildWithProperty("name", "Background").getProperty("hex").toString(), true));
         TextEditorTextColour = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
-            createColoursConfiguration.currentColourTheme.getChildWithProperty("name", "TextEditorTextColour").getProperty("hex").toString(), true));
+            textEditorCat.getChildWithProperty("name", "Text").getProperty("hex").toString(), true));
         TextEditorHighlightColour = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
-            createColoursConfiguration.currentColourTheme.getChildWithProperty("name", "TextEditorHighlightColour").getProperty("hex").toString(), true));
+            textEditorCat.getChildWithProperty("name", "Highlight").getProperty("hex").toString(), true));
         TextEditorOutlineColour = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
-            createColoursConfiguration.currentColourTheme.getChildWithProperty("name", "TextEditorOutlineColour").getProperty("hex").toString(), true));
+            textEditorCat.getChildWithProperty("name", "Outline").getProperty("hex").toString(), true));
         TextEditorFocusedOutlineColour = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
-            createColoursConfiguration.currentColourTheme.getChildWithProperty("name", "TextEditorFocusedOutlineColour").getProperty("hex").toString(), true));
+            textEditorCat.getChildWithProperty("name", "FocusedOutline").getProperty("hex").toString(), true));
 
         setColour(juce::PopupMenu::backgroundColourId, PopupMenuBackgroundColour);
         setColour(juce::PopupMenu::textColourId, PopupMenuTextColour);

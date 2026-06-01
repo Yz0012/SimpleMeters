@@ -4,18 +4,20 @@ WaveformComponent::WaveformComponent()
 {
     CreateColoursConfiguration& createColoursConfiguration = CreateColoursConfiguration::getInstance();
 
+    auto waveformCat = createColoursConfiguration.currentColourTheme
+        .getChildWithProperty("name", "Waveform");
     lineColorL = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
-        createColoursConfiguration.currentColourTheme.getChildWithProperty("name", "WaveformBoundaryLineL").getProperty("hex").toString(), true));
+        waveformCat.getChildWithProperty("name", "BoundaryLineL").getProperty("hex").toString(), true));
     fillColorL = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
-        createColoursConfiguration.currentColourTheme.getChildWithProperty("name", "WaveformFillL").getProperty("hex").toString(), true));
+        waveformCat.getChildWithProperty("name", "FillL").getProperty("hex").toString(), true));
     gradientColorOfLinesL = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
-        createColoursConfiguration.currentColourTheme.getChildWithProperty("name", "WaveformGradientColorOfLinesL").getProperty("hex").toString(), true));
+        waveformCat.getChildWithProperty("name", "GradientColorOfLinesL").getProperty("hex").toString(), true));
     lineColorR = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
-        createColoursConfiguration.currentColourTheme.getChildWithProperty("name", "WaveformBoundaryLineR").getProperty("hex").toString(), true));
+        waveformCat.getChildWithProperty("name", "BoundaryLineR").getProperty("hex").toString(), true));
     fillColorR = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
-        createColoursConfiguration.currentColourTheme.getChildWithProperty("name", "WaveformFillR").getProperty("hex").toString(), true));
+        waveformCat.getChildWithProperty("name", "FillR").getProperty("hex").toString(), true));
     gradientColorOfLinesR = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
-        createColoursConfiguration.currentColourTheme.getChildWithProperty("name", "WaveformGradientColorOfLinesR").getProperty("hex").toString(), true));
+        waveformCat.getChildWithProperty("name", "GradientColorOfLinesR").getProperty("hex").toString(), true));
 
     addAndMakeVisible(&componentControl);
     addAndMakeVisible(&drawBounds);

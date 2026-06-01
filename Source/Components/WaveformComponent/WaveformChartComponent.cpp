@@ -5,18 +5,20 @@ WaveformChartComponent::WaveformChartComponent()
 {
     CreateColoursConfiguration& createColoursConfiguration = CreateColoursConfiguration::getInstance();
 
+    auto waveformChartCat = createColoursConfiguration.currentColourTheme
+        .getChildWithProperty("name", "WaveformChart");
     lineColorL = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
-        createColoursConfiguration.currentColourTheme.getChildWithProperty("name", "WaveformChartBoundaryLineL").getProperty("hex").toString(), true));
+        waveformChartCat.getChildWithProperty("name", "BoundaryLineL").getProperty("hex").toString(), true));
     fillColorL = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
-        createColoursConfiguration.currentColourTheme.getChildWithProperty("name", "WaveformChartFillL").getProperty("hex").toString(), true));
+        waveformChartCat.getChildWithProperty("name", "FillL").getProperty("hex").toString(), true));
     gradientColorOfLinesL = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
-        createColoursConfiguration.currentColourTheme.getChildWithProperty("name", "WaveformChartGradientColorOfLinesL").getProperty("hex").toString(), true));
+        waveformChartCat.getChildWithProperty("name", "GradientColorOfLinesL").getProperty("hex").toString(), true));
     lineColorR = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
-        createColoursConfiguration.currentColourTheme.getChildWithProperty("name", "WaveformChartBoundaryLineR").getProperty("hex").toString(), true));
+        waveformChartCat.getChildWithProperty("name", "BoundaryLineR").getProperty("hex").toString(), true));
     fillColorR = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
-        createColoursConfiguration.currentColourTheme.getChildWithProperty("name", "WaveformChartFillR").getProperty("hex").toString(), true));
+        waveformChartCat.getChildWithProperty("name", "FillR").getProperty("hex").toString(), true));
     gradientColorOfLinesR = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
-        createColoursConfiguration.currentColourTheme.getChildWithProperty("name", "WaveformChartGradientColorOfLinesR").getProperty("hex").toString(), true));
+        waveformChartCat.getChildWithProperty("name", "GradientColorOfLinesR").getProperty("hex").toString(), true));
 
     addAndMakeVisible(&componentControl);
     addAndMakeVisible(&drawBounds);

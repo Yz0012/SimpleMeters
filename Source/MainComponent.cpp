@@ -8,8 +8,10 @@ MainComponent::MainComponent() : appState("AppState")
 
     CreateColoursConfiguration& createColoursConfiguration = CreateColoursConfiguration::getInstance();
 
+    auto mainCompCat = createColoursConfiguration.currentColourTheme
+        .getChildWithProperty("name", "MainComponent");
     mainComponentBackgroundColour = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
-        createColoursConfiguration.currentColourTheme.getChildWithProperty("name", "MainComponentBackground").getProperty("hex").toString(), false));
+        mainCompCat.getChildWithProperty("name", "Background").getProperty("hex").toString(), false));
 
     centreWithSize(600,400);
     addAndMakeVisible(header);
