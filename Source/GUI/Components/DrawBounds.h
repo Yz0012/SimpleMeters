@@ -13,5 +13,5 @@ public:
 
 	void paint(juce::Graphics&) override;
 private:
-
+	juce::Colour boundsColour;
 };

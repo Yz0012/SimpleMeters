@@ -63,6 +63,12 @@ public:
             }
         },
 
+        { "Category", {{ "name", "ComponentBounds" }},
+            {
+                { "Colour", {{ "name", "ComponentBoundsColour"}, { "hex", "#212A32" }}},
+            }
+        },
+
         { "Category", {{ "name", "PopupMenu" }},
             {
                 { "Colour", {{ "name", "Background"}, { "hex", "#212A32" }}},

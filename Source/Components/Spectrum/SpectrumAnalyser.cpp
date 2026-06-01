@@ -311,7 +311,7 @@ void SpectrumAnalyser::paint(juce::Graphics& g)
 void SpectrumAnalyser::timerCallback()
 {
     checkProcessBufferActivity();
-	repaint();
+	repaint(getLocalBounds());
 }
 
 void SpectrumAnalyser::callStopTimer()

@@ -87,7 +87,6 @@ void WaveformComponent::drawWaveform(
     {
         imageRingBuffer->push(tile);
     }
-    repaint();
 }
 
 void WaveformComponent::renderNextFrame(juce::Graphics& g, juce::Rectangle<int> bounds)

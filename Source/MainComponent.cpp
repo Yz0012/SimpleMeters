@@ -85,9 +85,6 @@ MainComponent::~MainComponent()
 
 void MainComponent::paint (juce::Graphics& g)
 {
-    CreateColoursConfiguration& createColoursConfiguration = CreateColoursConfiguration::getInstance();
-    mainComponentBackgroundColour = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
-        createColoursConfiguration.currentColourTheme.getChildWithProperty("name", "MainComponentBackground").getProperty("hex").toString(), false));
     g.fillAll(mainComponentBackgroundColour);
 
     header.setBounds(0, 0, getBounds().getWidth(), 50);
@@ -226,6 +223,7 @@ void MainComponent::openWaveformComponent(int x, int y)
                 waveform->drawWaveform(
                     pushSampleIntoJuceAudioBuffer.getLocalAudioBufferReference(),
                     pushSampleIntoJuceAudioBuffer.getLocalAudioBufferRMSReference());
+                waveform->repaint(waveform->getLocalBounds());
             });
     }
 
@@ -260,7 +258,7 @@ void MainComponent::openVectorOscilloscopeComponent(int x, int y)
             {
                 vector->pushStereoBuffer(
                     pushSampleIntoJuceAudioBuffer.getLocalAudioBufferReadPointer());
-                vector->repaint();
+                vector->repaint(vector->getLocalBounds());;
             });
     }
 
@@ -295,7 +293,7 @@ void MainComponent::openWaveformChartComponent(int x, int y)
                 chart->pushStereoBuffer(
                     pushSampleIntoJuceAudioBuffer.getLocalAudioBufferReadPointer(),
                     pushSampleIntoJuceAudioBuffer.getLocalAudioBufferRMS());
-                chart->repaint();
+                chart->repaint(chart->getLocalBounds());
             });
     }
 
