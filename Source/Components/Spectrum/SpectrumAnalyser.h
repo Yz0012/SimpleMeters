@@ -67,7 +67,7 @@ public:
 private:
     double lastProcessTime = 0;
 
-    AnalysisMode currentMode = Left;
+    AnalysisMode currentMode = Interleaved;
 
     juce::Colour lineColor = juce::Colour(0xFF8400FF);
     juce::Colour fillColor = juce::Colour(0xFF8400FF);

@@ -7,6 +7,12 @@
       <FILE id="vRjiPQ" name="CreatePushSampleIntoJuceAudioBufferInstance.h"
             compile="0" resource="0" file="Source/CreatePushSampleIntoJuceAudioBufferInstance.h"/>
       <GROUP id="{CBAFAF3B-058A-6BB7-DDA1-0AB3F1C79541}" name="GUI">
+        <GROUP id="{4CCE0439-35A6-164A-6A39-E2ADC8648477}" name="Configuration">
+          <FILE id="ALig7T" name="ColourThemeEditor.cpp" compile="1" resource="0"
+                file="Source/GUI/Configuration/ColourThemeEditor.cpp"/>
+          <FILE id="OVmPDB" name="ColourThemeEditor.h" compile="0" resource="0"
+                file="Source/GUI/Configuration/ColourThemeEditor.h"/>
+        </GROUP>
         <FILE id="QEPf9O" name="ThemeConfigurationButton.cpp" compile="1" resource="0"
               file="Source/GUI/ThemeConfigurationButton.cpp"/>
         <FILE id="YGNemZ" name="ThemeConfigurationButton.h" compile="0" resource="0"

@@ -206,38 +206,28 @@ void SpectrumAnalyser::drawSingleCurve(juce::Graphics& g,
 
     const int numBands = 256;
     std::vector<juce::Point<float>> points;
-    points.reserve(numBands + 2);
+    points.reserve(numBands);
 
     points.emplace_back(leftX,
         juce::jmap(scopeDataStorage[0], mindB, maxdB, bottom, top));
 
     for (int band = 0; band < numBands; ++band)
     {
-        const float fStart = band * scopeSizeTransformed / numBands;
-        const float fEnd = (band + 1) * scopeSizeTransformed / numBands;
+        const int fStart = band * scopeSize / numBands;
+        const int fEnd = (band + 1) * scopeSize / numBands;
 
-        int iStart = static_cast<int>(std::ceil(std::exp(fStart + 1.0f) - std::exp(1.0f)));
-        int iEnd = static_cast<int>(std::floor(std::exp(fEnd + 1.0f) - std::exp(1.0f)));
-
-        iStart = juce::jlimit(0, scopeSize - 1, iStart);
-        iEnd = juce::jlimit(0, scopeSize - 1, iEnd);
-
-        if (iStart > iEnd)
-            continue;
-
-        float maxVal = scopeDataStorage[iStart];
-        int maxIdx = iStart;
-        for (int i = iStart + 1; i <= iEnd; ++i)
+        float maxVal = scopeDataStorage[fStart];
+        for (int i = fStart + 1; i < fEnd; ++i)
         {
             if (scopeDataStorage[i] > maxVal)
-            {
                 maxVal = scopeDataStorage[i];
-                maxIdx = i;
-            }
         }
 
-        const float f = std::log(static_cast<float>(maxIdx) + std::exp(1.0f)) - 1.0f;
+        const float midIdx = (fStart + fEnd - 1) * 0.5f;
+
+        const float f = std::log(midIdx + std::exp(1.0f)) - 1.0f;
         const float x = (f / scopeSizeTransformed) * width + leftX;
+
         const float y = juce::jmap(maxVal, mindB, maxdB, bottom, top);
 
         points.emplace_back(x, y);
@@ -257,8 +247,8 @@ void SpectrumAnalyser::drawSingleCurve(juce::Graphics& g,
         const juce::Point<float> p0 = (i == 0) ? (p1 - (p2 - p1)) : points[i - 1];
         const juce::Point<float> p3 = (i + 2 >= points.size()) ? (p2 + (p2 - p1)) : points[i + 2];
 
-        const auto cp1 = p1 + (p2 - p0) * (0.5f / 3.0f);
-        const auto cp2 = p2 + (p1 - p3) * (0.5f / 3.0f);
+        const auto cp1 = p1 + (p2 - p0) / 6.0f;
+        const auto cp2 = p2 + (p1 - p3) / 6.0f;
 
         linePath.cubicTo(cp1, cp2, p2);
     }
