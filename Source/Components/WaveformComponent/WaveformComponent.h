@@ -3,25 +3,27 @@
 
 #include "../Source/CircularImageBuffer.h"
 #include "../../CreateConfiguration/CreateColoursConfiguration.h"
-#include "../../GUI/Components/ComponentControl.h"
 #include "../../GUI/Components/DrawBounds.h"
+#include "../../GUI/Components/ComponentHeader.h"
 
-class WaveformComponent : public juce::Component
+class WaveformComponent : public juce::Component, private juce::ValueTree::Listener
 {
 public:
     WaveformComponent();
     ~WaveformComponent();
 
     void paint(juce::Graphics& g) override;
+    void mouseDown(const juce::MouseEvent& event) override;
     void mouseEnter(const juce::MouseEvent& event) override;
     void mouseExit(const juce::MouseEvent&) override;
+
+    void valueTreePropertyChanged(juce::ValueTree& tree, const juce::Identifier& property) override;
 
     void clear();
 
     void drawWaveform(
         const juce::AudioBuffer<float>& localAudioBuffer,
         const float localAudioBufferRMS);
-    void drawAxis(juce::Graphics& g, juce::Rectangle<int> area);
 
     void renderNextFrame(juce::Graphics& g, juce::Rectangle<int> bounds);
 
@@ -37,9 +39,14 @@ public:
 
     uint16_t callbackId = 0;
 
-    ComponentControl componentControl;
     DrawBounds drawBounds;
+	ComponentHeader componentHeader{ juce::String("Waveform") };
+
+    using Callback = std::function<void()>;
+    Callback cb = nullptr;
 private:
+	juce::ValueTree waveformCat;
+
     juce::Colour lineColorL = juce::Colours::blueviolet;
     juce::Colour fillColorL = juce::Colours::blueviolet;
     juce::Colour gradientColorOfLinesL = juce::Colours::white;

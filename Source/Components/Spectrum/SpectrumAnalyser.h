@@ -1,10 +1,11 @@
 
 #pragma once
+
 #include <JuceHeader.h>
 
 #include "../../CreateConfiguration/CreateColoursConfiguration.h"
-#include "../../GUI/Components/ComponentControl.h"
 #include "../../GUI/Components/DrawBounds.h"
+#include "../../GUI/Components/ComponentHeader.h"
 
 enum AnalysisMode
 {
@@ -15,7 +16,7 @@ enum AnalysisMode
     Interleaved
 };
 
-class SpectrumAnalyser : public juce::Component , juce::Timer
+class SpectrumAnalyser : public juce::Component , juce::Timer, private juce::ValueTree::Listener
 {
 public:
 	SpectrumAnalyser();
@@ -43,13 +44,15 @@ public:
         float* gapSmoothedScopeData,
         juce::Colour lineColour,
         juce::Colour fillColour);
-    void drawFrequencyAxis(juce::Graphics& g,juce::Rectangle<int> bounds);
     void setAnalysisMode(AnalysisMode mode);
 
     void paint(juce::Graphics& g) override;
 	void timerCallback() override;
+    void mouseDown(const juce::MouseEvent& event) override;
     void mouseEnter(const juce::MouseEvent& event) override;
     void mouseExit(const juce::MouseEvent&) override;
+
+    void valueTreePropertyChanged(juce::ValueTree& tree, const juce::Identifier& property) override;
 
     void callStopTimer();
     void callstartTimerHz(int hz);
@@ -62,10 +65,15 @@ public:
     uint16_t callbackIdM = 0;
     uint16_t callbackIdS = 0;
 
-    ComponentControl componentControl;
     DrawBounds drawBounds;
+    ComponentHeader componentHeader{ juce::String("SpectrumAnalyzer") };
+
+    using Callback = std::function<void()>;
+    Callback cb = nullptr;
 private:
     double lastProcessTime = 0;
+
+    juce::ValueTree spectrumCat;
 
     AnalysisMode currentMode = Interleaved;
 
@@ -92,7 +100,6 @@ private:
     float scopeData2[scopeSize];
     float scopeDataStorage2[scopeSize];
     float gapSmoothedScopeData2[scopeSize];
-
 
     float level = 0.0f;
 

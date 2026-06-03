@@ -3,7 +3,7 @@
 
 #include <JuceHeader.h>
 
-class HeaderFixedButton : public juce::Component
+class HeaderFixedButton : public juce::Component, public juce::SettableTooltipClient
 {
 public:
 	HeaderFixedButton();
@@ -16,4 +16,6 @@ public:
 	bool getHeaderFixed() const;
 private:
 	bool headerFixed = false;
+
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(HeaderFixedButton);
 };

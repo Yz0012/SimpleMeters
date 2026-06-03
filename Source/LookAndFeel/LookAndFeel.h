@@ -127,6 +127,26 @@ public:
         g.fillRect(0, 0, width, height);
     }
 
+    void drawDocumentWindowTitleBar(juce::DocumentWindow& window,
+        juce::Graphics& g,
+        int w, int h,
+        int titleSpaceX, int titleSpaceW,
+        const juce::Image* icon,
+        bool drawTitleTextOnLeft) override
+    {
+        g.fillAll(juce::Colour(0xFF212A32));
+
+        g.setColour(juce::Colour(0xFFB7ED88));
+        g.setFont(juce::Font(18.0f, juce::Font::bold));
+
+        juce::String title = window.getName();
+
+        auto textArea = juce::Rectangle<int>(0, 0, w, h);
+        g.drawText(title, textArea, juce::Justification::centred, true);
+    }
+
+    void drawCornerResizer(juce::Graphics&, int, int, bool, bool) override {}
+
 private:
     juce::Typeface::Ptr cascadiaTypeface;
 

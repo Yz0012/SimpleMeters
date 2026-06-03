@@ -6,7 +6,7 @@
 #include "../CreateConfiguration/CreateColoursConfiguration.h"
 #include "../GUI/Configuration/ColourThemeEditor.h"
 
-class ThemeConfigurationButton : public juce::Component
+class ThemeConfigurationButton : public juce::Component, public juce::SettableTooltipClient
 {
 public:
 	ThemeConfigurationButton();
@@ -16,5 +16,4 @@ public:
 	void mouseDown(const juce::MouseEvent& event) override;
 	void mouseEnter(const juce::MouseEvent& event) override;
 private:
-	CreateColoursConfiguration createColoursConfiguration;
 };

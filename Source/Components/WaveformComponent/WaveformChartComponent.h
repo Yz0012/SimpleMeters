@@ -3,18 +3,21 @@
 #include <JuceHeader.h>
 
 #include "../../CreateConfiguration/CreateColoursConfiguration.h"
-#include "../../GUI/Components/ComponentControl.h"
 #include "../../GUI/Components/DrawBounds.h"
+#include "../../GUI/Components/ComponentHeader.h"
 
-class WaveformChartComponent : public juce::Component
+class WaveformChartComponent : public juce::Component, private juce::ValueTree::Listener
 {
 public:
 	WaveformChartComponent();
 	~WaveformChartComponent();
 
     void paint(juce::Graphics& g) override;
+    void mouseDown(const juce::MouseEvent& event) override;
     void mouseEnter(const juce::MouseEvent& event) override;
     void mouseExit(const juce::MouseEvent&) override;
+
+    void valueTreePropertyChanged(juce::ValueTree& tree, const juce::Identifier& property) override;
 
     void clear();
 
@@ -28,9 +31,14 @@ public:
 
     uint16_t callbackId = 0;
 
-    ComponentControl componentControl;
     DrawBounds drawBounds;
+    ComponentHeader componentHeader{ juce::String("WaveformChart") };
+
+    using Callback = std::function<void()>;
+    Callback cb = nullptr;
 private:
+    juce::ValueTree waveformChartCat;
+
     const juce::AudioBuffer<float>* localAudioBuffer = nullptr;
     //消除拷贝
     float localAudioBufferRMS;

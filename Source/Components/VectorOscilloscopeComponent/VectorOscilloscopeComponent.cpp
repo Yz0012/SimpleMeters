@@ -2,12 +2,19 @@
 
 VectorOscilloscopes::VectorOscilloscopes()
 {
-    addAndMakeVisible(&componentControl);
+    CreateColoursConfiguration& createColoursConfiguration = CreateColoursConfiguration::getInstance();
+
+    vectorCat = createColoursConfiguration.currentColourTheme
+        .getChildWithProperty("name", "SpectrumAnalyzer");
     addAndMakeVisible(&drawBounds);
+    addAndMakeVisible(&componentHeader);
+
+	vectorCat.addListener(this);
 }
 
 VectorOscilloscopes::~VectorOscilloscopes()
 {
+	vectorCat.removeListener(this);
 }
 
 void VectorOscilloscopes::pushStereoBuffer(const juce::AudioBuffer<float>* localAudioBuffer)
@@ -51,17 +58,34 @@ void VectorOscilloscopes::paint(juce::Graphics& g)
     g.drawImageAt(img, 0, 0);
 }
 
+void VectorOscilloscopes::mouseDown(const juce::MouseEvent& event)
+{
+    if (event.mods.isPopupMenu())
+    {
+        if (cb == nullptr) return;
+        cb();
+    }
+}
+
 void VectorOscilloscopes::mouseEnter(const juce::MouseEvent& event)
 {
-    componentControl.setVisible(true);
     drawBounds.setVisible(true);
+    componentHeader.setVisible(true);
 }
 
 void VectorOscilloscopes::mouseExit(const juce::MouseEvent&)
 {
-    if (!componentControl.isMouseOver())
+    if (!componentHeader.isMouseOver())
     {
-        componentControl.setVisible(false);
         drawBounds.setVisible(false);
+        componentHeader.setVisible(false);
+    }
+}
+
+void VectorOscilloscopes::valueTreePropertyChanged(juce::ValueTree& tree, const juce::Identifier& property)
+{
+    if (property == juce::Identifier("hex"))
+    {
+        repaint();
     }
 }

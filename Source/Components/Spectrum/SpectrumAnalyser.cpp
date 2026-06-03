@@ -5,7 +5,7 @@ SpectrumAnalyser::SpectrumAnalyser() : forwardFFT(fftOrder), window(fftSize, juc
 {
     CreateColoursConfiguration& createColoursConfiguration = CreateColoursConfiguration::getInstance();
 
-    auto spectrumCat = createColoursConfiguration.currentColourTheme
+    spectrumCat = createColoursConfiguration.currentColourTheme
         .getChildWithProperty("name", "SpectrumAnalyzer");
     lineColor = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
         spectrumCat.getChildWithProperty("name", "BoundaryLine").getProperty("hex").toString(), false));
@@ -21,12 +21,15 @@ SpectrumAnalyser::SpectrumAnalyser() : forwardFFT(fftOrder), window(fftSize, juc
 
     lastProcessTime = juce::Time::getMillisecondCounterHiRes();
 
-    addAndMakeVisible(&componentControl);
     addAndMakeVisible(&drawBounds);
+    addAndMakeVisible(&componentHeader);
+
+    spectrumCat.addListener(this);
 }
 
 SpectrumAnalyser::~SpectrumAnalyser()
 {
+    spectrumCat.removeListener(this);
 }
 
 void SpectrumAnalyser::processAudioBuffer(const juce::AudioBuffer<float>& buffer)
@@ -269,40 +272,6 @@ void SpectrumAnalyser::drawSingleCurve(juce::Graphics& g,
     g.strokePath(linePath, juce::PathStrokeType(1.0f));
 }
 
-void SpectrumAnalyser::drawFrequencyAxis(juce::Graphics& g,juce::Rectangle<int> bounds)
-{
-    juce::Path p;
-    g.setColour(juce::Colours::blueviolet.withAlpha(0.2f));
-    g.setFont(10.0f);
-    float width = bounds.getWidth();
-    float currentNum;
-	float previousNum = 0.0f;
-    for (int i = 0; i < 10; ++i)
-    {
-        float f = std::log((float)i + std::exp(1.0f)) - 1;
-        currentNum = (float)f / (std::log((float)10 + std::exp(1.0f)) - 1) * width / 3.0f + bounds.getX();
-        p.startNewSubPath(currentNum, bounds.getBottom());
-        p.lineTo(currentNum, bounds.getY());
-    }
-	previousNum = width / 3.0f;
-    for (int i = 0; i < 10; ++i)
-    {
-        float f = std::log((float)i + std::exp(1.0f)) - 1;
-        currentNum = (float)f / (std::log((float)10 + std::exp(1.0f)) - 1) * width / 3.0f + bounds.getX();
-        p.startNewSubPath(currentNum + previousNum, bounds.getBottom());
-        p.lineTo(currentNum + previousNum, bounds.getY());
-    }
-	previousNum = width / 3.0f * 2;
-    for (int i = 0; i < 10; ++i)
-    {
-        float f = std::log((float)i + std::exp(1.0f)) - 1;
-        currentNum = (float)f / (std::log((float)10 + std::exp(1.0f)) - 1) * width / 3.0f + bounds.getX();
-        p.startNewSubPath(currentNum + previousNum, bounds.getBottom());
-        p.lineTo(currentNum + previousNum, bounds.getY());
-    }
-    g.strokePath(p, juce::PathStrokeType(1.0f));
-}
-
 void SpectrumAnalyser::paint(juce::Graphics& g)
 {
     drawFrame(g, drawArea);
@@ -356,17 +325,38 @@ void SpectrumAnalyser::checkProcessBufferActivity()
     }
 }
 
+void SpectrumAnalyser::mouseDown(const juce::MouseEvent& event)
+{
+    if (event.mods.isPopupMenu())
+    {
+        if (cb == nullptr) return;
+        cb();
+    }
+}
+
 void SpectrumAnalyser::mouseEnter(const juce::MouseEvent& event)
 {
-    componentControl.setVisible(true);
     drawBounds.setVisible(true);
+    componentHeader.setVisible(true);
 }
 
 void SpectrumAnalyser::mouseExit(const juce::MouseEvent&)
 {
-    if (!componentControl.isMouseOver())
+    if (!componentHeader.isMouseOver())
     {
-        componentControl.setVisible(false);
         drawBounds.setVisible(false);
+        componentHeader.setVisible(false);
+    }
+}
+
+void SpectrumAnalyser::valueTreePropertyChanged(juce::ValueTree& tree, const juce::Identifier& property)
+{
+    if (property == juce::Identifier("hex"))
+    {
+        this->lineColor = juce::Colour(CreateColoursConfiguration::getInstance().colourHexToARGBInt(
+            spectrumCat.getChildWithProperty("name", "BoundaryLine").getProperty("hex").toString(), false));
+		this->fillColor = juce::Colour(CreateColoursConfiguration::getInstance().colourHexToARGBInt(
+			spectrumCat.getChildWithProperty("name", "Fill").getProperty("hex").toString(), false));
+        repaint();
     }
 }

@@ -54,6 +54,12 @@ public:
             }
         },
 
+        { "Category", {{ "name", "VectorOscilloscopes" }},
+            {
+                { "Colour", {{ "name", "Colour"},          { "hex", "#0091FF" }}}
+            }
+        },
+
         { "Category", {{ "name", "MainComponent" }},
             {
                 { "Colour", {{ "name", "Background"}, { "hex", "#172027" }}},
@@ -65,7 +71,7 @@ public:
 
         { "Category", {{ "name", "ComponentBounds" }},
             {
-                { "Colour", {{ "name", "ComponentBoundsColour"}, { "hex", "#212A32" }}},
+                { "Colour", {{ "name", "ComponentBoundsColour"}, { "hex", "#B7ED88" }}},
             }
         },
 

@@ -7,6 +7,10 @@
       <FILE id="vRjiPQ" name="CreatePushSampleIntoJuceAudioBufferInstance.h"
             compile="0" resource="0" file="Source/CreatePushSampleIntoJuceAudioBufferInstance.h"/>
       <GROUP id="{CBAFAF3B-058A-6BB7-DDA1-0AB3F1C79541}" name="GUI">
+        <FILE id="QipF6T" name="PinOnTopButton.cpp" compile="1" resource="0"
+              file="Source/GUI/PinOnTopButton.cpp"/>
+        <FILE id="ZDJvGt" name="PinOnTopButton.h" compile="0" resource="0"
+              file="Source/GUI/PinOnTopButton.h"/>
         <GROUP id="{4CCE0439-35A6-164A-6A39-E2ADC8648477}" name="Configuration">
           <FILE id="ALig7T" name="ColourThemeEditor.cpp" compile="1" resource="0"
                 file="Source/GUI/Configuration/ColourThemeEditor.cpp"/>
@@ -24,6 +28,14 @@
                 file="Source/GUI/Components/ComponentControl.cpp"/>
           <FILE id="lqY9Ed" name="ComponentControl.h" compile="0" resource="0"
                 file="Source/GUI/Components/ComponentControl.h"/>
+          <FILE id="zGTM8T" name="ComponentHeader.cpp" compile="1" resource="0"
+                file="Source/GUI/Components/ComponentHeader.cpp"/>
+          <FILE id="ljtzB7" name="ComponentHeader.h" compile="0" resource="0"
+                file="Source/GUI/Components/ComponentHeader.h"/>
+          <FILE id="CXDuFM" name="ComponentThemeConfigurationButton.cpp" compile="1"
+                resource="0" file="Source/GUI/Components/ComponentThemeConfigurationButton.cpp"/>
+          <FILE id="gnz7sV" name="ComponentThemeConfigurationButton.h" compile="0"
+                resource="0" file="Source/GUI/Components/ComponentThemeConfigurationButton.h"/>
           <FILE id="DfMFhw" name="DrawBounds.cpp" compile="1" resource="0" file="Source/GUI/Components/DrawBounds.cpp"/>
           <FILE id="jf1tux" name="DrawBounds.h" compile="0" resource="0" file="Source/GUI/Components/DrawBounds.h"/>
         </GROUP>
@@ -50,11 +62,15 @@
         <FILE id="NeERhE" name="(L+R)2.png" compile="0" resource="1" file="Source/Assets/(L+R)2.png"/>
         <FILE id="lNRPEH" name="CascadiaMono.ttf" compile="0" resource="1"
               file="Source/Assets/CascadiaMono.ttf"/>
+        <FILE id="fWG07y" name="closeHeaderPinIcon.png" compile="0" resource="1"
+              file="Source/Assets/closeHeaderPinIcon.png"/>
         <FILE id="brkXTA" name="closeIcon.png" compile="0" resource="1" file="Source/Assets/closeIcon.png"/>
         <FILE id="NRgyu4" name="closeIcon10px.png" compile="0" resource="1"
               file="Source/Assets/closeIcon10px.png"/>
         <FILE id="ixC5a7" name="closeWASAPIButton.png" compile="0" resource="1"
               file="Source/Assets/closeWASAPIButton.png"/>
+        <FILE id="xKOgwA" name="headerPinIcon.png" compile="0" resource="1"
+              file="Source/Assets/headerPinIcon.png"/>
         <FILE id="elpz0r" name="L-R.png" compile="0" resource="1" file="Source/Assets/L-R.png"/>
         <FILE id="tmab0P" name="LAR.png" compile="0" resource="1" file="Source/Assets/LAR.png"/>
         <FILE id="HgEQ9E" name="LRLRLRLR.png" compile="0" resource="1" file="Source/Assets/LRLRLRLR.png"/>
@@ -140,6 +156,8 @@
       <FILE id="oZzoUv" name="MainComponent.cpp" compile="1" resource="0"
             file="Source/MainComponent.cpp"/>
     </GROUP>
+    <FILE id="sCghns" name="WaveformChartComponent.png" compile="0" resource="1"
+          file="Source/Assets/WaveformChartComponent.png"/>
   </MAINGROUP>
   <MODULES>
     <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>

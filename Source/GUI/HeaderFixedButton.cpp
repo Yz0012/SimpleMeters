@@ -13,11 +13,11 @@ void HeaderFixedButton::paint(juce::Graphics& g)
 {
 	if (headerFixed)
 	{
-		g.drawImageAt(juce::ImageCache::getFromMemory(BinaryData::pinCloseIcon_png, BinaryData::pinCloseIcon_pngSize), 0, 0);
+		g.drawImageAt(juce::ImageCache::getFromMemory(BinaryData::closeHeaderPinIcon_png, BinaryData::closeHeaderPinIcon_pngSize), 0, 0);
 	}
 	else
 	{
-		g.drawImageAt(juce::ImageCache::getFromMemory(BinaryData::pinIcon_png, BinaryData::pinIcon_pngSize), 0, 0);
+		g.drawImageAt(juce::ImageCache::getFromMemory(BinaryData::headerPinIcon_png, BinaryData::headerPinIcon_pngSize), 0, 0);
 	}
 }
 

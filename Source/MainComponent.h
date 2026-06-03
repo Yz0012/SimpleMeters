@@ -10,7 +10,7 @@
 
 #include "GUI/Header.h"
 
-class MainComponent : public juce::Component, public juce::ValueTree::Listener
+class MainComponent : public juce::Component, private juce::ValueTree::Listener
 {
 public:
     MainComponent();
@@ -25,6 +25,8 @@ public:
 	void mouseExit(const juce::MouseEvent&) override;
 	void userTriedToCloseWindow() override;
 
+	void valueTreePropertyChanged(juce::ValueTree& tree, const juce::Identifier& property) override;
+
 	void openSpectrumAnalyser(int x, int y);
 	void openWaveformComponent(int x, int y);
 	void openVectorOscilloscopeComponent(int x, int y);
@@ -35,7 +37,7 @@ public:
 
 	juce::ComponentDragger dragger;
 private:
-	juce::ValueTree appState;
+	juce::ValueTree mainCategory;
 
 	PushSampleIntoJuceAudioBuffer<float>& pushSampleIntoJuceAudioBuffer = CreatePushSampleIntoJuceAudioBufferInstance::getInstance();
 

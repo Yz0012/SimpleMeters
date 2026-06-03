@@ -4,7 +4,7 @@ WaveformComponent::WaveformComponent()
 {
     CreateColoursConfiguration& createColoursConfiguration = CreateColoursConfiguration::getInstance();
 
-    auto waveformCat = createColoursConfiguration.currentColourTheme
+    waveformCat = createColoursConfiguration.currentColourTheme
         .getChildWithProperty("name", "Waveform");
     lineColorL = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
         waveformCat.getChildWithProperty("name", "BoundaryLineL").getProperty("hex").toString(), true));
@@ -19,12 +19,15 @@ WaveformComponent::WaveformComponent()
     gradientColorOfLinesR = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
         waveformCat.getChildWithProperty("name", "GradientColorOfLinesR").getProperty("hex").toString(), true));
 
-    addAndMakeVisible(&componentControl);
     addAndMakeVisible(&drawBounds);
+	addAndMakeVisible(&componentHeader);
+
+	waveformCat.addListener(this);
 }
 
 WaveformComponent::~WaveformComponent()
 {
+	waveformCat.removeListener(this);
 	imageRingBuffer.reset();
 }
 
@@ -122,89 +125,51 @@ void WaveformComponent::renderNextFrame(juce::Graphics& g, juce::Rectangle<int> 
     }
 }
 
-void WaveformComponent::drawAxis(juce::Graphics& g, juce::Rectangle<int> area)
-{
-    g.setColour(juce::Colours::blueviolet.withAlpha(0.5f));
-    g.setFont(10.0f);
-
-    const float topY = (float)area.getY();
-    const float bottomY = (float)(area.getY() + area.getHeight());
-    const float midY = (topY + bottomY) * 0.5f;
-    const float halfHeight = (float)area.getHeight() * 0.5f;
-
-    const int labelX = area.getX() - 40;
-    const int labelW = 40;
-
-    {
-        g.drawText("0 dBFS", labelX, (int)topY - 10, labelW, 20,
-            juce::Justification::centredRight);
-
-        juce::Path p;
-        p.startNewSubPath((float)area.getX(), topY);
-        p.lineTo((float)(area.getX() + area.getWidth()), topY);
-        g.strokePath(p, juce::PathStrokeType(1.0f));
-    }
-
-    for (float db : dbValues)
-    {
-        const float amplitude = std::pow(10.0f, db / 20.0f);
-        const float yTop = midY - halfHeight * amplitude;
-
-        {
-            juce::Path line;
-            line.startNewSubPath((float)area.getX(), yTop);
-            line.lineTo((float)(area.getX() + area.getWidth()), yTop);
-            g.strokePath(line, juce::PathStrokeType(1.0f));
-        }
-
-        juce::String label = juce::String((int)db) + " dBFS";
-        g.drawText(label, labelX, (int)yTop - 10, labelW, 20,
-            juce::Justification::centredRight);
-    }
-    for (float db : dbValues)
-    {
-        const float amplitude = std::pow(10.0f, db / 20.0f);
-        const float yTop = midY + halfHeight * amplitude;
-
-        {
-            juce::Path line;
-            line.startNewSubPath((float)area.getX(), yTop);
-            line.lineTo((float)(area.getX() + area.getWidth()), yTop);
-            g.strokePath(line, juce::PathStrokeType(1.0f));
-        }
-
-        juce::String label = juce::String((int)db) + " dBFS";
-        g.drawText(label, labelX, (int)yTop - 10, labelW, 20,
-            juce::Justification::centredRight);
-    }
-
-    {
-        g.drawText("0 dBFS", labelX, (int)topY - 10, labelW, 20,
-            juce::Justification::centredRight);
-
-        juce::Path p;
-        p.startNewSubPath((float)area.getX(), bottomY);
-        p.lineTo((float)(area.getX() + area.getWidth()), bottomY);
-        g.strokePath(p, juce::PathStrokeType(1.0f));
-    }
-}
-
-void WaveformComponent::paint(juce::Graphics& g)
+void WaveformComponent::paint(juce::Graphics&  g)
 {
     renderNextFrame(g, drawArea);
 }
 
+void WaveformComponent::mouseDown(const juce::MouseEvent& event)
+{
+    if (event.mods.isPopupMenu())
+    {
+        if (cb == nullptr) return;
+        cb();
+    }
+}
+
 void WaveformComponent::mouseEnter(const juce::MouseEvent& event)
 {
-    componentControl.setVisible(true);
     drawBounds.setVisible(true);
+    componentHeader.setVisible(true);
 }
 
 void WaveformComponent::mouseExit(const juce::MouseEvent&)
-{
-    if (!componentControl.isMouseOver())
+{ 
+    if (!componentHeader.isMouseOver())
     {
-        componentControl.setVisible(false);
         drawBounds.setVisible(false);
+        componentHeader.setVisible(false);
+    }
+}
+
+void WaveformComponent::valueTreePropertyChanged(juce::ValueTree& tree, const juce::Identifier& property)
+{
+    if (property == juce::Identifier("hex"))
+    {
+        lineColorL = juce::Colour(CreateColoursConfiguration::getInstance().colourHexToARGBInt(
+            waveformCat.getChildWithProperty("name", "BoundaryLineL").getProperty("hex").toString(), true));
+        fillColorL = juce::Colour(CreateColoursConfiguration::getInstance().colourHexToARGBInt(
+            waveformCat.getChildWithProperty("name", "FillL").getProperty("hex").toString(), true));
+        gradientColorOfLinesL = juce::Colour(CreateColoursConfiguration::getInstance().colourHexToARGBInt(
+            waveformCat.getChildWithProperty("name", "GradientColorOfLinesL").getProperty("hex").toString(), true));
+        lineColorR = juce::Colour(CreateColoursConfiguration::getInstance().colourHexToARGBInt(
+            waveformCat.getChildWithProperty("name", "BoundaryLineR").getProperty("hex").toString(), true));
+        fillColorR = juce::Colour(CreateColoursConfiguration::getInstance().colourHexToARGBInt(
+            waveformCat.getChildWithProperty("name", "FillR").getProperty("hex").toString(), true));
+        gradientColorOfLinesR = juce::Colour(CreateColoursConfiguration::getInstance().colourHexToARGBInt(
+            waveformCat.getChildWithProperty("name", "GradientColorOfLinesR").getProperty("hex").toString(), true));
+        repaint();
     }
 }

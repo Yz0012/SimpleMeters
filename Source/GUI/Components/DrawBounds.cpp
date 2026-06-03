@@ -7,6 +7,7 @@ DrawBounds::DrawBounds()
 		.getChildWithProperty("name", "ComponentBounds");
 	boundsColour = juce::Colour(CreateColoursConfiguration::getInstance().colourHexToARGBInt(
 		drawBoundsCat.getChildWithProperty("name", "ComponentBoundsColour").getProperty("hex").toString(), true));
+	
 }
 
 DrawBounds::~DrawBounds()

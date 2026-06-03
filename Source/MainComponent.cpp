@@ -1,6 +1,6 @@
 #include "MainComponent.h"
 
-MainComponent::MainComponent() : appState("AppState")
+MainComponent::MainComponent()
 {
     setOpaque(true);
 
@@ -8,20 +8,25 @@ MainComponent::MainComponent() : appState("AppState")
 
     CreateColoursConfiguration& createColoursConfiguration = CreateColoursConfiguration::getInstance();
 
-    auto mainCompCat = createColoursConfiguration.currentColourTheme
+    mainCategory = createColoursConfiguration.currentColourTheme
         .getChildWithProperty("name", "MainComponent");
     mainComponentBackgroundColour = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
-        mainCompCat.getChildWithProperty("name", "Background").getProperty("hex").toString(), false));
+        mainCategory.getChildWithProperty("name", "Background").getProperty("hex").toString(), false));
+    mainCategory.addListener(this);
 
     centreWithSize(600,400);
     addAndMakeVisible(header);
-    header.WASAPIButton.setBounds(20,10,30,30);
-    header.windowsSizeButton.setBounds(60,10,30,30);
-    header.headerFixedButton.setBounds(100,10,30,30);
-    header.themeConfigurationButton.setBounds(140,10,30,30);
+    header.WASAPIButton.setBounds(20, 10, 30, 30);
+    header.windowsSizeButton.setBounds(60, 10, 30, 30);
+    header.headerFixedButton.setBounds(100, 10, 30, 30);
+    header.themeConfigurationButton.setBounds(180, 10, 30, 30);
+	header.pinOnTopButton.setBounds(140, 10, 30, 30);
     header.windowControl.setTooltip("Close");
     header.WASAPIButton.setTooltip("Enable or disable miniaudio WASAPI loopback");
     header.windowsSizeButton.setTooltip("Resize Window");
+	header.headerFixedButton.setTooltip("Pin header");
+    header.pinOnTopButton.setTooltip("Pinned window");
+	header.themeConfigurationButton.setTooltip("Open theme configuration");
     header.windowsSizeButton.onClick = [this]
         {
             juce::AlertWindow* aw = new juce::AlertWindow(
@@ -68,10 +73,24 @@ MainComponent::MainComponent() : appState("AppState")
                 header.WASAPIButton.repaint();
             }
         };
+	header.pinOnTopButton.onClick = [this]
+		{
+			if (header.pinOnTopButton.pinFixed)
+			{
+				setAlwaysOnTop(false);
+			}
+			else
+			{
+				setAlwaysOnTop(true);
+			}
+		};
 }
 
 MainComponent::~MainComponent()
 {
+    if (mainCategory.isValid())
+        mainCategory.removeListener(this);
+
     pushSampleIntoJuceAudioBuffer.removeAll();
     pushSampleIntoJuceAudioBuffer.removeAllM();
     pushSampleIntoJuceAudioBuffer.removeAllS();
@@ -105,10 +124,10 @@ void MainComponent::mouseDown(const juce::MouseEvent& event)
     {
         juce::PopupMenu menu;
 
-        menu.addItem(1, "SpectrumAnalyser");
-        menu.addItem(2, "Waveform");
-        menu.addItem(3, "VectorOscilloscopeComponent");
-        menu.addItem(4, "WaveformChart");
+        menu.addItem(1, "SpectrumAnalyser", true, false, juce::Drawable::createFromImageData(BinaryData::spectrumAnalyzerIcon_png, BinaryData::spectrumAnalyzerIcon_pngSize));
+        menu.addItem(2, "Waveform", true, false, juce::Drawable::createFromImageData(BinaryData::WaveformComponent_png, BinaryData::WaveformComponent_pngSize));
+        menu.addItem(3, "VectorOscilloscopeComponent", true, false, juce::Drawable::createFromImageData(BinaryData::VectorOscilloscopeComponent_png, BinaryData::VectorOscilloscopeComponent_pngSize));
+        menu.addItem(4, "WaveformChart", true, false, juce::Drawable::createFromImageData(BinaryData::WaveformChartComponent_png, BinaryData::WaveformChartComponent_pngSize));
 
         menu.showMenuAsync(
             juce::PopupMenu::Options(),
@@ -191,12 +210,13 @@ void MainComponent::openSpectrumAnalyser(int x, int y)
     }
 
     addAndMakeVisible(spectrum.get());
-    spectrum->componentControl.setBounds(480, 10, 10, 10);
+    spectrum->componentHeader.componentControl.setBounds(470, 20, 10, 10);
     spectrum->drawBounds.setBounds(0,0,500,150);
     spectrum->drawBounds.setInterceptsMouseClicks(false, false);
 
+    // 不统一
     std::weak_ptr<SpectrumAnalyser> weakSpectrum = spectrum;
-    spectrum->componentControl.setCallBackFuntion([this, weakSpectrum]()
+    spectrum->componentHeader.componentControl.setCallBackFuntion([this, weakSpectrum]()
         {
             if (auto sp = weakSpectrum.lock())
             {
@@ -207,8 +227,58 @@ void MainComponent::openSpectrumAnalyser(int x, int y)
             ComponentManagement::getInstance().resetSpectrumAnalyser();
         });
 
+    spectrum->cb = [weakSpectrum]()
+        {
+            juce::PopupMenu menu;
+
+            menu.addItem(1, "Position", true, false);
+            menu.addItem(2, "ComponentSize", true, false);
+            
+            juce::PopupMenu modeMenu;
+            modeMenu.addItem(3, "Left", true, false, juce::Drawable::createFromImageData(BinaryData::LAR_png, BinaryData::LAR_pngSize));
+            modeMenu.addItem(4, "Right", true, false, juce::Drawable::createFromImageData(BinaryData::LAR_png, BinaryData::LAR_pngSize));
+            modeMenu.addItem(5, "Stereo", true, false, juce::Drawable::createFromImageData(BinaryData::LR2_png, BinaryData::LR2_pngSize));
+            modeMenu.addItem(6, "LR", true, false, juce::Drawable::createFromImageData(BinaryData::LR_png, BinaryData::LR_pngSize));
+            modeMenu.addItem(7, "Interleaved", true, false, juce::Drawable::createFromImageData(BinaryData::LRLRLRLR_png, BinaryData::LRLRLRLR_pngSize));
+			menu.addSubMenu("Mode", modeMenu);
+
+            menu.showMenuAsync(
+                juce::PopupMenu::Options(),
+                [weakSpectrum](int result)
+                {
+                    if (auto sp = weakSpectrum.lock())
+                    {
+                        if (result == 0)
+                        {
+                        }
+                        else if (result == 3)
+                        {
+                            sp->setAnalysisMode(AnalysisMode::Left);
+                        }
+                        else if (result == 4)
+                        {
+                            sp->setAnalysisMode(AnalysisMode::Right);
+                        }
+                        else if (result == 5)
+                        {
+                            sp->setAnalysisMode(AnalysisMode::Stereo);
+                        }
+                        else if (result == 6)
+                        {
+                            sp->setAnalysisMode(AnalysisMode::LR);
+                        }
+                        else if (result == 7)
+                        {
+                            sp->setAnalysisMode(AnalysisMode::Interleaved);
+                        }
+                    }
+                });
+        };
+
     spectrum->setBounds(x, y, 500, 150);
-    spectrum->drawArea.setBounds(0, 0, 500, 150);
+    spectrum->drawArea.setBounds(0, 50, 500, 100);
+    spectrum->componentHeader.setBounds(0, 0, 500, 50);
+    spectrum->componentHeader.themeConfigButton.setBounds(10, 10, 30, 30);
 }
 
 void MainComponent::openWaveformComponent(int x, int y)
@@ -228,12 +298,12 @@ void MainComponent::openWaveformComponent(int x, int y)
     }
 
     addAndMakeVisible(waveform.get());
-    waveform->componentControl.setBounds(480, 10, 10, 10);
+    waveform->componentHeader.componentControl.setBounds(470, 20, 10, 10);
     waveform->drawBounds.setBounds(0, 0, 500, 150);
     waveform->drawBounds.setInterceptsMouseClicks(false, false);
 
     std::weak_ptr<WaveformComponent> weakWaveform = waveform;
-    waveform->componentControl.setCallBackFuntion([this, weakWaveform]()
+    waveform->componentHeader.componentControl.setCallBackFuntion([this, weakWaveform]()
         {
             if (auto wf = weakWaveform.lock())
             {
@@ -242,9 +312,29 @@ void MainComponent::openWaveformComponent(int x, int y)
             ComponentManagement::getInstance().resetWaveformComponent();
         });
 
+    waveform->cb = [weakWaveform]()
+        {
+            juce::PopupMenu menu;
+            menu.addItem(1, "Position", true, false);
+            menu.addItem(2, "ComponentSize", true, false);
+            menu.showMenuAsync(
+                juce::PopupMenu::Options(),
+                [weakWaveform](int result)
+                {
+                    if (auto wf = weakWaveform.lock())
+                    {
+                        if (result == 0)
+                        {
+                        }
+                    }
+                });
+        };
+
     waveform->setBounds(x, y, 500, 150);
-    waveform->tileArea.setBounds(0, 0, 16, 150);
-    waveform->drawArea.setBounds(0, 0, 500, 150);
+    waveform->tileArea.setBounds(0, 0, 16, 100);
+    waveform->drawArea.setBounds(0, 50, 500, 100);
+	waveform->componentHeader.setBounds(0, 0, 500, 50);
+	waveform->componentHeader.themeConfigButton.setBounds(10, 10, 30, 30);
 }
 
 void MainComponent::openVectorOscilloscopeComponent(int x, int y)
@@ -263,12 +353,12 @@ void MainComponent::openVectorOscilloscopeComponent(int x, int y)
     }
 
     addAndMakeVisible(vector.get());
-    vector->componentControl.setBounds(280, 10, 10, 10);
+    vector->componentHeader.componentControl.setBounds(270, 20, 10, 10);
     vector->drawBounds.setBounds(0, 0, 300, 300);
     vector->drawBounds.setInterceptsMouseClicks(false, false);
 
     std::weak_ptr<VectorOscilloscopes> weakVector = vector;
-    vector->componentControl.setCallBackFuntion([this, weakVector]()
+    vector->componentHeader.componentControl.setCallBackFuntion([this, weakVector]()
         {
             if (auto vec = weakVector.lock())
             {
@@ -277,7 +367,27 @@ void MainComponent::openVectorOscilloscopeComponent(int x, int y)
             ComponentManagement::getInstance().resetVectorOscilloscopes();
         });
 
+    vector->cb = [weakVector]()
+        {
+            juce::PopupMenu menu;
+            menu.addItem(1, "Position", true, false);
+            menu.addItem(2, "ComponentSize", true, false);
+            menu.showMenuAsync(
+                juce::PopupMenu::Options(),
+                [weakVector](int result)
+                {
+                    if (auto vec = weakVector.lock())
+                    {
+                        if (result == 0)
+                        {
+                        }
+                    }
+                });
+        };
+
     vector->setBounds(x, y, 300, 300);
+    vector->componentHeader.setBounds(0, 0, 300, 50);
+    vector->componentHeader.themeConfigButton.setBounds(10, 10, 30, 30);
 }
 
 void MainComponent::openWaveformChartComponent(int x, int y)
@@ -298,12 +408,12 @@ void MainComponent::openWaveformChartComponent(int x, int y)
     }
 
     addAndMakeVisible(chart.get());
-    chart->componentControl.setBounds(480, 10, 10, 10);
+    chart->componentHeader.componentControl.setBounds(470, 20, 10, 10);
     chart->drawBounds.setBounds(0, 0, 500, 150);
     chart->drawBounds.setInterceptsMouseClicks(false, false);
 
     std::weak_ptr<WaveformChartComponent> weakChart = chart;
-    chart->componentControl.setCallBackFuntion([this, weakChart]()
+    chart->componentHeader.componentControl.setCallBackFuntion([this, weakChart]()
         {
             if (auto ch = weakChart.lock())
             {
@@ -312,8 +422,28 @@ void MainComponent::openWaveformChartComponent(int x, int y)
             ComponentManagement::getInstance().resetWaveformChartComponent();
         });
 
+    chart->cb = [weakChart]()
+        {
+            juce::PopupMenu menu;
+            menu.addItem(1, "Position", true, false);
+            menu.addItem(2, "ComponentSize", true, false);
+            menu.showMenuAsync(
+                juce::PopupMenu::Options(),
+                [weakChart](int result)
+                {
+                    if (auto ch = weakChart.lock())
+                    {
+                        if (result == 0)
+                        {
+                        }
+                    }
+                });
+        };
+
     chart->setBounds(x, y, 500, 150);
-    chart->drawArea.setBounds(0, 0, 500, 150);
+    chart->drawArea.setBounds(0, 50, 500, 100);
+    chart->componentHeader.setBounds(0, 0, 500, 50);
+    chart->componentHeader.themeConfigButton.setBounds(10, 10, 30, 30);
 }
 
 void MainComponent::userTriedToCloseWindow()
@@ -333,4 +463,14 @@ void MainComponent::stopWASAPIDevice()
 {
     miniAudioWASAPI->stopDevice();
     DBG("device stop");
+}
+
+void MainComponent::valueTreePropertyChanged(juce::ValueTree& tree, const juce::Identifier& property)
+{
+    if (property == juce::Identifier("hex"))
+    {
+        this->mainComponentBackgroundColour = juce::Colour(CreateColoursConfiguration::getInstance().colourHexToARGBInt(
+            mainCategory.getChildWithProperty("name", "Background").getProperty("hex").toString(), false));
+		repaint();
+    }
 }

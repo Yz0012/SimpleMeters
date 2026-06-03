@@ -1,31 +1,33 @@
 
-#include "ThemeConfigurationButton.h"
+#include "ComponentThemeConfigurationButton.h"
 
-ThemeConfigurationButton::ThemeConfigurationButton()
+
+ComponentThemeConfigurationButton::ComponentThemeConfigurationButton(juce::String& categoryName)
+    : categoryName(categoryName)
 {
 }
 
-ThemeConfigurationButton::~ThemeConfigurationButton()
+ComponentThemeConfigurationButton::~ComponentThemeConfigurationButton()
 {
 }
 
-void ThemeConfigurationButton::paint(juce::Graphics& g)
+void ComponentThemeConfigurationButton::paint(juce::Graphics& g)
 {
 	g.drawImageAt(juce::ImageCache::getFromMemory(BinaryData::themeConfigurationIcon_png, BinaryData::themeConfigurationIcon_pngSize), 0, 0);
 }
 
-void ThemeConfigurationButton::mouseDown(const juce::MouseEvent& event)
+void ComponentThemeConfigurationButton::mouseDown(const juce::MouseEvent& event)
 {
     CreateColoursConfiguration& createColoursConfiguration = CreateColoursConfiguration::getInstance();
 
     juce::ValueTree mainCategory = createColoursConfiguration.currentColourTheme
-        .getChildWithProperty("name", "MainComponent");
+        .getChildWithProperty("name", categoryName);
 
     if (!mainCategory.isValid())
     {
         juce::AlertWindow::showMessageBoxAsync(juce::AlertWindow::WarningIcon,
             "Error",
-            "Cannot find 'MainComponent' category.");
+            "Cannot find this category.");
         return;
     }
 
@@ -82,7 +84,7 @@ void ThemeConfigurationButton::mouseDown(const juce::MouseEvent& event)
     auto content = std::make_unique<DialogContent>(mainCategory);
 
     juce::DialogWindow::LaunchOptions options;
-    options.dialogTitle = "Edit MainComponent Colours(Does't support transparency :)";
+    options.dialogTitle = "Edit Component Colours";
     options.dialogBackgroundColour = juce::Colour(0xFF172027);
     options.escapeKeyTriggersCloseButton = true;
     options.useNativeTitleBar = false;
@@ -101,8 +103,7 @@ void ThemeConfigurationButton::mouseDown(const juce::MouseEvent& event)
     );
 }
 
-
-void ThemeConfigurationButton::mouseEnter(const juce::MouseEvent&)
+void ComponentThemeConfigurationButton::mouseEnter(const juce::MouseEvent&)
 {
-	setMouseCursor(juce::MouseCursor::PointingHandCursor);
+    setMouseCursor(juce::MouseCursor::PointingHandCursor);
 }

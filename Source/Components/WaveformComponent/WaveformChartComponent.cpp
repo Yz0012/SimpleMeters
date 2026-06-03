@@ -5,7 +5,7 @@ WaveformChartComponent::WaveformChartComponent()
 {
     CreateColoursConfiguration& createColoursConfiguration = CreateColoursConfiguration::getInstance();
 
-    auto waveformChartCat = createColoursConfiguration.currentColourTheme
+    waveformChartCat = createColoursConfiguration.currentColourTheme
         .getChildWithProperty("name", "WaveformChart");
     lineColorL = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
         waveformChartCat.getChildWithProperty("name", "BoundaryLineL").getProperty("hex").toString(), true));
@@ -20,12 +20,15 @@ WaveformChartComponent::WaveformChartComponent()
     gradientColorOfLinesR = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
         waveformChartCat.getChildWithProperty("name", "GradientColorOfLinesR").getProperty("hex").toString(), true));
 
-    addAndMakeVisible(&componentControl);
     addAndMakeVisible(&drawBounds);
+	addAndMakeVisible(&componentHeader);
+
+	waveformChartCat.addListener(this);
 }
 
 WaveformChartComponent::~WaveformChartComponent()
 {
+    waveformChartCat.removeListener(this);
 }
 
 void WaveformChartComponent::clear()
@@ -122,17 +125,46 @@ void WaveformChartComponent::paint(juce::Graphics& g)
     }
 }
 
+void WaveformChartComponent::mouseDown(const juce::MouseEvent& event)
+{
+    if (event.mods.isPopupMenu())
+    {
+        if (cb == nullptr) return;
+        cb();
+    }
+}
+
 void WaveformChartComponent::mouseEnter(const juce::MouseEvent& event)
 {
-    componentControl.setVisible(true);
     drawBounds.setVisible(true);
+    componentHeader.setVisible(true);
 }
 
 void WaveformChartComponent::mouseExit(const juce::MouseEvent&)
 {
-    if (!componentControl.isMouseOver())
+    if (!componentHeader.isMouseOver())
     {
-        componentControl.setVisible(false);
         drawBounds.setVisible(false);
+        componentHeader.setVisible(false);
+    }
+}
+
+void WaveformChartComponent::valueTreePropertyChanged(juce::ValueTree& tree, const juce::Identifier& property)
+{
+    if (property == juce::Identifier("hex"))
+    {
+        lineColorL = juce::Colour(CreateColoursConfiguration::getInstance().colourHexToARGBInt(
+            waveformChartCat.getChildWithProperty("name", "BoundaryLineL").getProperty("hex").toString(), true));
+        fillColorL = juce::Colour(CreateColoursConfiguration::getInstance().colourHexToARGBInt(
+            waveformChartCat.getChildWithProperty("name", "FillL").getProperty("hex").toString(), true));
+        gradientColorOfLinesL = juce::Colour(CreateColoursConfiguration::getInstance().colourHexToARGBInt(
+            waveformChartCat.getChildWithProperty("name", "GradientColorOfLinesL").getProperty("hex").toString(), true));
+        lineColorR = juce::Colour(CreateColoursConfiguration::getInstance().colourHexToARGBInt(
+            waveformChartCat.getChildWithProperty("name", "BoundaryLineR").getProperty("hex").toString(), true));
+        fillColorR = juce::Colour(CreateColoursConfiguration::getInstance().colourHexToARGBInt(
+            waveformChartCat.getChildWithProperty("name", "FillR").getProperty("hex").toString(), true));
+        gradientColorOfLinesR = juce::Colour(CreateColoursConfiguration::getInstance().colourHexToARGBInt(
+            waveformChartCat.getChildWithProperty("name", "GradientColorOfLinesR").getProperty("hex").toString(), true));
+        repaint();
     }
 }

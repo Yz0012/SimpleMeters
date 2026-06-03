@@ -8,6 +8,7 @@ Header::Header()
 	addAndMakeVisible(&windowsSizeButton);
 	addAndMakeVisible(&headerFixedButton);
 	addAndMakeVisible(&themeConfigurationButton);
+	addAndMakeVisible(&pinOnTopButton);
 }
 
 Header::~Header()
