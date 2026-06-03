@@ -20,7 +20,7 @@ Features currently being developed or already completed include:
 - [ ] Component hover effect
 - [ ] Component pause functionality
 - [ ] VST3 support
-- [ ] Spectrum mode switching
+- [x] Spectrum mode switching
 - [ ] Spectrum display with gain curve
 - [ ] Spectrum coordinate mapping curve
 - [ ] Spectrum bar graph
