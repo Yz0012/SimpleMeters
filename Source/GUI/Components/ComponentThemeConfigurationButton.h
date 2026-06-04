@@ -6,7 +6,7 @@
 #include "../../CreateConfiguration/CreateColoursConfiguration.h"
 #include "../../GUI/Configuration/ColourThemeEditor.h"
 
-class ComponentThemeConfigurationButton : public juce::Component
+class ComponentThemeConfigurationButton : public juce::Component, public juce::SettableTooltipClient
 {
 public:
 	ComponentThemeConfigurationButton(juce::String& categoryName);

@@ -17,6 +17,10 @@ SpectrumAnalyser::SpectrumAnalyser() : forwardFFT(fftOrder), window(fftSize, juc
         scopeData[i] = mindB;
         gapSmoothedScopeData[i] = mindB;
         scopeDataStorage[i] = mindB;
+
+        scopeData2[i] = mindB;
+        gapSmoothedScopeData2[i] = mindB;
+        scopeDataStorage2[i] = mindB;
     }
 
     lastProcessTime = juce::Time::getMillisecondCounterHiRes();
@@ -300,6 +304,10 @@ void SpectrumAnalyser::scopeDataReset()
         scopeData[i] = mindB;
         gapSmoothedScopeData[i] = mindB;
         scopeDataStorage[i] = mindB;
+
+		scopeData2[i] = mindB;
+		gapSmoothedScopeData2[i] = mindB;
+		scopeDataStorage2[i] = mindB;
     }
 }
 

@@ -24,7 +24,7 @@ MainComponent::MainComponent()
     header.windowControl.setTooltip("Close");
     header.WASAPIButton.setTooltip("Enable or disable miniaudio WASAPI loopback");
     header.windowsSizeButton.setTooltip("Resize Window");
-	header.headerFixedButton.setTooltip("Pin header");
+	header.headerFixedButton.setTooltip("Pinned header");
     header.pinOnTopButton.setTooltip("Pinned window");
 	header.themeConfigurationButton.setTooltip("Open theme configuration");
     header.windowsSizeButton.onClick = [this]
@@ -279,6 +279,7 @@ void MainComponent::openSpectrumAnalyser(int x, int y)
     spectrum->drawArea.setBounds(0, 50, 500, 100);
     spectrum->componentHeader.setBounds(0, 0, 500, 50);
     spectrum->componentHeader.themeConfigButton.setBounds(10, 10, 30, 30);
+    spectrum->componentHeader.themeConfigButton.setTooltip("Theme Configuration");
 }
 
 void MainComponent::openWaveformComponent(int x, int y)
@@ -335,6 +336,7 @@ void MainComponent::openWaveformComponent(int x, int y)
     waveform->drawArea.setBounds(0, 50, 500, 100);
 	waveform->componentHeader.setBounds(0, 0, 500, 50);
 	waveform->componentHeader.themeConfigButton.setBounds(10, 10, 30, 30);
+    waveform->componentHeader.themeConfigButton.setTooltip("Theme Configuration");
 }
 
 void MainComponent::openVectorOscilloscopeComponent(int x, int y)
@@ -388,6 +390,7 @@ void MainComponent::openVectorOscilloscopeComponent(int x, int y)
     vector->setBounds(x, y, 300, 300);
     vector->componentHeader.setBounds(0, 0, 300, 50);
     vector->componentHeader.themeConfigButton.setBounds(10, 10, 30, 30);
+    vector->componentHeader.themeConfigButton.setTooltip("Theme Configuration");
 }
 
 void MainComponent::openWaveformChartComponent(int x, int y)
@@ -444,6 +447,7 @@ void MainComponent::openWaveformChartComponent(int x, int y)
     chart->drawArea.setBounds(0, 50, 500, 100);
     chart->componentHeader.setBounds(0, 0, 500, 50);
     chart->componentHeader.themeConfigButton.setBounds(10, 10, 30, 30);
+    chart->componentHeader.themeConfigButton.setTooltip("Theme Configuration");
 }
 
 void MainComponent::userTriedToCloseWindow()
