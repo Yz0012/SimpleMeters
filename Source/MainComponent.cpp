@@ -231,14 +231,14 @@ void MainComponent::openSpectrumAnalyser(int x, int y)
         {
             juce::PopupMenu menu;
 
-            menu.addItem(1, "Position", true, false);
-            menu.addItem(2, "ComponentSize", true, false);
+            menu.addItem(1, "Position", true, false, juce::Drawable::createFromImageData(BinaryData::menuPosition_png, BinaryData::menuPosition_pngSize));
+            menu.addItem(2, "ComponentSize", true, false, juce::Drawable::createFromImageData(BinaryData::menuComponentSize_png, BinaryData::menuComponentSize_pngSize));
             
             juce::PopupMenu modeMenu;
             modeMenu.addItem(3, "Left", true, false, juce::Drawable::createFromImageData(BinaryData::LAR_png, BinaryData::LAR_pngSize));
-            modeMenu.addItem(4, "Right", true, false, juce::Drawable::createFromImageData(BinaryData::LAR_png, BinaryData::LAR_pngSize));
+            modeMenu.addItem(4, "Right", true, false, juce::Drawable::createFromImageData(BinaryData::LAR2_png, BinaryData::LAR2_pngSize));
             modeMenu.addItem(5, "Stereo", true, false, juce::Drawable::createFromImageData(BinaryData::LR2_png, BinaryData::LR2_pngSize));
-            modeMenu.addItem(6, "LR", true, false, juce::Drawable::createFromImageData(BinaryData::LR_png, BinaryData::LR_pngSize));
+            modeMenu.addItem(6, "Side", true, false, juce::Drawable::createFromImageData(BinaryData::LR_png, BinaryData::LR_pngSize));
             modeMenu.addItem(7, "Interleaved", true, false, juce::Drawable::createFromImageData(BinaryData::LRLRLRLR_png, BinaryData::LRLRLRLR_pngSize));
 			menu.addSubMenu("Mode", modeMenu);
 
@@ -250,6 +250,71 @@ void MainComponent::openSpectrumAnalyser(int x, int y)
                     {
                         if (result == 0)
                         {
+                        }
+                        else if (result == 1)
+                        {
+                            juce::AlertWindow* aw = new juce::AlertWindow(
+                                "Set position",
+                                "Enter X and Y coordinates,please don't input zero or any number smaller then 0 :)",
+                                juce::AlertWindow::QuestionIcon);
+
+                            aw->setOpaque(false);
+                            aw->setDropShadowEnabled(false);
+                            aw->addTextEditor("X", "", "X");
+                            aw->addTextEditor("Y", "", "Y");
+                            aw->getTextEditor("X")->setInputRestrictions(4, "0123456789");
+                            aw->getTextEditor("Y")->setInputRestrictions(4, "0123456789");
+                            aw->addButton("OK", 1, juce::KeyPress(juce::KeyPress::returnKey));
+                            aw->addButton("Cancel", 0, juce::KeyPress(juce::KeyPress::escapeKey));
+
+                            aw->enterModalState(true, juce::ModalCallbackFunction::create(
+                                [sp, aw](int result)
+                                {
+                                    if (result == 1)
+                                    {
+                                        int&& X = aw->getTextEditorContents("X").getIntValue();
+                                        int&& Y = aw->getTextEditorContents("Y").getIntValue();
+                                        if (X <= 0 || Y <= 0) return;
+										sp->setBounds(X, Y, sp->getWidth(), sp->getHeight());
+                                    }
+                                    delete aw;
+                                }
+                            ), true);
+                        }
+                        else if (result == 2)
+                        {
+                            juce::AlertWindow* aw = new juce::AlertWindow(
+                                "Resize Component",
+                                "Enter Width and Height,please don't input zero or any number smaller then 100 :)",
+                                juce::AlertWindow::QuestionIcon);
+
+                            aw->setOpaque(false);
+                            aw->setDropShadowEnabled(false);
+                            aw->addTextEditor("Width", "", "Width");
+                            aw->addTextEditor("Height", "", "Height");
+                            aw->getTextEditor("Width")->setInputRestrictions(3, "0123456789");
+                            aw->getTextEditor("Height")->setInputRestrictions(3, "0123456789");
+                            aw->addButton("OK", 1, juce::KeyPress(juce::KeyPress::returnKey));
+                            aw->addButton("Cancel", 0, juce::KeyPress(juce::KeyPress::escapeKey));
+
+                            aw->enterModalState(true, juce::ModalCallbackFunction::create(
+                                [sp, aw](int result)
+                                {
+                                    if (result == 1)
+                                    {
+                                        int&& Width = aw->getTextEditorContents("Width").getIntValue();
+                                        int&& Height = aw->getTextEditorContents("Height").getIntValue();
+                                        if (Width <= 100 || Height <= 100) return;
+                                        sp->setBounds(sp->getX(), sp->getY(), Width, Height);
+										sp->drawArea.setBounds(50, 65, Width - 65, Height - 100);
+										sp->eqReferenceLines.setBounds(0, 50, Width, Height - 50);
+										sp->componentHeader.setBounds(0, 0, Width, 50);
+                                        sp->componentHeader.componentControl.setBounds(Width - 30, 20, 10, 10);
+                                        sp->drawBounds.setBounds(0, 0, Width, Height);
+                                    }
+                                    delete aw;
+                                }
+                            ), true);
                         }
                         else if (result == 3)
                         {
@@ -276,7 +341,9 @@ void MainComponent::openSpectrumAnalyser(int x, int y)
         };
 
     spectrum->setBounds(x, y, 500, 150);
-    spectrum->drawArea.setBounds(0, 50, 500, 100);
+    spectrum->drawArea.setBounds(50, 65, 435, 50);
+    spectrum->eqReferenceLines.setBounds(0, 50, 500, 100);
+	spectrum->eqReferenceLines.setInterceptsMouseClicks(false, false);
     spectrum->componentHeader.setBounds(0, 0, 500, 50);
     spectrum->componentHeader.themeConfigButton.setBounds(10, 10, 30, 30);
     spectrum->componentHeader.themeConfigButton.setTooltip("Theme Configuration");
@@ -316,8 +383,8 @@ void MainComponent::openWaveformComponent(int x, int y)
     waveform->cb = [weakWaveform]()
         {
             juce::PopupMenu menu;
-            menu.addItem(1, "Position", true, false);
-            menu.addItem(2, "ComponentSize", true, false);
+            menu.addItem(1, "Position", true, false, juce::Drawable::createFromImageData(BinaryData::menuPosition_png, BinaryData::menuPosition_pngSize));
+            menu.addItem(2, "ComponentSize", true, false, juce::Drawable::createFromImageData(BinaryData::menuComponentSize_png, BinaryData::menuComponentSize_pngSize));
             menu.showMenuAsync(
                 juce::PopupMenu::Options(),
                 [weakWaveform](int result)
@@ -326,6 +393,71 @@ void MainComponent::openWaveformComponent(int x, int y)
                     {
                         if (result == 0)
                         {
+                        }
+                        else if (result == 1)
+                        {
+                            juce::AlertWindow* aw = new juce::AlertWindow(
+                                "Set position",
+                                "Enter X and Y coordinates,please don't input zero or any number smaller then 0 :)",
+                                juce::AlertWindow::QuestionIcon);
+
+                            aw->setOpaque(false);
+                            aw->setDropShadowEnabled(false);
+                            aw->addTextEditor("X", "", "X");
+                            aw->addTextEditor("Y", "", "Y");
+                            aw->getTextEditor("X")->setInputRestrictions(4, "0123456789");
+                            aw->getTextEditor("Y")->setInputRestrictions(4, "0123456789");
+                            aw->addButton("OK", 1, juce::KeyPress(juce::KeyPress::returnKey));
+                            aw->addButton("Cancel", 0, juce::KeyPress(juce::KeyPress::escapeKey));
+
+                            aw->enterModalState(true, juce::ModalCallbackFunction::create(
+                                [wf, aw](int result)
+                                {
+                                    if (result == 1)
+                                    {
+                                        int&& X = aw->getTextEditorContents("X").getIntValue();
+                                        int&& Y = aw->getTextEditorContents("Y").getIntValue();
+                                        if (X <= 0 || Y <= 0) return;
+                                        wf->setBounds(X, Y, wf->getWidth(), wf->getHeight());
+                                    }
+                                    delete aw;
+                                }
+                            ), true);
+                        }
+                        else if (result == 2)
+                        {
+                            juce::AlertWindow* aw = new juce::AlertWindow(
+                                "Resize Component",
+                                "Enter Width and Height,please don't input zero or any number smaller then 100 :)",
+                                juce::AlertWindow::QuestionIcon);
+
+                            aw->setOpaque(false);
+                            aw->setDropShadowEnabled(false);
+                            aw->addTextEditor("Width", "", "Width");
+                            aw->addTextEditor("Height", "", "Height");
+                            aw->getTextEditor("Width")->setInputRestrictions(3, "0123456789");
+                            aw->getTextEditor("Height")->setInputRestrictions(3, "0123456789");
+                            aw->addButton("OK", 1, juce::KeyPress(juce::KeyPress::returnKey));
+                            aw->addButton("Cancel", 0, juce::KeyPress(juce::KeyPress::escapeKey));
+
+                            aw->enterModalState(true, juce::ModalCallbackFunction::create(
+                                [wf, aw](int result)
+                                {
+                                    if (result == 1)
+                                    {
+                                        int&& Width = aw->getTextEditorContents("Width").getIntValue();
+                                        int&& Height = aw->getTextEditorContents("Height").getIntValue();
+                                        if (Width <= 100 || Height <= 100) return;
+                                        wf->setBounds(wf->getX(), wf->getY(), Width, Height);
+                                        wf->drawArea.setBounds(0, 50, Width, Height - 50);
+                                        wf->tileArea.setBounds(0, 0, 16, Height - 50);
+                                        wf->componentHeader.setBounds(0, 0, Width, 50);
+                                        wf->componentHeader.componentControl.setBounds(Width - 30, 20, 10, 10);
+                                        wf->drawBounds.setBounds(0, 0, Width, Height);
+                                    }
+                                    delete aw;
+                                }
+                            ), true);
                         }
                     }
                 });
@@ -372,8 +504,8 @@ void MainComponent::openVectorOscilloscopeComponent(int x, int y)
     vector->cb = [weakVector]()
         {
             juce::PopupMenu menu;
-            menu.addItem(1, "Position", true, false);
-            menu.addItem(2, "ComponentSize", true, false);
+            menu.addItem(1, "Position", true, false, juce::Drawable::createFromImageData(BinaryData::menuPosition_png, BinaryData::menuPosition_pngSize));
+            menu.addItem(2, "ComponentSize", true, false, juce::Drawable::createFromImageData(BinaryData::menuComponentSize_png, BinaryData::menuComponentSize_pngSize));
             menu.showMenuAsync(
                 juce::PopupMenu::Options(),
                 [weakVector](int result)
@@ -382,6 +514,67 @@ void MainComponent::openVectorOscilloscopeComponent(int x, int y)
                     {
                         if (result == 0)
                         {
+                        }
+                        else if (result == 1)
+                        {
+                            juce::AlertWindow* aw = new juce::AlertWindow(
+                                "Set position",
+                                "Enter X and Y coordinates,please don't input zero or any number smaller then 0 :)",
+                                juce::AlertWindow::QuestionIcon);
+
+                            aw->setOpaque(false);
+                            aw->setDropShadowEnabled(false);
+                            aw->addTextEditor("X", "", "X");
+                            aw->addTextEditor("Y", "", "Y");
+                            aw->getTextEditor("X")->setInputRestrictions(4, "0123456789");
+                            aw->getTextEditor("Y")->setInputRestrictions(4, "0123456789");
+                            aw->addButton("OK", 1, juce::KeyPress(juce::KeyPress::returnKey));
+                            aw->addButton("Cancel", 0, juce::KeyPress(juce::KeyPress::escapeKey));
+
+                            aw->enterModalState(true, juce::ModalCallbackFunction::create(
+                                [vec, aw](int result)
+                                {
+                                    if (result == 1)
+                                    {
+                                        int&& X = aw->getTextEditorContents("X").getIntValue();
+                                        int&& Y = aw->getTextEditorContents("Y").getIntValue();
+                                        if (X <= 0 || Y <= 0) return;
+                                        vec->setBounds(X, Y, vec->getWidth(), vec->getHeight());
+                                    }
+                                    delete aw;
+                                }
+                            ), true);
+                        }
+                        else if (result == 2)
+                        {
+                            juce::AlertWindow* aw = new juce::AlertWindow(
+                                "Resize Component",
+                                "Enter Width and Height,please don't input zero or any number smaller then 100 :)",
+                                juce::AlertWindow::QuestionIcon);
+
+                            aw->setOpaque(false);
+                            aw->setDropShadowEnabled(false);
+                            aw->addTextEditor("Width", "", "Width");
+                            aw->addTextEditor("Height", "", "Height");
+                            aw->getTextEditor("Width")->setInputRestrictions(3, "0123456789");
+                            aw->getTextEditor("Height")->setInputRestrictions(3, "0123456789");
+                            aw->addButton("OK", 1, juce::KeyPress(juce::KeyPress::returnKey));
+                            aw->addButton("Cancel", 0, juce::KeyPress(juce::KeyPress::escapeKey));
+
+                            aw->enterModalState(true, juce::ModalCallbackFunction::create(
+                                [vec, aw](int result)
+                                {
+                                    if (result == 1)
+                                    {
+                                        int&& Width = aw->getTextEditorContents("Width").getIntValue();
+                                        int&& Height = aw->getTextEditorContents("Height").getIntValue();
+                                        if (Width <= 100 || Height <= 100) return;
+                                        vec->setBounds(vec->getX(), vec->getY(), Width, Height);
+                                        vec->drawBounds.setBounds(0, 0, Width, Height);
+                                    }
+                                    delete aw;
+                                }
+                            ), true);
                         }
                     }
                 });
@@ -428,8 +621,8 @@ void MainComponent::openWaveformChartComponent(int x, int y)
     chart->cb = [weakChart]()
         {
             juce::PopupMenu menu;
-            menu.addItem(1, "Position", true, false);
-            menu.addItem(2, "ComponentSize", true, false);
+            menu.addItem(1, "Position", true, false, juce::Drawable::createFromImageData(BinaryData::menuPosition_png, BinaryData::menuPosition_pngSize));
+            menu.addItem(2, "ComponentSize", true, false, juce::Drawable::createFromImageData(BinaryData::menuComponentSize_png, BinaryData::menuComponentSize_pngSize));
             menu.showMenuAsync(
                 juce::PopupMenu::Options(),
                 [weakChart](int result)
@@ -438,6 +631,70 @@ void MainComponent::openWaveformChartComponent(int x, int y)
                     {
                         if (result == 0)
                         {
+                        }
+                        else if (result == 1)
+                        {
+                            juce::AlertWindow* aw = new juce::AlertWindow(
+                                "Set position",
+                                "Enter X and Y coordinates,please don't input zero or any number smaller then 0 :)",
+                                juce::AlertWindow::QuestionIcon);
+
+                            aw->setOpaque(false);
+                            aw->setDropShadowEnabled(false);
+                            aw->addTextEditor("X", "", "X");
+                            aw->addTextEditor("Y", "", "Y");
+                            aw->getTextEditor("X")->setInputRestrictions(4, "0123456789");
+                            aw->getTextEditor("Y")->setInputRestrictions(4, "0123456789");
+                            aw->addButton("OK", 1, juce::KeyPress(juce::KeyPress::returnKey));
+                            aw->addButton("Cancel", 0, juce::KeyPress(juce::KeyPress::escapeKey));
+
+                            aw->enterModalState(true, juce::ModalCallbackFunction::create(
+                                [ch, aw](int result)
+                                {
+                                    if (result == 1)
+                                    {
+                                        int&& X = aw->getTextEditorContents("X").getIntValue();
+                                        int&& Y = aw->getTextEditorContents("Y").getIntValue();
+                                        if (X <= 0 || Y <= 0) return;
+                                        ch->setBounds(X, Y, ch->getWidth(), ch->getHeight());
+                                    }
+                                    delete aw;
+                                }
+                            ), true);
+                        }
+                        else if (result == 2)
+                        {
+                            juce::AlertWindow* aw = new juce::AlertWindow(
+                                "Resize Component",
+                                "Enter Width and Height,please don't input zero or any number smaller then 100 :)",
+                                juce::AlertWindow::QuestionIcon);
+
+                            aw->setOpaque(false);
+                            aw->setDropShadowEnabled(false);
+                            aw->addTextEditor("Width", "", "Width");
+                            aw->addTextEditor("Height", "", "Height");
+                            aw->getTextEditor("Width")->setInputRestrictions(3, "0123456789");
+                            aw->getTextEditor("Height")->setInputRestrictions(3, "0123456789");
+                            aw->addButton("OK", 1, juce::KeyPress(juce::KeyPress::returnKey));
+                            aw->addButton("Cancel", 0, juce::KeyPress(juce::KeyPress::escapeKey));
+
+                            aw->enterModalState(true, juce::ModalCallbackFunction::create(
+                                [ch, aw](int result)
+                                {
+                                    if (result == 1)
+                                    {
+                                        int&& Width = aw->getTextEditorContents("Width").getIntValue();
+                                        int&& Height = aw->getTextEditorContents("Height").getIntValue();
+                                        if (Width <= 100 || Height <= 100) return;
+                                        ch->setBounds(ch->getX(), ch->getY(), Width, Height);
+                                        ch->drawArea.setBounds(0, 50, Width, Height - 50);
+                                        ch->componentHeader.setBounds(0, 0, Width, 50);
+                                        ch->componentHeader.componentControl.setBounds(Width - 30, 20, 10, 10);
+                                        ch->drawBounds.setBounds(0, 0, Width, Height);
+                                    }
+                                    delete aw;
+                                }
+                            ), true);
                         }
                     }
                 });

@@ -6,6 +6,7 @@
 #include "../../CreateConfiguration/CreateColoursConfiguration.h"
 #include "../../GUI/Components/DrawBounds.h"
 #include "../../GUI/Components/ComponentHeader.h"
+#include "EQReferenceLineComponent.h"
 
 enum AnalysisMode
 {
@@ -16,11 +17,11 @@ enum AnalysisMode
     Interleaved
 };
 
-class SpectrumAnalyser : public juce::Component , juce::Timer, private juce::ValueTree::Listener
+class SpectrumAnalyser : public juce::Component, juce::Timer, private juce::ValueTree::Listener
 {
 public:
-	SpectrumAnalyser();
-	~SpectrumAnalyser();
+    SpectrumAnalyser();
+    ~SpectrumAnalyser();
 
     enum {
         fftOrder = 12,
@@ -36,18 +37,17 @@ public:
     void processAudioBuffer(const juce::AudioBuffer<float>& buffer);
     void pushNextSampleIntoFifo(float sample, int channelIndex) noexcept;
     void drawNextFrameOfSpectrum(int channelIndex);
-    void drawFrame(juce::Graphics& g,juce::Rectangle<int> bounds);
+    void drawFrame(juce::Graphics& g, juce::Rectangle<int> bounds);
     void drawSingleCurve(juce::Graphics& g,
         juce::Rectangle<int> bounds,
         const float* scopeData,
         float* scopeDataStorage,
-        float* gapSmoothedScopeData,
         juce::Colour lineColour,
         juce::Colour fillColour);
     void setAnalysisMode(AnalysisMode mode);
 
     void paint(juce::Graphics& g) override;
-	void timerCallback() override;
+    void timerCallback() override;
     void mouseDown(const juce::MouseEvent& event) override;
     void mouseEnter(const juce::MouseEvent& event) override;
     void mouseExit(const juce::MouseEvent&) override;
@@ -67,6 +67,7 @@ public:
 
     DrawBounds drawBounds;
     ComponentHeader componentHeader{ juce::String("SpectrumAnalyzer") };
+    EQReferenceLineComponent eqReferenceLines;
 
     using Callback = std::function<void()>;
     Callback cb = nullptr;
@@ -89,17 +90,15 @@ private:
     bool nextFFTBlockReady = false;
 
     float scopeData[scopeSize];
-    float gapSmoothedScopeData[scopeSize];
     float scopeDataStorage[scopeSize];
 
     float fifo2[fftSize];
     float fftData2[fftSize * 2];
     int fifoIndex2 = 0;
     bool nextFFTBlockReady2 = false;
-     
+
     float scopeData2[scopeSize];
     float scopeDataStorage2[scopeSize];
-    float gapSmoothedScopeData2[scopeSize];
 
     float level = 0.0f;
 

@@ -15,11 +15,9 @@ SpectrumAnalyser::SpectrumAnalyser() : forwardFFT(fftOrder), window(fftSize, juc
     for (int i = 0; i < scopeSize; ++i)
     {
         scopeData[i] = mindB;
-        gapSmoothedScopeData[i] = mindB;
         scopeDataStorage[i] = mindB;
 
         scopeData2[i] = mindB;
-        gapSmoothedScopeData2[i] = mindB;
         scopeDataStorage2[i] = mindB;
     }
 
@@ -27,6 +25,7 @@ SpectrumAnalyser::SpectrumAnalyser() : forwardFFT(fftOrder), window(fftSize, juc
 
     addAndMakeVisible(&drawBounds);
     addAndMakeVisible(&componentHeader);
+	addAndMakeVisible(&eqReferenceLines);
 
     spectrumCat.addListener(this);
 }
@@ -172,23 +171,23 @@ void SpectrumAnalyser::drawFrame(juce::Graphics& g, juce::Rectangle<int> bounds)
 {
     if (currentMode == Left || currentMode == Right || currentMode == Interleaved)
     {
-        drawSingleCurve(g, bounds, scopeData, scopeDataStorage, gapSmoothedScopeData,
+        drawSingleCurve(g, bounds, scopeData, scopeDataStorage,
             lineColor, fillColor);
     }
     else if (currentMode == LR)
     {
         juce::Colour line2 = juce::Colours::orange;
         juce::Colour fill2 = line2.withAlpha(0.3f);
-        drawSingleCurve(g, bounds, scopeData2, scopeDataStorage2, gapSmoothedScopeData2,
+        drawSingleCurve(g, bounds, scopeData2, scopeDataStorage2,
             line2, fill2);
     }
     else if (currentMode == Stereo)
     {
-        drawSingleCurve(g, bounds, scopeData, scopeDataStorage, gapSmoothedScopeData,
+        drawSingleCurve(g, bounds, scopeData, scopeDataStorage,
             lineColor, fillColor);
         juce::Colour line2 = juce::Colours::greenyellow;
         juce::Colour fill2 = line2.withAlpha(0.3f);
-        drawSingleCurve(g, bounds, scopeData2, scopeDataStorage2, gapSmoothedScopeData2,
+        drawSingleCurve(g, bounds, scopeData2, scopeDataStorage2,
             line2, fill2);
     }
 
@@ -198,7 +197,6 @@ void SpectrumAnalyser::drawSingleCurve(juce::Graphics& g,
     juce::Rectangle<int> bounds,
     const float* scopeData,
     float* scopeDataStorage,
-    float* gapSmoothedScopeData,
     juce::Colour lineColour,
     juce::Colour fillColour)
 {
@@ -209,37 +207,43 @@ void SpectrumAnalyser::drawSingleCurve(juce::Graphics& g,
 
     for (int i = 0; i < scopeSize; ++i)
     {
-        gapSmoothedScopeData[i] = (scopeData[i] - scopeDataStorage[i]) * 0.70f;
-        scopeDataStorage[i] = scopeData[i] - gapSmoothedScopeData[i];
+        const float diff = scopeData[i] - scopeDataStorage[i];
+        const float coeff = (diff > 0.0f) ? 0.7f : 0.9f;
+        scopeDataStorage[i] = scopeData[i] - diff * coeff;
     }
 
-    const int numBands = 256;
     std::vector<juce::Point<float>> points;
-    points.reserve(numBands);
+    points.reserve(scopeSize / 2 + 1);
 
     points.emplace_back(leftX,
         juce::jmap(scopeDataStorage[0], mindB, maxdB, bottom, top));
 
-    for (int band = 0; band < numBands; ++band)
+    int i = 0;
+    while (i < scopeSize - 1)
     {
-        const int fStart = band * scopeSize / numBands;
-        const int fEnd = (band + 1) * scopeSize / numBands;
 
-        float maxVal = scopeDataStorage[fStart];
-        for (int i = fStart + 1; i < fEnd; ++i)
+        int step = 1 + i / 40;
+        step = juce::jlimit(2, 16, step);
+
+        int nextIdx = i + step;
+        if (nextIdx >= scopeSize)
+            nextIdx = scopeSize - 1;
+
+        float maxVal = scopeDataStorage[i];
+        for (int idx = i + 1; idx <= nextIdx; ++idx)
         {
-            if (scopeDataStorage[i] > maxVal)
-                maxVal = scopeDataStorage[i];
+            if (scopeDataStorage[idx] > maxVal)
+                maxVal = scopeDataStorage[idx];
         }
 
-        const float midIdx = (fStart + fEnd - 1) * 0.5f;
-
+        const float midIdx = (i + nextIdx) * 0.5f;
         const float f = std::log(midIdx + std::exp(1.0f)) - 1.0f;
         const float x = (f / scopeSizeTransformed) * width + leftX;
-
         const float y = juce::jmap(maxVal, mindB, maxdB, bottom, top);
 
         points.emplace_back(x, y);
+
+        i = nextIdx;
     }
 
     if (points.size() < 2)
@@ -302,11 +306,9 @@ void SpectrumAnalyser::scopeDataReset()
     for (int i = 0; i < scopeSize; ++i)
     {
         scopeData[i] = mindB;
-        gapSmoothedScopeData[i] = mindB;
         scopeDataStorage[i] = mindB;
 
 		scopeData2[i] = mindB;
-		gapSmoothedScopeData2[i] = mindB;
 		scopeDataStorage2[i] = mindB;
     }
 }

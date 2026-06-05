@@ -73,7 +73,12 @@
               file="Source/Assets/headerPinIcon.png"/>
         <FILE id="elpz0r" name="L-R.png" compile="0" resource="1" file="Source/Assets/L-R.png"/>
         <FILE id="tmab0P" name="LAR.png" compile="0" resource="1" file="Source/Assets/LAR.png"/>
+        <FILE id="vLOoHV" name="LAR2.png" compile="0" resource="1" file="Source/Assets/LAR2.png"/>
         <FILE id="HgEQ9E" name="LRLRLRLR.png" compile="0" resource="1" file="Source/Assets/LRLRLRLR.png"/>
+        <FILE id="Q9sETO" name="menuComponentSize.png" compile="0" resource="1"
+              file="Source/Assets/menuComponentSize.png"/>
+        <FILE id="aBzy2d" name="menuPosition.png" compile="0" resource="1"
+              file="Source/Assets/menuPosition.png"/>
         <FILE id="sOci6S" name="OFL.txt" compile="0" resource="1" file="Source/Assets/OFL.txt"/>
         <FILE id="Zy1mqf" name="openWASAPIButton.png" compile="0" resource="1"
               file="Source/Assets/openWASAPIButton.png"/>
@@ -97,6 +102,8 @@
       </GROUP>
       <GROUP id="{EEE00817-5370-279A-C380-774ED0991585}" name="Components">
         <GROUP id="{18D4E39F-8650-E045-DBA0-DD4F8F199AED}" name="Spectrum">
+          <FILE id="W63HlC" name="EQReferenceLineComponent.h" compile="0" resource="0"
+                file="Source/Components/Spectrum/EQReferenceLineComponent.h"/>
           <FILE id="dRG2bK" name="SpectrumAnalyser.cpp" compile="1" resource="0"
                 file="Source/Components/Spectrum/SpectrumAnalyser.cpp"/>
           <FILE id="iQtCu7" name="SpectrumAnalyser.h" compile="0" resource="0"
