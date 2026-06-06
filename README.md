@@ -2,7 +2,7 @@
 
 [中文](README_zh.md)
 
-<img width="1874" height="750" alt="image" src="https://github.com/user-attachments/assets/5a84ee06-4f50-4896-b887-696275f495fd" />
+<img width="2004" height="1341" alt="2026-06-05 232329" src="https://github.com/user-attachments/assets/2c7e00a5-56dc-46db-abbb-fa595d24be56" />
 
 SimpleMeters is an audio analysis tool for the Windows platform.
 
@@ -20,7 +20,7 @@ Features currently being developed or already completed include:
 - [ ] Component hover effect
 - [ ] Component pause functionality
 - [ ] VST3 support
-- [ ] Spectrum mode switching
+- [x] Spectrum mode switching
 - [ ] Spectrum display with gain curve
 - [ ] Spectrum coordinate mapping curve
 - [ ] Spectrum bar graph

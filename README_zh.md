@@ -2,7 +2,7 @@
 
 [English](README.md)
 
-<img width="1874" height="750" alt="image" src="https://github.com/user-attachments/assets/5a84ee06-4f50-4896-b887-696275f495fd" />
+<img width="2004" height="1341" alt="2026-06-05 232329" src="https://github.com/user-attachments/assets/2c7e00a5-56dc-46db-abbb-fa595d24be56" />
 
 SimpleMeters是一个Windows平台上的音频分析工具
 
@@ -19,7 +19,7 @@ SimpleMeters是一个Windows平台上的音频分析工具
 - [ ] 组件Hover效果
 - [ ] 组件暂停功能
 - [ ] vst3支持
-- [ ] 频谱模式切换
+- [x] 频谱模式切换
 - [ ] 频谱显示增益曲线
 - [ ] 频谱坐标映射曲线
 - [ ] 频谱柱形图
