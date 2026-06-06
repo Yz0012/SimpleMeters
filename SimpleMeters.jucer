@@ -119,6 +119,8 @@
                 file="Source/Components/Spectrum/SpectrumAnalyser.h"/>
         </GROUP>
         <GROUP id="{B4A1E825-28E0-A712-9B48-1C6A818C7B1B}" name="VectorOscilloscopeComponent">
+          <FILE id="qm1mOh" name="OscilloscopeReferenceLines.h" compile="0" resource="0"
+                file="Source/Components/VectorOscilloscopeComponent/OscilloscopeReferenceLines.h"/>
           <FILE id="IVo88h" name="VectorOscilloscopeComponent.cpp" compile="1"
                 resource="0" file="Source/Components/VectorOscilloscopeComponent/VectorOscilloscopeComponent.cpp"/>
           <FILE id="BvnQ1J" name="VectorOscilloscopeComponent.h" compile="0"

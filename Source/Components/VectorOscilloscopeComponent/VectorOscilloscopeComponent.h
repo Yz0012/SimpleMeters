@@ -5,6 +5,7 @@
 #include "../../CreateConfiguration/CreateColoursConfiguration.h"
 #include "../../GUI/Components/DrawBounds.h"
 #include "../../GUI/Components/ComponentHeader.h"
+#include "OscilloscopeReferenceLines.h"
 
 class VectorOscilloscopes : public juce::Component, private juce::ValueTree::Listener
 {
@@ -24,6 +25,7 @@ public:
 
 	ComponentHeader componentHeader{ juce::String("VectorOscilloscopes") };
 	DrawBounds drawBounds;
+	OscilloscopeReferenceLines oscilloscopeReferenceLines;
 
 	using Callback = std::function<void()>;
 	Callback cb = nullptr;

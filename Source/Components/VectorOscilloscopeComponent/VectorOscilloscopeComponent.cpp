@@ -8,6 +8,7 @@ VectorOscilloscopes::VectorOscilloscopes()
         .getChildWithProperty("name", "SpectrumAnalyzer");
     addAndMakeVisible(&drawBounds);
     addAndMakeVisible(&componentHeader);
+	addAndMakeVisible(&oscilloscopeReferenceLines);
 
 	vectorCat.addListener(this);
 }

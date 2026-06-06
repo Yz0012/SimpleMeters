@@ -605,7 +605,10 @@ void MainComponent::openVectorOscilloscopeComponent(int x, int y)
                                         int&& Height = aw->getTextEditorContents("Height").getIntValue();
                                         if (Width <= 100 || Height <= 100) return;
                                         vec->setBounds(vec->getX(), vec->getY(), Width, Height);
+                                        vec->componentHeader.setBounds(0, 0, Width, 50);
+                                        vec->componentHeader.componentControl.setBounds(Width - 30, 20, 10, 10);
                                         vec->drawBounds.setBounds(0, 0, Width, Height);
+                                        vec->oscilloscopeReferenceLines.setBounds(0, 0, Width, Height);
                                     }
                                     delete aw;
                                 }
@@ -617,10 +620,19 @@ void MainComponent::openVectorOscilloscopeComponent(int x, int y)
 
     vector->setBounds(x, y, 300, 300);
     vector->componentHeader.setBounds(0, 0, 300, 50);
+    vector->oscilloscopeReferenceLines.setBounds(0, 0, 300, 300);
     vector->componentHeader.themeConfigButton.setBounds(10, 10, 30, 30);
     vector->componentHeader.themeConfigButton.setTooltip("Theme Configuration");
     vector->componentHeader.headerFixedButton.setBounds(50, 10, 30, 30);
     vector->componentHeader.headerFixedButton.setTooltip("Fixed Header");
+    vector->componentHeader.drawLinesButton.setBounds(90, 10, 30, 30);
+    vector->componentHeader.drawLinesButton.onClick = [weakVector]()
+        {
+            if (auto sp = weakVector.lock())
+            {
+                sp->oscilloscopeReferenceLines.setVisible(!sp->oscilloscopeReferenceLines.isVisible());
+            }
+        };
 }
 
 void MainComponent::openWaveformChartComponent(int x, int y)
