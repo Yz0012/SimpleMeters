@@ -237,9 +237,10 @@ void MainComponent::openSpectrumAnalyser(int x, int y)
             juce::PopupMenu modeMenu;
             modeMenu.addItem(3, "Left", true, false, juce::Drawable::createFromImageData(BinaryData::LAR_png, BinaryData::LAR_pngSize));
             modeMenu.addItem(4, "Right", true, false, juce::Drawable::createFromImageData(BinaryData::LAR2_png, BinaryData::LAR2_pngSize));
-            modeMenu.addItem(5, "Stereo", true, false, juce::Drawable::createFromImageData(BinaryData::LR2_png, BinaryData::LR2_pngSize));
-            modeMenu.addItem(6, "Side", true, false, juce::Drawable::createFromImageData(BinaryData::LR_png, BinaryData::LR_pngSize));
-            modeMenu.addItem(7, "Interleaved", true, false, juce::Drawable::createFromImageData(BinaryData::LRLRLRLR_png, BinaryData::LRLRLRLR_pngSize));
+			modeMenu.addItem(5, "Mono", true, false, juce::Drawable::createFromImageData(BinaryData::LRMono_png, BinaryData::LRMono_pngSize));
+            modeMenu.addItem(6, "Stereo", true, false, juce::Drawable::createFromImageData(BinaryData::LR2_png, BinaryData::LR2_pngSize));
+            modeMenu.addItem(7, "Side", true, false, juce::Drawable::createFromImageData(BinaryData::LR_png, BinaryData::LR_pngSize));
+            modeMenu.addItem(8, "Interleaved", true, false, juce::Drawable::createFromImageData(BinaryData::LRLRLRLR_png, BinaryData::LRLRLRLR_pngSize));
 			menu.addSubMenu("Mode", modeMenu);
 
             menu.showMenuAsync(
@@ -319,22 +320,44 @@ void MainComponent::openSpectrumAnalyser(int x, int y)
                         else if (result == 3)
                         {
                             sp->setAnalysisMode(AnalysisMode::Left);
+							sp->eqReferenceLines.informationText = "CurrentMode: Left";
+                            sp->eqReferenceLines.modeNum = 0;
+							sp->eqReferenceLines.repaint();
                         }
                         else if (result == 4)
                         {
                             sp->setAnalysisMode(AnalysisMode::Right);
+							sp->eqReferenceLines.informationText = "CurrentMode: Right";
+                            sp->eqReferenceLines.modeNum = 1;
+                            sp->eqReferenceLines.repaint();
                         }
                         else if (result == 5)
                         {
-                            sp->setAnalysisMode(AnalysisMode::Stereo);
+                            sp->setAnalysisMode(AnalysisMode::Mono);
+							sp->eqReferenceLines.informationText = "CurrentMode: Mono (L+R)";
+                            sp->eqReferenceLines.modeNum = 2;
+							sp->eqReferenceLines.repaint();
                         }
                         else if (result == 6)
                         {
-                            sp->setAnalysisMode(AnalysisMode::LR);
+                            sp->setAnalysisMode(AnalysisMode::Stereo);
+                            sp->eqReferenceLines.informationText = "CurrentMode: Stereo (L&R)";
+                            sp->eqReferenceLines.modeNum = 3;
+                            sp->eqReferenceLines.repaint();
                         }
                         else if (result == 7)
                         {
+                            sp->setAnalysisMode(AnalysisMode::LR);
+                            sp->eqReferenceLines.informationText = "CurrentMode: Side (L-R)";
+                            sp->eqReferenceLines.modeNum = 4;
+                            sp->eqReferenceLines.repaint();
+                        }
+                        else if (result == 8)
+                        {
                             sp->setAnalysisMode(AnalysisMode::Interleaved);
+                            sp->eqReferenceLines.informationText = "CurrentMode: Interleaved";
+                            sp->eqReferenceLines.modeNum = 5;
+                            sp->eqReferenceLines.repaint();
                         }
                     }
                 });
@@ -347,6 +370,16 @@ void MainComponent::openSpectrumAnalyser(int x, int y)
     spectrum->componentHeader.setBounds(0, 0, 500, 50);
     spectrum->componentHeader.themeConfigButton.setBounds(10, 10, 30, 30);
     spectrum->componentHeader.themeConfigButton.setTooltip("Theme Configuration");
+	spectrum->componentHeader.headerFixedButton.setBounds(50, 10, 30, 30);
+    spectrum->componentHeader.headerFixedButton.setTooltip("Fixed Header");
+    spectrum->componentHeader.drawLinesButton.setBounds(90, 10, 30, 30);
+    spectrum->componentHeader.drawLinesButton.onClick = [weakSpectrum]()
+        {
+            if (auto sp = weakSpectrum.lock())
+            {
+                sp->eqReferenceLines.setVisible(!sp->eqReferenceLines.isVisible());
+            }
+        };
 }
 
 void MainComponent::openWaveformComponent(int x, int y)
@@ -469,6 +502,8 @@ void MainComponent::openWaveformComponent(int x, int y)
 	waveform->componentHeader.setBounds(0, 0, 500, 50);
 	waveform->componentHeader.themeConfigButton.setBounds(10, 10, 30, 30);
     waveform->componentHeader.themeConfigButton.setTooltip("Theme Configuration");
+    waveform->componentHeader.headerFixedButton.setBounds(50, 10, 30, 30);
+    waveform->componentHeader.headerFixedButton.setTooltip("Fixed Header");
 }
 
 void MainComponent::openVectorOscilloscopeComponent(int x, int y)
@@ -584,6 +619,8 @@ void MainComponent::openVectorOscilloscopeComponent(int x, int y)
     vector->componentHeader.setBounds(0, 0, 300, 50);
     vector->componentHeader.themeConfigButton.setBounds(10, 10, 30, 30);
     vector->componentHeader.themeConfigButton.setTooltip("Theme Configuration");
+    vector->componentHeader.headerFixedButton.setBounds(50, 10, 30, 30);
+    vector->componentHeader.headerFixedButton.setTooltip("Fixed Header");
 }
 
 void MainComponent::openWaveformChartComponent(int x, int y)
@@ -705,6 +742,8 @@ void MainComponent::openWaveformChartComponent(int x, int y)
     chart->componentHeader.setBounds(0, 0, 500, 50);
     chart->componentHeader.themeConfigButton.setBounds(10, 10, 30, 30);
     chart->componentHeader.themeConfigButton.setTooltip("Theme Configuration");
+    chart->componentHeader.headerFixedButton.setBounds(50, 10, 30, 30);
+    chart->componentHeader.headerFixedButton.setTooltip("Fixed Header");
 }
 
 void MainComponent::userTriedToCloseWindow()

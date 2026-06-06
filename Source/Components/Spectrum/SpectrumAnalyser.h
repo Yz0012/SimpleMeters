@@ -12,6 +12,7 @@ enum AnalysisMode
 {
     Left,
     Right,
+    Mono,
     Stereo,
     LR,
     Interleaved

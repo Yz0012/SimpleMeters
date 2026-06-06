@@ -75,7 +75,7 @@ void VectorOscilloscopes::mouseEnter(const juce::MouseEvent& event)
 
 void VectorOscilloscopes::mouseExit(const juce::MouseEvent&)
 {
-    if (!componentHeader.isMouseOver())
+    if (!componentHeader.isMouseOver() && !componentHeader.headerFixedButton.getHeaderFixed())
     {
         drawBounds.setVisible(false);
         componentHeader.setVisible(false);

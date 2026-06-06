@@ -6,6 +6,9 @@
 class EQReferenceLineComponent : public juce::Component
 {
 public:
+    juce::String informationText = "CurrentMode: Interleaved";
+    uint16_t modeNum = 5;
+
     EQReferenceLineComponent()
     {
         setOpaque(false);
@@ -110,6 +113,34 @@ public:
 
         juce::Rectangle<int> freqTitleRect(plotArea.getX() + plotArea.getWidth() / 2 - 60, getHeight() - marginBottom + 15, 120, 20);
         g.drawFittedText("Frequency (Hz)", freqTitleRect, juce::Justification::centred, 1);
+
+        juce::Rectangle<int> informationTextRect(plotArea.getX() + plotArea.getWidth() - 310, 15, 300, 20);
+        g.drawFittedText(informationText, informationTextRect, juce::Justification::centredRight, 1);
+
+        if (modeNum == 0)
+        {
+            g.drawImageAt(juce::ImageCache::getFromMemory(BinaryData::LAR_png, BinaryData::LAR_pngSize), plotArea.getX() + 10, plotArea.getY() + 10);
+        }
+        else if (modeNum == 1)
+        {
+            g.drawImageAt(juce::ImageCache::getFromMemory(BinaryData::LAR2_png, BinaryData::LAR2_pngSize), plotArea.getX() + 10, plotArea.getY() + 10);
+        }
+        else if (modeNum == 2)
+        {
+            g.drawImageAt(juce::ImageCache::getFromMemory(BinaryData::LRMono_png, BinaryData::LRMono_pngSize), plotArea.getX() + 10, plotArea.getY() + 10);
+        }
+        else if (modeNum == 3)
+        {
+            g.drawImageAt(juce::ImageCache::getFromMemory(BinaryData::LR2_png, BinaryData::LR2_pngSize), plotArea.getX() + 10, plotArea.getY() + 10);
+        }
+        else if (modeNum == 4)
+        {
+            g.drawImageAt(juce::ImageCache::getFromMemory(BinaryData::LR_png, BinaryData::LR_pngSize), plotArea.getX() + 10, plotArea.getY() + 10);
+        }
+        else if (modeNum == 5)
+        {
+            g.drawImageAt(juce::ImageCache::getFromMemory(BinaryData::LRLRLRLR_png, BinaryData::LRLRLRLR_pngSize), plotArea.getX() + 10, plotArea.getY() + 10);
+        }
     }
 
     void resized() override

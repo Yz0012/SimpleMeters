@@ -51,7 +51,6 @@ void SpectrumAnalyser::processAudioBuffer(const juce::AudioBuffer<float>& buffer
 
     if (currentMode == Left)
     {
-        const int channelsToMix = juce::jmin(buffer.getNumChannels(), 2);
         for (int i = 0; i < numSamples; ++i)
         {
             pushNextSampleIntoFifo(buffer.getReadPointer(0)[i], 0);
@@ -59,10 +58,21 @@ void SpectrumAnalyser::processAudioBuffer(const juce::AudioBuffer<float>& buffer
     }
     else if (currentMode == Right)
     {
-        const int channelsToMix = juce::jmin(buffer.getNumChannels(), 2);
         for (int i = 0; i < numSamples; ++i)
         {
             pushNextSampleIntoFifo(buffer.getReadPointer(1)[i], 0);
+        }
+    }
+    else if (currentMode == Mono)
+    {
+        const int channelsToMix = juce::jmin(buffer.getNumChannels(), 2);
+        for (int i = 0; i < numSamples; ++i)
+        {
+            float mixed = 0.0f;
+            for (int ch = 0; ch < channelsToMix; ++ch)
+                mixed += buffer.getReadPointer(ch)[i];
+            mixed /= static_cast<float>(channelsToMix);
+            pushNextSampleIntoFifo(mixed, 0);
         }
     }
     else if (currentMode == Stereo && numChannels >= 2)
@@ -169,7 +179,7 @@ void SpectrumAnalyser::drawNextFrameOfSpectrum(int channelIndex)
 
 void SpectrumAnalyser::drawFrame(juce::Graphics& g, juce::Rectangle<int> bounds)
 {
-    if (currentMode == Left || currentMode == Right || currentMode == Interleaved)
+    if (currentMode == Left || currentMode == Right || currentMode == Mono ||currentMode == Interleaved)
     {
         drawSingleCurve(g, bounds, scopeData, scopeDataStorage,
             lineColor, fillColor);
@@ -208,7 +218,7 @@ void SpectrumAnalyser::drawSingleCurve(juce::Graphics& g,
     for (int i = 0; i < scopeSize; ++i)
     {
         const float diff = scopeData[i] - scopeDataStorage[i];
-        const float coeff = (diff > 0.0f) ? 0.7f : 0.9f;
+        const float coeff = (diff > 0.0f) ? 0.6f : 0.95f;
         scopeDataStorage[i] = scopeData[i] - diff * coeff;
     }
 
@@ -352,7 +362,7 @@ void SpectrumAnalyser::mouseEnter(const juce::MouseEvent& event)
 
 void SpectrumAnalyser::mouseExit(const juce::MouseEvent&)
 {
-    if (!componentHeader.isMouseOver())
+    if (!componentHeader.isMouseOver() && !componentHeader.headerFixedButton.getHeaderFixed())
     {
         drawBounds.setVisible(false);
         componentHeader.setVisible(false);

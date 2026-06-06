@@ -38,6 +38,10 @@
                 resource="0" file="Source/GUI/Components/ComponentThemeConfigurationButton.h"/>
           <FILE id="DfMFhw" name="DrawBounds.cpp" compile="1" resource="0" file="Source/GUI/Components/DrawBounds.cpp"/>
           <FILE id="jf1tux" name="DrawBounds.h" compile="0" resource="0" file="Source/GUI/Components/DrawBounds.h"/>
+          <FILE id="Z6geim" name="DrawLinesButton.cpp" compile="1" resource="0"
+                file="Source/GUI/Components/DrawLinesButton.cpp"/>
+          <FILE id="Ws6MyE" name="DrawLinesButton.h" compile="0" resource="0"
+                file="Source/GUI/Components/DrawLinesButton.h"/>
         </GROUP>
         <FILE id="Kvpw94" name="HeaderFixedButton.h" compile="0" resource="0"
               file="Source/GUI/HeaderFixedButton.h"/>
@@ -62,6 +66,8 @@
         <FILE id="NeERhE" name="(L+R)2.png" compile="0" resource="1" file="Source/Assets/(L+R)2.png"/>
         <FILE id="lNRPEH" name="CascadiaMono.ttf" compile="0" resource="1"
               file="Source/Assets/CascadiaMono.ttf"/>
+        <FILE id="ZJvZpK" name="closeDrawReferenceLine.png" compile="0" resource="1"
+              file="Source/Assets/closeDrawReferenceLine.png"/>
         <FILE id="fWG07y" name="closeHeaderPinIcon.png" compile="0" resource="1"
               file="Source/Assets/closeHeaderPinIcon.png"/>
         <FILE id="brkXTA" name="closeIcon.png" compile="0" resource="1" file="Source/Assets/closeIcon.png"/>
@@ -69,12 +75,15 @@
               file="Source/Assets/closeIcon10px.png"/>
         <FILE id="ixC5a7" name="closeWASAPIButton.png" compile="0" resource="1"
               file="Source/Assets/closeWASAPIButton.png"/>
+        <FILE id="v7SPXn" name="DrawReferenceLine.png" compile="0" resource="1"
+              file="Source/Assets/DrawReferenceLine.png"/>
         <FILE id="xKOgwA" name="headerPinIcon.png" compile="0" resource="1"
               file="Source/Assets/headerPinIcon.png"/>
         <FILE id="elpz0r" name="L-R.png" compile="0" resource="1" file="Source/Assets/L-R.png"/>
         <FILE id="tmab0P" name="LAR.png" compile="0" resource="1" file="Source/Assets/LAR.png"/>
         <FILE id="vLOoHV" name="LAR2.png" compile="0" resource="1" file="Source/Assets/LAR2.png"/>
         <FILE id="HgEQ9E" name="LRLRLRLR.png" compile="0" resource="1" file="Source/Assets/LRLRLRLR.png"/>
+        <FILE id="VrcQZ8" name="LRMono.png" compile="0" resource="1" file="Source/Assets/LRMono.png"/>
         <FILE id="Q9sETO" name="menuComponentSize.png" compile="0" resource="1"
               file="Source/Assets/menuComponentSize.png"/>
         <FILE id="aBzy2d" name="menuPosition.png" compile="0" resource="1"

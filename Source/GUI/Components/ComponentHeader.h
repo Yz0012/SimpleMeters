@@ -5,6 +5,8 @@
 
 #include "ComponentThemeConfigurationButton.h"
 #include "ComponentControl.h"
+#include "DrawLinesButton.h"
+#include "../HeaderFixedButton.h"
 
 class ComponentHeader : public juce::Component
 {
@@ -17,6 +19,8 @@ public:
 	ComponentThemeConfigurationButton themeConfigButton{ identity };
 
 	ComponentControl componentControl;
+	HeaderFixedButton headerFixedButton;
+	DrawLinesButton drawLinesButton;
 private:
 
 };
