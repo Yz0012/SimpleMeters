@@ -5,6 +5,7 @@
 #include "../../CreateConfiguration/CreateColoursConfiguration.h"
 #include "../../GUI/Components/DrawBounds.h"
 #include "../../GUI/Components/ComponentHeader.h"
+#include "WaveformComponentReferenceLine.h"
 
 class WaveformComponent : public juce::Component, private juce::ValueTree::Listener
 {
@@ -41,6 +42,7 @@ public:
 
     DrawBounds drawBounds;
 	ComponentHeader componentHeader{ juce::String("Waveform") };
+	WaveformComponentReferenceLine waveformReferenceLine;
 
     using Callback = std::function<void()>;
     Callback cb = nullptr;

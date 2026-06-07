@@ -366,7 +366,6 @@ void MainComponent::openSpectrumAnalyser(int x, int y)
     spectrum->setBounds(x, y, 500, 150);
     spectrum->drawArea.setBounds(50, 65, 435, 50);
     spectrum->eqReferenceLines.setBounds(0, 50, 500, 100);
-	spectrum->eqReferenceLines.setInterceptsMouseClicks(false, false);
     spectrum->componentHeader.setBounds(0, 0, 500, 50);
     spectrum->componentHeader.themeConfigButton.setBounds(10, 10, 30, 30);
     spectrum->componentHeader.themeConfigButton.setTooltip("Theme Configuration");
@@ -482,8 +481,9 @@ void MainComponent::openWaveformComponent(int x, int y)
                                         int&& Height = aw->getTextEditorContents("Height").getIntValue();
                                         if (Width <= 100 || Height <= 100) return;
                                         wf->setBounds(wf->getX(), wf->getY(), Width, Height);
-                                        wf->drawArea.setBounds(0, 50, Width, Height - 50);
-                                        wf->tileArea.setBounds(0, 0, 16, Height - 50);
+                                        wf->drawArea.setBounds(45, 50, Width - 45, Height - 70);
+                                        wf->tileArea.setBounds(0, 0, 16, Height - 70);
+										wf->waveformReferenceLine.setBounds(0, 50, Width, Height - 50);
                                         wf->componentHeader.setBounds(0, 0, Width, 50);
                                         wf->componentHeader.componentControl.setBounds(Width - 30, 20, 10, 10);
                                         wf->drawBounds.setBounds(0, 0, Width, Height);
@@ -497,13 +497,22 @@ void MainComponent::openWaveformComponent(int x, int y)
         };
 
     waveform->setBounds(x, y, 500, 150);
-    waveform->tileArea.setBounds(0, 0, 16, 100);
-    waveform->drawArea.setBounds(0, 50, 500, 100);
+    waveform->tileArea.setBounds(0, 0, 16, 80);
+    waveform->drawArea.setBounds(45, 50, 455, 80);
+	waveform->waveformReferenceLine.setBounds(0, 50, 500, 100);
 	waveform->componentHeader.setBounds(0, 0, 500, 50);
 	waveform->componentHeader.themeConfigButton.setBounds(10, 10, 30, 30);
     waveform->componentHeader.themeConfigButton.setTooltip("Theme Configuration");
     waveform->componentHeader.headerFixedButton.setBounds(50, 10, 30, 30);
     waveform->componentHeader.headerFixedButton.setTooltip("Fixed Header");
+    waveform->componentHeader.drawLinesButton.setBounds(90, 10, 30, 30);
+    waveform->componentHeader.drawLinesButton.onClick = [weakWaveform]()
+        {
+            if (auto sp = weakWaveform.lock())
+            {
+                sp->waveformReferenceLine.setVisible(!sp->waveformReferenceLine.isVisible());
+            }
+        };
 }
 
 void MainComponent::openVectorOscilloscopeComponent(int x, int y)
@@ -736,7 +745,8 @@ void MainComponent::openWaveformChartComponent(int x, int y)
                                         int&& Height = aw->getTextEditorContents("Height").getIntValue();
                                         if (Width <= 100 || Height <= 100) return;
                                         ch->setBounds(ch->getX(), ch->getY(), Width, Height);
-                                        ch->drawArea.setBounds(0, 50, Width, Height - 50);
+                                        ch->drawArea.setBounds(45, 50, Width - 45, Height - 70);
+                                        ch->chartReferenceLine.setBounds(0, 50, Width, Height - 50);
                                         ch->componentHeader.setBounds(0, 0, Width, 50);
                                         ch->componentHeader.componentControl.setBounds(Width - 30, 20, 10, 10);
                                         ch->drawBounds.setBounds(0, 0, Width, Height);
@@ -750,12 +760,21 @@ void MainComponent::openWaveformChartComponent(int x, int y)
         };
 
     chart->setBounds(x, y, 500, 150);
-    chart->drawArea.setBounds(0, 50, 500, 100);
+    chart->drawArea.setBounds(45, 50, 455, 80);
+    chart->chartReferenceLine.setBounds(0, 50, 500, 100);
     chart->componentHeader.setBounds(0, 0, 500, 50);
     chart->componentHeader.themeConfigButton.setBounds(10, 10, 30, 30);
     chart->componentHeader.themeConfigButton.setTooltip("Theme Configuration");
     chart->componentHeader.headerFixedButton.setBounds(50, 10, 30, 30);
     chart->componentHeader.headerFixedButton.setTooltip("Fixed Header");
+    chart->componentHeader.drawLinesButton.setBounds(90, 10, 30, 30);
+    chart->componentHeader.drawLinesButton.onClick = [weakChart]()
+        {
+            if (auto sp = weakChart.lock())
+            {
+                sp->chartReferenceLine.setVisible(!sp->chartReferenceLine.isVisible());
+            }
+        };
 }
 
 void MainComponent::userTriedToCloseWindow()

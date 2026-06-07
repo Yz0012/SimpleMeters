@@ -12,6 +12,7 @@ public:
     EQReferenceLineComponent()
     {
         setOpaque(false);
+        setInterceptsMouseClicks(false, false);
 
         sampleRate = 48000.0f;
         scopeSize = 1024;

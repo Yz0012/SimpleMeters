@@ -127,6 +127,8 @@
                 resource="0" file="Source/Components/VectorOscilloscopeComponent/VectorOscilloscopeComponent.h"/>
         </GROUP>
         <GROUP id="{CCB894DA-40A2-A5A5-6487-E4A125C4574A}" name="WaveformComponent">
+          <FILE id="Pt94Iy" name="ChartReferenceLine.h" compile="0" resource="0"
+                file="Source/Components/WaveformComponent/ChartReferenceLine.h"/>
           <FILE id="Wx9AQ7" name="WaveformChartComponent.cpp" compile="1" resource="0"
                 file="Source/Components/WaveformComponent/WaveformChartComponent.cpp"/>
           <FILE id="SvruY8" name="WaveformChartComponent.h" compile="0" resource="0"
@@ -135,6 +137,8 @@
                 file="Source/Components/WaveformComponent/WaveformComponent.cpp"/>
           <FILE id="OQ2QtS" name="WaveformComponent.h" compile="0" resource="0"
                 file="Source/Components/WaveformComponent/WaveformComponent.h"/>
+          <FILE id="UkZ3J3" name="WaveformComponentReferenceLine.h" compile="0"
+                resource="0" file="Source/Components/WaveformComponent/WaveformComponentReferenceLine.h"/>
         </GROUP>
         <FILE id="hYe14l" name="ComponentManagement.cpp" compile="1" resource="0"
               file="Source/Components/ComponentManagement.cpp"/>

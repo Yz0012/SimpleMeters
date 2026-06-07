@@ -50,8 +50,13 @@ public:
             rx * amp9 * 2.0f, ry * amp9 * 2.0f, 1.2f);
 
         g.setColour(lineColor.withAlpha(0.8f));
-        g.drawLine(cx, 0.0f, cx, static_cast<float>(h), 0.8f);
-        g.drawLine(0.0f, cy, static_cast<float>(w), cy, 0.8f);
+        float dashLengths[] = { 8.0f, 8.0f };
+
+        juce::Line<float> verticalLine(cx, 0.0f, cx, static_cast<float>(h));
+        g.drawDashedLine(verticalLine, dashLengths, 2, 0.8f);
+
+        juce::Line<float> horizontalLine(0.0f, cy, static_cast<float>(w), cy);
+        g.drawDashedLine(horizontalLine, dashLengths, 2, 0.8f);
 
         const float endX = w - 40.0f;
         float y = 10.0f;

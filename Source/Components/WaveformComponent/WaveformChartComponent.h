@@ -5,6 +5,7 @@
 #include "../../CreateConfiguration/CreateColoursConfiguration.h"
 #include "../../GUI/Components/DrawBounds.h"
 #include "../../GUI/Components/ComponentHeader.h"
+#include "ChartReferenceLine.h"
 
 class WaveformChartComponent : public juce::Component, private juce::ValueTree::Listener
 {
@@ -33,6 +34,7 @@ public:
 
     DrawBounds drawBounds;
     ComponentHeader componentHeader{ juce::String("WaveformChart") };
+	ChartReferenceLine chartReferenceLine;
 
     using Callback = std::function<void()>;
     Callback cb = nullptr;

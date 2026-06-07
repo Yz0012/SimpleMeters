@@ -22,6 +22,7 @@ WaveformChartComponent::WaveformChartComponent()
 
     addAndMakeVisible(&drawBounds);
 	addAndMakeVisible(&componentHeader);
+	addAndMakeVisible(&chartReferenceLine);
 
 	waveformChartCat.addListener(this);
 }

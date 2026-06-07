@@ -21,6 +21,7 @@ WaveformComponent::WaveformComponent()
 
     addAndMakeVisible(&drawBounds);
 	addAndMakeVisible(&componentHeader);
+	addAndMakeVisible(&waveformReferenceLine);
 
 	waveformCat.addListener(this);
 }
@@ -96,8 +97,6 @@ void WaveformComponent::renderNextFrame(juce::Graphics& g, juce::Rectangle<int> 
 {
     if (bounds.getWidth() <= 0 || bounds.getHeight() <= 0)
         return;
-
-    //drawAxis(g, bounds);
 
     //优化
     int tileSize = (int)(bounds.getWidth() / tileArea.getWidth()) + 1;
