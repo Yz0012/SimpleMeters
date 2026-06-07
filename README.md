@@ -25,7 +25,7 @@ Features currently being developed or already completed include:
 - [ ] Spectrum coordinate mapping curve
 - [ ] Spectrum bar graph
 - [ ] Spectrum waterfall display
-- [ ] Spectrum reference lines
+- [x] Spectrum reference lines
 - [ ] Spectrum fundamental frequency / peak display
 - [ ] True peak display
 - [ ] Loudness metering (LUFS, RMS, etc.)
@@ -35,12 +35,12 @@ Features currently being developed or already completed include:
 - [ ] Optimize waveform ring buffer
 - [ ] Chart range selection
 - [ ] Chart range selection based on fundamental frequency
-- [ ] Waveform reference lines
+- [x] Waveform reference lines
 - [ ] Waveform L-R
 - [ ] Stereo analysis mode
 - [ ] Stereo analysis graph rotation
 - [ ] Stereo analysis graph color change over time
-- [ ] Stereo analysis reference lines
+- [x] Stereo analysis reference lines
 - [ ] BPM blinking
 - [ ] Pre-gain
 - [ ] Audio input detection
