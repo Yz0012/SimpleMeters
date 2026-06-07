@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="TkEGC8" name="SimpleMeters" projectType="guiapp" useAppConfig="0"
-              addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" version="0.0.1">
+              addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" version="1.0.0">
   <MAINGROUP id="LAPktj" name="SimpleMeters">
     <GROUP id="{7D5B5DC3-1EC8-72B5-0D8D-111EEF7BB463}" name="Source">
       <FILE id="vRjiPQ" name="CreatePushSampleIntoJuceAudioBufferInstance.h"
