@@ -110,6 +110,14 @@
               file="Source/Assets/WaveformComponent.png"/>
       </GROUP>
       <GROUP id="{EEE00817-5370-279A-C380-774ED0991585}" name="Components">
+        <GROUP id="{8E61455B-5029-C950-78D3-89D0DB0861EC}" name="LoudnessMeterComponents">
+          <FILE id="vyc8Po" name="RMSMeterComponent.cpp" compile="1" resource="0"
+                file="Source/Components/LoudnessMeterComponents/RMSMeterComponent.cpp"/>
+          <FILE id="RdaE6P" name="RMSMeterComponent.h" compile="0" resource="0"
+                file="Source/Components/LoudnessMeterComponents/RMSMeterComponent.h"/>
+          <FILE id="DUBVdN" name="TicksComponent.h" compile="0" resource="0"
+                file="Source/Components/LoudnessMeterComponents/TicksComponent.h"/>
+        </GROUP>
         <GROUP id="{18D4E39F-8650-E045-DBA0-DD4F8F199AED}" name="Spectrum">
           <FILE id="W63HlC" name="EQReferenceLineComponent.h" compile="0" resource="0"
                 file="Source/Components/Spectrum/EQReferenceLineComponent.h"/>

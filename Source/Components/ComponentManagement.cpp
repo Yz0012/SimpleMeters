@@ -50,6 +50,17 @@ std::shared_ptr<WaveformChartComponent> ComponentManagement::getWaveformChartCom
     return waveformChartComponent;
 }
 
+std::shared_ptr<RMSMeterComponent> ComponentManagement::getRMSMeterComponent()
+{
+	jassert(juce::MessageManager::getInstance()->isThisTheMessageThread());
+
+	if (rmsMeterComponent == nullptr)
+	{
+		rmsMeterComponent = std::make_shared<RMSMeterComponent>();
+	}
+	return rmsMeterComponent;
+}
+
 void ComponentManagement::resetWaveformComponent()
 {
     waveformComponent.reset();
@@ -70,10 +81,16 @@ void ComponentManagement::resetWaveformChartComponent()
     waveformChartComponent.reset();
 }
 
+void ComponentManagement::resetRMSMeterComponent()
+{
+	rmsMeterComponent.reset();
+}
+
 void ComponentManagement::resetAllComponents()
 {
     resetWaveformComponent();
     resetSpectrumAnalyser();
     resetVectorOscilloscopes();
     resetWaveformChartComponent();
+    resetRMSMeterComponent();
 }

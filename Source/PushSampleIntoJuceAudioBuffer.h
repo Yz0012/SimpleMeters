@@ -39,8 +39,8 @@ public:
 
             if (allReady)
             {
-                localAudioBufferRMS = sqrtf(leftLocalAudioBufferRMS * leftLocalAudioBufferRMS +
-                    rightLocalAudioBufferRMS * rightLocalAudioBufferRMS);
+                localAudioBufferRMS = sqrtf((leftLocalAudioBufferRMS * leftLocalAudioBufferRMS +
+                    rightLocalAudioBufferRMS * rightLocalAudioBufferRMS) * 0.5f);
                 // Thread-safe
                 activeReadIndex.store(currentWriteIdx, std::memory_order_release);
                 currentWriteIdx = 1 - currentWriteIdx;

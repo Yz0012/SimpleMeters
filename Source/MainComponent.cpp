@@ -128,6 +128,7 @@ void MainComponent::mouseDown(const juce::MouseEvent& event)
         menu.addItem(2, "Waveform", true, false, juce::Drawable::createFromImageData(BinaryData::WaveformComponent_png, BinaryData::WaveformComponent_pngSize));
         menu.addItem(3, "VectorOscilloscopeComponent", true, false, juce::Drawable::createFromImageData(BinaryData::VectorOscilloscopeComponent_png, BinaryData::VectorOscilloscopeComponent_pngSize));
         menu.addItem(4, "WaveformChart", true, false, juce::Drawable::createFromImageData(BinaryData::WaveformChartComponent_png, BinaryData::WaveformChartComponent_pngSize));
+        menu.addItem(5, "RMSMeter", true, false, juce::Drawable::createFromImageData(BinaryData::RMSComponent_png, BinaryData::RMSComponent_pngSize));
 
         menu.showMenuAsync(
             juce::PopupMenu::Options(),
@@ -151,6 +152,10 @@ void MainComponent::mouseDown(const juce::MouseEvent& event)
                 else if (result == 4)
                 {
                     openWaveformChartComponent(event.getMouseDownX(), event.getMouseDownY());
+                }
+                else if (result == 5)
+                {
+					openRMSMeterComponent(event.getMouseDownX(), event.getMouseDownY());
                 }
             });
     }
@@ -775,6 +780,23 @@ void MainComponent::openWaveformChartComponent(int x, int y)
                 sp->chartReferenceLine.setVisible(!sp->chartReferenceLine.isVisible());
             }
         };
+}
+
+void MainComponent::openRMSMeterComponent(int x, int y)
+{
+	auto rmsMeter = ComponentManagement::getInstance().getRMSMeterComponent();
+
+    if (!rmsMeter->callbackId)
+    {
+        rmsMeter->callbackId = pushSampleIntoJuceAudioBuffer.add(
+            [this, rmsMeter]()
+            {
+                rmsMeter->updateRMSValues(pushSampleIntoJuceAudioBuffer.getLeftLocalAudioBufferRMSReference(), pushSampleIntoJuceAudioBuffer.getRightLocalAudioBufferRMSReference(), pushSampleIntoJuceAudioBuffer.getLocalAudioBufferRMSReference());
+            });
+    }
+    addAndMakeVisible(rmsMeter.get());
+    rmsMeter->setBounds(x, y, 150, 500);
+	rmsMeter->ticksComponent.setBounds(0, 0, 150, 500);
 }
 
 void MainComponent::userTriedToCloseWindow()

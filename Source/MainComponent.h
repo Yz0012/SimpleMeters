@@ -19,7 +19,7 @@ public:
 
     void paint (juce::Graphics&) override;
     void resized() override;
-	 
+
 	void mouseDown(const juce::MouseEvent& event) override;
 	void mouseDrag(const juce::MouseEvent& event) override;
 	void mouseEnter(const juce::MouseEvent&) override;
@@ -32,6 +32,7 @@ public:
 	void openWaveformComponent(int x, int y);
 	void openVectorOscilloscopeComponent(int x, int y);
 	void openWaveformChartComponent(int x, int y);
+	void openRMSMeterComponent(int x, int y);
 
 	void stopAndCloseWASAPIDevice();
 	void stopWASAPIDevice();
