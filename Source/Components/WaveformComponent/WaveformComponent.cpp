@@ -39,7 +39,7 @@ void WaveformComponent::clear()
 
 void WaveformComponent::drawWaveform(
     const juce::AudioBuffer<float>& localAudioBuffer,
-    const float localAudioBufferRMS)
+    const float& localAudioBufferRMS)
 {
     const int width = tileArea.getWidth();
     const int height = tileArea.getHeight();

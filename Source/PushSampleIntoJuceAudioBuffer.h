@@ -24,12 +24,23 @@ public:
             for (auto ready : channelReady)
                 if (!ready) { allReady = false; break; }
 
+            /* Although computation should not be placed in the audio thread, about 1000 float samples will not block the audio thread.
+            The computation process on modern CPUs only takes a few microseconds.
+            Considering that it is possible to implement automatic start and stop callbacks, I think it is worth it. */
+
+            if (channel)
+            {
+                rightLocalAudioBufferRMS = buffers[channel].getRMSLevel(channel, 0, bufferSize);
+            }
+            else
+            {
+				leftLocalAudioBufferRMS = buffers[channel].getRMSLevel(channel, 0, bufferSize);
+            }
+
             if (allReady)
             {
-                /* Although computation should not be placed in the audio thread, about 1000 float samples will not block the audio thread.
-                The computation process on modern CPUs only takes a few microseconds.
-                Considering that it is possible to implement automatic start and stop callbacks, I think it is worth it. */
-                localAudioBufferRMS = buffers[currentWriteIdx].getRMSLevel(0, 0, bufferSize);
+                localAudioBufferRMS = sqrtf(leftLocalAudioBufferRMS * leftLocalAudioBufferRMS +
+                    rightLocalAudioBufferRMS * rightLocalAudioBufferRMS);
                 // Thread-safe
                 activeReadIndex.store(currentWriteIdx, std::memory_order_release);
                 currentWriteIdx = 1 - currentWriteIdx;
@@ -208,24 +219,61 @@ public:
 		return buffers[idx].getRMSLevel(channel, startSample, numSamples);
     }
 
-    /* Return localAudioBuffer RMS,the RMS will calculating when the function 
-    called. */
+    /* Return localAudioBuffer RMS, the RMS will be calculated when the function is called. */
     T getLocalAudioBufferRMS(int channel, int startSample, int numSamples) const
     {
         int idx = activeReadIndex.load(std::memory_order_acquire);
         return buffers[idx].getRMSLevel(channel, startSample, numSamples);
     }
 
-    /* Return localAudioBuffer RMS Read Pointer. */
-    const T getLocalAudioBufferRMS() const
+    /* Return localAudioBuffer RMS (stored atomic value). */
+    T getLocalAudioBufferRMS() const
     {
         return localAudioBufferRMS.load(std::memory_order_acquire);
     }
 
-    /* Return localAudioBuffer RMS reference. */
-    const T& getLocalAudioBufferRMSReference() const
+    /* Return localAudioBuffer RMS (stored atomic value) – note: returns by value, NOT reference. */
+    T getLocalAudioBufferRMSReference() const
     {
         return localAudioBufferRMS.load(std::memory_order_acquire);
+    }
+
+    /* Return left channel RMS of localAudioBuffer, the RMS will be calculated when the function is called. */
+    T getLeftLocalAudioBufferRMS(int startSample, int numSamples) const
+    {
+        int idx = activeReadIndex.load(std::memory_order_acquire);
+        return buffers[idx].getRMSLevel(0, startSample, numSamples);
+    }
+
+    /* Return left channel RMS of localAudioBuffer (stored atomic value). */
+    T getLeftLocalAudioBufferRMS() const
+    {
+        return leftLocalAudioBufferRMS.load(std::memory_order_acquire);
+    }
+
+    /* Return left channel RMS of localAudioBuffer (stored atomic value) – returns by value. */
+    T getLeftLocalAudioBufferRMSReference() const
+    {
+        return leftLocalAudioBufferRMS.load(std::memory_order_acquire);
+    }
+
+    /* Return right channel RMS of localAudioBuffer, the RMS will be calculated when the function is called. */
+    T getRightLocalAudioBufferRMS(int startSample, int numSamples) const
+    {
+        int idx = activeReadIndex.load(std::memory_order_acquire);
+        return buffers[idx].getRMSLevel(1, startSample, numSamples);
+    }
+
+    /* Return right channel RMS of localAudioBuffer (stored atomic value). */
+    T getRightLocalAudioBufferRMS() const
+    {
+        return rightLocalAudioBufferRMS.load(std::memory_order_acquire);
+    }
+
+    /* Return right channel RMS of localAudioBuffer (stored atomic value) – returns by value. */
+    T getRightLocalAudioBufferRMSReference() const
+    {
+        return rightLocalAudioBufferRMS.load(std::memory_order_acquire);
     }
 
     /* Return number of channels. */
@@ -288,6 +336,8 @@ private:
     std::mutex muteCallbacksMutex;
     std::mutex startCallbacksMutex;
     std::atomic<T> localAudioBufferRMS;
+	std::atomic<T> leftLocalAudioBufferRMS;
+	std::atomic<T> rightLocalAudioBufferRMS;
     static constexpr float rmsSilenceThreshold = 0.00001f;
     int silentBufferCount = 0;
     int bufferCountThreshold = 200;

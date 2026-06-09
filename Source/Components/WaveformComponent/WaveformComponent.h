@@ -24,7 +24,7 @@ public:
 
     void drawWaveform(
         const juce::AudioBuffer<float>& localAudioBuffer,
-        const float localAudioBufferRMS);
+        const float& localAudioBufferRMS);
 
     void renderNextFrame(juce::Graphics& g, juce::Rectangle<int> bounds);
 
