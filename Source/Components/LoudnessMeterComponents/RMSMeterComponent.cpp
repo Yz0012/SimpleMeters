@@ -2,14 +2,29 @@
 
 RMSMeterComponent::RMSMeterComponent()
 {
+    CreateColoursConfiguration& createColoursConfiguration = CreateColoursConfiguration::getInstance();
+
+    rmsMeterCat = createColoursConfiguration.currentColourTheme
+        .getChildWithProperty("name", "RMSMeterComponent");
+    
+    buttomColor = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
+        rmsMeterCat.getChildWithProperty("name", "Bottom").getProperty("hex").toString(), false));
+    topColor = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
+        rmsMeterCat.getChildWithProperty("name", "Top").getProperty("hex").toString(), false));
+
+    addAndMakeVisible(&drawBounds);
+    addAndMakeVisible(&componentHeader);
     addAndMakeVisible(&ticksComponent);
 
     startTimerHz(30);
+
+	rmsMeterCat.addListener(this);
 }
 
 RMSMeterComponent::~RMSMeterComponent()
 {
     stopTimer();
+    rmsMeterCat.removeListener(this);
 }
 
 void RMSMeterComponent::paint(juce::Graphics& g)
@@ -31,7 +46,7 @@ void RMSMeterComponent::paint(juce::Graphics& g)
         if (safeTopY < meterHeight)
         {
             juce::Rectangle<float> safeRect(xOffset, safeTopY, barWidth, meterHeight - safeTopY);
-            juce::ColourGradient gradient(juce::Colour(0xFFB7ED88), 0.0f, meterHeight, juce::Colours::white, 0.0f, zeroDbY, false);
+            juce::ColourGradient gradient(buttomColor, 0.0f, meterHeight, topColor, 0.0f, zeroDbY, false);
             g.setGradientFill(gradient);
             g.fillRect(safeRect);
         }
@@ -117,4 +132,40 @@ float RMSMeterComponent::amplitudeToY(float amplitude, float availableHeight) co
 {
     float db = juce::Decibels::gainToDecibels(std::max(0.00001f, amplitude), -60.0f);
     return juce::jmap(db, -60.0f, 12.0f, availableHeight, 0.0f);
+}
+
+void RMSMeterComponent::mouseDown(const juce::MouseEvent& event)
+{
+    if (event.mods.isPopupMenu())
+    {
+        if (cb == nullptr) return;
+        cb();
+    }
+}
+
+void RMSMeterComponent::mouseEnter(const juce::MouseEvent& event)
+{
+    drawBounds.setVisible(true);
+    componentHeader.setVisible(true);
+}
+
+void RMSMeterComponent::mouseExit(const juce::MouseEvent&)
+{
+    if (!componentHeader.isMouseOver() && !componentHeader.headerFixedButton.getHeaderFixed())
+    {
+        drawBounds.setVisible(false);
+        componentHeader.setVisible(false);
+    }
+}
+
+void RMSMeterComponent::valueTreePropertyChanged(juce::ValueTree& tree, const juce::Identifier& property)
+{
+    if (property == juce::Identifier("hex"))
+    {
+        this->buttomColor = juce::Colour(CreateColoursConfiguration::getInstance().colourHexToARGBInt(
+            rmsMeterCat.getChildWithProperty("name", "Bottom").getProperty("hex").toString(), false));
+        this->topColor = juce::Colour(CreateColoursConfiguration::getInstance().colourHexToARGBInt(
+            rmsMeterCat.getChildWithProperty("name", "Top").getProperty("hex").toString(), false));
+        repaint();
+    }
 }

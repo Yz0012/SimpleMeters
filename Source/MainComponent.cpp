@@ -29,31 +29,33 @@ MainComponent::MainComponent()
 	header.themeConfigurationButton.setTooltip("Open theme configuration");
     header.windowsSizeButton.onClick = [this]
         {
-            juce::AlertWindow* aw = new juce::AlertWindow(
+            auto aw = std::make_unique<juce::AlertWindow>(
                 "Resize Window",
-                "Enter Width and Height,please don't input zero or any number smaller then 200 :)",
+                "Enter Width and Height, please don't input zero or any number smaller than 200 :)",
                 juce::AlertWindow::QuestionIcon);
 
             aw->setOpaque(false);
             aw->setDropShadowEnabled(false);
             aw->addTextEditor("Width", "", "Width");
             aw->addTextEditor("Height", "", "Height");
-            aw->getTextEditor("Width")->setInputRestrictions(4,"0123456789");
+            aw->getTextEditor("Width")->setInputRestrictions(4, "0123456789");
             aw->getTextEditor("Height")->setInputRestrictions(4, "0123456789");
             aw->addButton("OK", 1, juce::KeyPress(juce::KeyPress::returnKey));
             aw->addButton("Cancel", 0, juce::KeyPress(juce::KeyPress::escapeKey));
 
-            aw->enterModalState(true, juce::ModalCallbackFunction::create(
-                [this,aw](int result)
+            juce::AlertWindow* rawPtr = aw.release();
+
+            rawPtr->enterModalState(true, juce::ModalCallbackFunction::create(
+                [this, rawPtr](int result)
                 {
                     if (result == 1)
                     {
-                        int &&Width = aw->getTextEditorContents("Width").getIntValue();
-                        int &&Height = aw->getTextEditorContents("Height").getIntValue();
-                        if (Width <= 200 || Height <= 200) return;
-                        setSize(aw->getTextEditorContents("Width").getIntValue(), aw->getTextEditorContents("Height").getIntValue());
+                        int width = rawPtr->getTextEditorContents("Width").getIntValue();
+                        int height = rawPtr->getTextEditorContents("Height").getIntValue();
+                        if (width > 200 && height > 200)
+                            setSize(width, height);
                     }
-                    delete aw;
+                    delete rawPtr;
                 }
             ), true);
         };
@@ -217,7 +219,6 @@ void MainComponent::openSpectrumAnalyser(int x, int y)
     addAndMakeVisible(spectrum.get());
     spectrum->componentHeader.componentControl.setBounds(470, 20, 10, 10);
     spectrum->drawBounds.setBounds(0,0,500,150);
-    spectrum->drawBounds.setInterceptsMouseClicks(false, false);
 
     // 不统一
     std::weak_ptr<SpectrumAnalyser> weakSpectrum = spectrum;
@@ -405,7 +406,6 @@ void MainComponent::openWaveformComponent(int x, int y)
     addAndMakeVisible(waveform.get());
     waveform->componentHeader.componentControl.setBounds(470, 20, 10, 10);
     waveform->drawBounds.setBounds(0, 0, 500, 150);
-    waveform->drawBounds.setInterceptsMouseClicks(false, false);
 
     std::weak_ptr<WaveformComponent> weakWaveform = waveform;
     waveform->componentHeader.componentControl.setCallBackFuntion([this, weakWaveform]()
@@ -538,7 +538,6 @@ void MainComponent::openVectorOscilloscopeComponent(int x, int y)
     addAndMakeVisible(vector.get());
     vector->componentHeader.componentControl.setBounds(270, 20, 10, 10);
     vector->drawBounds.setBounds(0, 0, 300, 300);
-    vector->drawBounds.setInterceptsMouseClicks(false, false);
 
     std::weak_ptr<VectorOscilloscopes> weakVector = vector;
     vector->componentHeader.componentControl.setCallBackFuntion([this, weakVector]()
@@ -669,7 +668,6 @@ void MainComponent::openWaveformChartComponent(int x, int y)
     addAndMakeVisible(chart.get());
     chart->componentHeader.componentControl.setBounds(470, 20, 10, 10);
     chart->drawBounds.setBounds(0, 0, 500, 150);
-    chart->drawBounds.setInterceptsMouseClicks(false, false);
 
     std::weak_ptr<WaveformChartComponent> weakChart = chart;
     chart->componentHeader.componentControl.setCallBackFuntion([this, weakChart]()
@@ -794,9 +792,115 @@ void MainComponent::openRMSMeterComponent(int x, int y)
                 rmsMeter->updateRMSValues(pushSampleIntoJuceAudioBuffer.getLeftLocalAudioBufferRMSReference(), pushSampleIntoJuceAudioBuffer.getRightLocalAudioBufferRMSReference(), pushSampleIntoJuceAudioBuffer.getLocalAudioBufferRMSReference());
             });
     }
+
+    std::weak_ptr<RMSMeterComponent> weakRMSMeter = rmsMeter;
+    rmsMeter->componentHeader.componentControl.setCallBackFuntion([this, weakRMSMeter]()
+        {
+            if (auto ch = weakRMSMeter.lock())
+            {
+                pushSampleIntoJuceAudioBuffer.remove(ch->callbackId);
+            }
+            ComponentManagement::getInstance().resetWaveformChartComponent();
+        });
+
+    rmsMeter->cb = [weakRMSMeter]()
+        {
+            juce::PopupMenu menu;
+            menu.addItem(1, "Position", true, false, juce::Drawable::createFromImageData(BinaryData::menuPosition_png, BinaryData::menuPosition_pngSize));
+            menu.addItem(2, "ComponentSize", true, false, juce::Drawable::createFromImageData(BinaryData::menuComponentSize_png, BinaryData::menuComponentSize_pngSize));
+            menu.showMenuAsync(
+                juce::PopupMenu::Options(),
+                [weakRMSMeter](int result)
+                {
+                    if (auto rms = weakRMSMeter.lock())
+                    {
+                        if (result == 0)
+                        {
+                        }
+                        else if (result == 1)
+                        {
+                            juce::AlertWindow* aw = new juce::AlertWindow(
+                                "Set position",
+                                "Enter X and Y coordinates,please don't input zero or any number smaller then 0 :)",
+                                juce::AlertWindow::QuestionIcon);
+
+                            aw->setOpaque(false);
+                            aw->setDropShadowEnabled(false);
+                            aw->addTextEditor("X", "", "X");
+                            aw->addTextEditor("Y", "", "Y");
+                            aw->getTextEditor("X")->setInputRestrictions(4, "0123456789");
+                            aw->getTextEditor("Y")->setInputRestrictions(4, "0123456789");
+                            aw->addButton("OK", 1, juce::KeyPress(juce::KeyPress::returnKey));
+                            aw->addButton("Cancel", 0, juce::KeyPress(juce::KeyPress::escapeKey));
+
+                            aw->enterModalState(true, juce::ModalCallbackFunction::create(
+                                [rms, aw](int result)
+                                {
+                                    if (result == 1)
+                                    {
+                                        int&& X = aw->getTextEditorContents("X").getIntValue();
+                                        int&& Y = aw->getTextEditorContents("Y").getIntValue();
+                                        if (X <= 0 || Y <= 0) return;
+                                        rms->setBounds(X, Y, rms->getWidth(), rms->getHeight());
+                                    }
+                                    delete aw;
+                                }
+                            ), true);
+                        }
+                        else if (result == 2)
+                        {
+                            juce::AlertWindow* aw = new juce::AlertWindow(
+                                "Resize Component",
+                                "Enter Width and Height,please don't input zero or any number smaller then 100 :)",
+                                juce::AlertWindow::QuestionIcon);
+
+                            aw->setOpaque(false);
+                            aw->setDropShadowEnabled(false);
+                            aw->addTextEditor("Width", "", "Width");
+                            aw->addTextEditor("Height", "", "Height");
+                            aw->getTextEditor("Width")->setInputRestrictions(3, "0123456789");
+                            aw->getTextEditor("Height")->setInputRestrictions(3, "0123456789");
+                            aw->addButton("OK", 1, juce::KeyPress(juce::KeyPress::returnKey));
+                            aw->addButton("Cancel", 0, juce::KeyPress(juce::KeyPress::escapeKey));
+
+                            aw->enterModalState(true, juce::ModalCallbackFunction::create(
+                                [rms, aw](int result)
+                                {
+                                    if (result == 1)
+                                    {
+                                        int&& Width = aw->getTextEditorContents("Width").getIntValue();
+                                        int&& Height = aw->getTextEditorContents("Height").getIntValue();
+                                        if (Width <= 100 || Height <= 100) return;
+                                        rms->setBounds(rms->getX(), rms->getY(), Width, Height);
+                                        rms->ticksComponent.setBounds(0, 0, Width, Height);
+                                        rms->componentHeader.setBounds(0, 0, Width, 50);
+                                        rms->componentHeader.componentControl.setBounds(Width - 30, 20, 10, 10);
+                                        rms->drawBounds.setBounds(0, 0, Width, Height);
+                                    }
+                                    delete aw;
+                                }
+                            ), true);
+                        }
+                    }
+                });
+        };
     addAndMakeVisible(rmsMeter.get());
     rmsMeter->setBounds(x, y, 150, 500);
-	rmsMeter->ticksComponent.setBounds(0, 0, 150, 500);
+    rmsMeter->drawBounds.setBounds(0, 0, 150, 500);
+    rmsMeter->ticksComponent.setBounds(0, 0, 150, 500);
+    rmsMeter->componentHeader.setBounds(0, 0, 150, 50);
+    rmsMeter->componentHeader.themeConfigButton.setBounds(10, 10, 30, 30);
+    rmsMeter->componentHeader.themeConfigButton.setTooltip("Theme Configuration");
+    rmsMeter->componentHeader.headerFixedButton.setBounds(50, 10, 30, 30);
+    rmsMeter->componentHeader.headerFixedButton.setTooltip("Fixed Header");
+    rmsMeter->componentHeader.drawLinesButton.setBounds(90, 10, 30, 30);
+    rmsMeter->componentHeader.drawLinesButton.onClick = [weakRMSMeter]()
+        {
+            if (auto rms = weakRMSMeter.lock())
+            {
+				rms->ticksComponent.setVisible(!rms->ticksComponent.isVisible());
+            }
+        };
 }
 
 void MainComponent::userTriedToCloseWindow()

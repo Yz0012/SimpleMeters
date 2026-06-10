@@ -1,11 +1,12 @@
 #pragma once
 #include <JuceHeader.h>
 
+#include "../../CreateConfiguration/CreateColoursConfiguration.h"
 #include "../../GUI/Components/DrawBounds.h"
 #include "../../GUI/Components/ComponentHeader.h"
 #include "TicksComponent.h"
 
-class RMSMeterComponent : public juce::Component, private juce::Timer
+class RMSMeterComponent : public juce::Component, private juce::Timer, private juce::ValueTree::Listener
 {
 public:
     RMSMeterComponent();
@@ -13,6 +14,11 @@ public:
 
     void paint(juce::Graphics& g) override;
     void resized() override;
+    void mouseDown(const juce::MouseEvent& event) override;
+    void mouseEnter(const juce::MouseEvent& event) override;
+    void mouseExit(const juce::MouseEvent&) override;
+
+    void valueTreePropertyChanged(juce::ValueTree& tree, const juce::Identifier& property) override;
 
     void updateRMSValues(float left, float right, float total);
 
@@ -21,7 +27,15 @@ public:
 	TicksComponent ticksComponent;
 
     uint16_t callbackId = 0;
+
+    using Callback = std::function<void()>;
+    Callback cb = nullptr;
 private:
+    juce::ValueTree rmsMeterCat;
+
+    juce::Colour buttomColor;
+    juce::Colour topColor;
+
     void timerCallback() override;
     float amplitudeToY(float amplitude, float availableHeight) const;
 

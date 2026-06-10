@@ -60,6 +60,13 @@ public:
             }
         },
 
+        { "Category", {{ "name", "RMSMeterComponent" }},
+            {
+                { "Colour", {{ "name", "Bottom"},          { "hex", "#B7ED88" }}},
+                { "Colour", {{ "name", "Top"},          { "hex", "#FFFFFF" }}}
+            }
+        },
+
         { "Category", {{ "name", "MainComponent" }},
             {
                 { "Colour", {{ "name", "Background"}, { "hex", "#172027" }}},

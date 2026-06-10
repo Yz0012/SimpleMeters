@@ -8,6 +8,7 @@ DrawBounds::DrawBounds()
 	boundsColour = juce::Colour(CreateColoursConfiguration::getInstance().colourHexToARGBInt(
 		drawBoundsCat.getChildWithProperty("name", "ComponentBoundsColour").getProperty("hex").toString(), true));
 	
+	setInterceptsMouseClicks(false, false);
 }
 
 DrawBounds::~DrawBounds()
