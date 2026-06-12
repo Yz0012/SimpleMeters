@@ -26,7 +26,7 @@ Features currently being developed or already completed include:
 - [ ] Spectrum bar graph
 - [ ] Spectrum waterfall display
 - [x] Spectrum reference lines
-- [ ] Spectrum fundamental frequency / peak display
+- [x] Spectrum fundamental frequency / peak display
 - [ ] True peak display
 - [ ] Loudness metering (LUFS, RMS, etc.)
 - [ ] Select different sample buffers for volume analysis
