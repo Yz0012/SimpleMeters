@@ -43,6 +43,7 @@ public:
         juce::Rectangle<int> bounds,
         const float* scopeData,
         float* scopeDataStorage,
+        float* destScope,
         juce::Colour lineColour,
         juce::Colour fillColour);
     void setAnalysisMode(AnalysisMode mode);
@@ -100,6 +101,9 @@ private:
 
     float scopeData2[scopeSize];
     float scopeDataStorage2[scopeSize];
+
+    float destScope1[scopeSize];
+    float destScope2[scopeSize];
 
     float level = 0.0f;
 

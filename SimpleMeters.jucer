@@ -4,6 +4,12 @@
               addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" version="1.0.0">
   <MAINGROUP id="LAPktj" name="SimpleMeters">
     <GROUP id="{7D5B5DC3-1EC8-72B5-0D8D-111EEF7BB463}" name="Source">
+      <GROUP id="{C5FA046D-E422-E51A-9447-91A2D64B7EA5}" name="IntermediateDataLayer">
+        <FILE id="BgddM1" name="AudioLayerManager.h" compile="0" resource="0"
+              file="Source/IntermediateDataLayer/AudioLayerManager.h"/>
+        <FILE id="BuVRct" name="FftDataLayer.h" compile="0" resource="0" file="Source/IntermediateDataLayer/FftDataLayer.h"/>
+        <FILE id="yW981h" name="TruePeak.h" compile="0" resource="0" file="Source/IntermediateDataLayer/TruePeak.h"/>
+      </GROUP>
       <FILE id="vRjiPQ" name="CreatePushSampleIntoJuceAudioBufferInstance.h"
             compile="0" resource="0" file="Source/CreatePushSampleIntoJuceAudioBufferInstance.h"/>
       <GROUP id="{CBAFAF3B-058A-6BB7-DDA1-0AB3F1C79541}" name="GUI">

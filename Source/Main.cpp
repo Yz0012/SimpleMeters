@@ -13,7 +13,7 @@ public:
     void initialise(const juce::String& commandLine) override
     {
         mainComponent.reset(new MainComponent());
-        mainComponent->addToDesktop(juce::ComponentPeer::windowIsResizable | juce::ComponentPeer::windowHasDropShadow);
+        mainComponent->addToDesktop(juce::ComponentPeer::windowIsResizable);
         mainComponent->setVisible(true);
 
         juce::MessageManager::callAsync([this] {

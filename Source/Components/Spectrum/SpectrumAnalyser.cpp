@@ -19,6 +19,9 @@ SpectrumAnalyser::SpectrumAnalyser() : forwardFFT(fftOrder), window(fftSize, juc
 
         scopeData2[i] = mindB;
         scopeDataStorage2[i] = mindB;
+
+        destScope1[i] = mindB;
+        destScope2[i] = mindB;
     }
 
     lastProcessTime = juce::Time::getMillisecondCounterHiRes();
@@ -146,6 +149,7 @@ void SpectrumAnalyser::drawNextFrameOfSpectrum(int channelIndex)
 {
     float* fftBlock = (channelIndex == 0) ? fftData : fftData2;
     float* destScope = (channelIndex == 0) ? scopeData : scopeData2;
+    float* destScopeGain = (channelIndex == 0) ? destScope1 : destScope2;
 
     window.multiplyWithWindowingTable(fftBlock, fftSize);
     forwardFFT.performFrequencyOnlyForwardTransform(fftBlock);
@@ -157,7 +161,8 @@ void SpectrumAnalyser::drawNextFrameOfSpectrum(int channelIndex)
             auto skewedProportionX = i / (float)scopeSize;
             auto fftDataIndex = juce::jlimit(0, fftSize / 2, (int)(skewedProportionX * (float)fftSize * 0.25f));
             auto sourceDecibels = juce::Decibels::gainToDecibels(fftBlock[fftDataIndex]) - juce::Decibels::gainToDecibels((float)fftSize);
-            destScope[i] = juce::jlimit(mindB, maxdB, sourceDecibels + (2.0f * std::log(1.0f * i + std::exp(1.0f)) - 7) * 3.0f);
+            destScope[i] = sourceDecibels;
+            destScopeGain[i] = juce::jlimit(mindB, maxdB, sourceDecibels + (2.0f * std::log(1.0f * i + std::exp(1.0f)) - 7) * 3.0f);
         }
     }
     else
@@ -167,7 +172,8 @@ void SpectrumAnalyser::drawNextFrameOfSpectrum(int channelIndex)
             auto skewedProportionX = i / (float)scopeSize;
             auto fftDataIndex = juce::jlimit(0, fftSize / 2, (int)(skewedProportionX * (float)fftSize * 0.5f));
             auto sourceDecibels = juce::Decibels::gainToDecibels(fftBlock[fftDataIndex]) - juce::Decibels::gainToDecibels((float)fftSize);
-            destScope[i] = juce::jlimit(mindB, maxdB, sourceDecibels + (2.0f * std::log(1.0f * i + std::exp(1.0f)) - 7) * 3.0f);
+            destScope[i] = sourceDecibels;
+            destScopeGain[i] = juce::jlimit(mindB, maxdB, sourceDecibels + (2.0f * std::log(1.0f * i + std::exp(1.0f)) - 7) * 3.0f);
         }
     }
 
@@ -181,23 +187,23 @@ void SpectrumAnalyser::drawFrame(juce::Graphics& g, juce::Rectangle<int> bounds)
 {
     if (currentMode == Left || currentMode == Right || currentMode == Mono ||currentMode == Interleaved)
     {
-        drawSingleCurve(g, bounds, scopeData, scopeDataStorage,
+        drawSingleCurve(g, bounds, scopeData, scopeDataStorage, destScope1,
             lineColor, fillColor);
     }
     else if (currentMode == LR)
     {
         juce::Colour line2 = juce::Colours::orange;
         juce::Colour fill2 = line2.withAlpha(0.3f);
-        drawSingleCurve(g, bounds, scopeData2, scopeDataStorage2,
+        drawSingleCurve(g, bounds, scopeData2, scopeDataStorage2, destScope2,
             line2, fill2);
     }
     else if (currentMode == Stereo)
     {
-        drawSingleCurve(g, bounds, scopeData, scopeDataStorage,
+        drawSingleCurve(g, bounds, scopeData, scopeDataStorage, destScope1,
             lineColor, fillColor);
         juce::Colour line2 = juce::Colours::greenyellow;
         juce::Colour fill2 = line2.withAlpha(0.3f);
-        drawSingleCurve(g, bounds, scopeData2, scopeDataStorage2,
+        drawSingleCurve(g, bounds, scopeData2, scopeDataStorage2, destScope2,
             line2, fill2);
     }
 
@@ -207,6 +213,7 @@ void SpectrumAnalyser::drawSingleCurve(juce::Graphics& g,
     juce::Rectangle<int> bounds,
     const float* scopeData,
     float* scopeDataStorage,
+    float* destScope,
     juce::Colour lineColour,
     juce::Colour fillColour)
 {
@@ -215,11 +222,20 @@ void SpectrumAnalyser::drawSingleCurve(juce::Graphics& g,
     const float top = static_cast<float>(bounds.getY());
     const float leftX = static_cast<float>(bounds.getX());
 
+    float globalMaxVal = -std::numeric_limits<float>::max();
+    int globalMaxBinIdx = 0;
+    juce::Point<float> globalMaxPoint;
+
     for (int i = 0; i < scopeSize; ++i)
     {
-        const float diff = scopeData[i] - scopeDataStorage[i];
+        if (globalMaxVal < scopeData[i])
+        {
+            globalMaxBinIdx = i;
+            globalMaxVal = scopeData[i];
+        }
+        const float diff = destScope[i] - scopeDataStorage[i];
         const float coeff = (diff > 0.0f) ? 0.6f : 0.95f;
-        scopeDataStorage[i] = scopeData[i] - diff * coeff;
+        scopeDataStorage[i] = destScope[i] - diff * coeff;
     }
 
     std::vector<juce::Point<float>> points;
@@ -231,7 +247,6 @@ void SpectrumAnalyser::drawSingleCurve(juce::Graphics& g,
     int i = 0;
     while (i < scopeSize - 1)
     {
-
         int step = 1 + i / 40;
         step = juce::jlimit(2, 16, step);
 
@@ -240,10 +255,15 @@ void SpectrumAnalyser::drawSingleCurve(juce::Graphics& g,
             nextIdx = scopeSize - 1;
 
         float maxVal = scopeDataStorage[i];
+        int localMaxIdx = i;
+
         for (int idx = i + 1; idx <= nextIdx; ++idx)
         {
             if (scopeDataStorage[idx] > maxVal)
+            {
                 maxVal = scopeDataStorage[idx];
+                localMaxIdx = idx;
+            }
         }
 
         const float midIdx = (i + nextIdx) * 0.5f;
@@ -252,6 +272,11 @@ void SpectrumAnalyser::drawSingleCurve(juce::Graphics& g,
         const float y = juce::jmap(maxVal, mindB, maxdB, bottom, top);
 
         points.emplace_back(x, y);
+
+        if (i < globalMaxBinIdx)
+        {
+            globalMaxPoint = { x, y };
+        }
 
         i = nextIdx;
     }
@@ -288,6 +313,79 @@ void SpectrumAnalyser::drawSingleCurve(juce::Graphics& g,
 
     g.setColour(lineColour);
     g.strokePath(linePath, juce::PathStrokeType(1.0f));
+
+    if (globalMaxBinIdx > 0)
+    {
+        const float sampleRate = 48000.0f;
+
+        float refinedBinIdx = static_cast<float>(globalMaxBinIdx);
+
+        if (globalMaxBinIdx > 0 && globalMaxBinIdx < scopeSize - 1)
+        {
+            float y1 = scopeData[globalMaxBinIdx - 1];
+            float y2 = scopeData[globalMaxBinIdx];
+            float y3 = scopeData[globalMaxBinIdx + 1];
+
+            float denominator = 2.0f * (2.0f * y2 - y1 - y3);
+            if (std::abs(denominator) > 1e-5f)
+            {
+                float delta = (y3 - y1) / denominator;
+
+                delta = juce::jlimit(-0.5f, 0.5f, delta);
+
+                refinedBinIdx += delta;
+            }
+        }
+
+        const float freq = (refinedBinIdx * (sampleRate * 0.5f)) / static_cast<float>(scopeSize);
+
+        const float rawPeakDB = scopeData[globalMaxBinIdx];
+        const float displayPeakDB = destScope[globalMaxBinIdx];
+        const float currentDisplayDB = scopeDataStorage[globalMaxBinIdx];
+
+        juce::String pitchStr = "-";
+        if (freq > 20.0f && freq < 20000.0f)
+        {
+            const float floatNote = 69.0f + 12.0f * std::log2(freq / 440.0f);
+            const int midiNote = juce::roundToInt(floatNote);
+            const float cents = (floatNote - static_cast<float>(midiNote)) * 100.0f;
+
+            const char* noteNames[] = { "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" };
+            int noteIndex = midiNote % 12;
+            int octave = midiNote / 12 - 1;
+
+            if (noteIndex >= 0 && noteIndex < 12)
+            {
+                pitchStr = juce::String(noteNames[noteIndex]) + juce::String(octave);
+                pitchStr += (cents >= 0 ? " +" : " ") + juce::String(cents, 1) + "c";
+            }
+        }
+
+        juce::StringArray textLines;
+        textLines.add("Freq: " + juce::String(freq, 1) + " Hz (" + pitchStr + ")");
+        textLines.add("Raw dB: " + juce::String(rawPeakDB, 2));
+        textLines.add("display dB: " + juce::String(displayPeakDB, 2));
+        textLines.add("Val: " + juce::String(currentDisplayDB, 2));
+
+        g.setColour(juce::Colours::white.withAlpha(0.8f));
+        g.fillEllipse(globalMaxPoint.x - 3.0f, globalMaxPoint.y - 3.0f, 6.0f, 6.0f);
+
+        g.setFont(12.0f);
+
+        float textX = globalMaxPoint.x + 8.0f;
+        float textY = globalMaxPoint.y - 10.0f;
+        if (textX + 120.0f > bounds.getRight())
+            textX = globalMaxPoint.x - 130.0f;
+
+        for (int j = 0; j < textLines.size(); ++j)
+        {
+            g.drawText(textLines[j],
+                static_cast<int>(textX),
+                static_cast<int>(textY + j * 14.0f),
+                120, 14,
+                juce::Justification::centredLeft, false);
+        }
+    }
 }
 
 void SpectrumAnalyser::paint(juce::Graphics& g)
@@ -320,6 +418,9 @@ void SpectrumAnalyser::scopeDataReset()
 
 		scopeData2[i] = mindB;
 		scopeDataStorage2[i] = mindB;
+
+        destScope1[i] = mindB;
+        destScope2[i] = mindB;
     }
 }
 

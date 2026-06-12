@@ -794,13 +794,14 @@ void MainComponent::openRMSMeterComponent(int x, int y)
     }
 
     std::weak_ptr<RMSMeterComponent> weakRMSMeter = rmsMeter;
+    rmsMeter->componentHeader.componentControl.setBounds(140, 20, 10, 10);
     rmsMeter->componentHeader.componentControl.setCallBackFuntion([this, weakRMSMeter]()
         {
-            if (auto ch = weakRMSMeter.lock())
+            if (auto rms = weakRMSMeter.lock())
             {
-                pushSampleIntoJuceAudioBuffer.remove(ch->callbackId);
+                pushSampleIntoJuceAudioBuffer.remove(rms->callbackId);
             }
-            ComponentManagement::getInstance().resetWaveformChartComponent();
+            ComponentManagement::getInstance().resetRMSMeterComponent();
         });
 
     rmsMeter->cb = [weakRMSMeter]()
@@ -874,6 +875,7 @@ void MainComponent::openRMSMeterComponent(int x, int y)
                                         rms->setBounds(rms->getX(), rms->getY(), Width, Height);
                                         rms->ticksComponent.setBounds(0, 0, Width, Height);
                                         rms->componentHeader.setBounds(0, 0, Width, 50);
+                                        rms->componentHeader.componentControl.setBounds(Width - 10, 20, 10, 10);
                                         rms->componentHeader.componentControl.setBounds(Width - 30, 20, 10, 10);
                                         rms->drawBounds.setBounds(0, 0, Width, Height);
                                     }
