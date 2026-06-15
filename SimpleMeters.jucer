@@ -127,6 +127,10 @@
         <GROUP id="{18D4E39F-8650-E045-DBA0-DD4F8F199AED}" name="Spectrum">
           <FILE id="W63HlC" name="EQReferenceLineComponent.h" compile="0" resource="0"
                 file="Source/Components/Spectrum/EQReferenceLineComponent.h"/>
+          <FILE id="dkMKtl" name="SpectrumAnalyser(Mono).cpp" compile="1" resource="0"
+                file="Source/Components/Spectrum/SpectrumAnalyser(Mono).cpp"/>
+          <FILE id="Lu6h1y" name="SpectrumAnalyser(Mono).h" compile="0" resource="0"
+                file="Source/Components/Spectrum/SpectrumAnalyser(Mono).h"/>
           <FILE id="dRG2bK" name="SpectrumAnalyser.cpp" compile="1" resource="0"
                 file="Source/Components/Spectrum/SpectrumAnalyser.cpp"/>
           <FILE id="iQtCu7" name="SpectrumAnalyser.h" compile="0" resource="0"

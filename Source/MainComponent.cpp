@@ -127,10 +127,11 @@ void MainComponent::mouseDown(const juce::MouseEvent& event)
         juce::PopupMenu menu;
 
         menu.addItem(1, "SpectrumAnalyser", true, false, juce::Drawable::createFromImageData(BinaryData::spectrumAnalyzerIcon_png, BinaryData::spectrumAnalyzerIcon_pngSize));
-        menu.addItem(2, "Waveform", true, false, juce::Drawable::createFromImageData(BinaryData::WaveformComponent_png, BinaryData::WaveformComponent_pngSize));
-        menu.addItem(3, "VectorOscilloscopeComponent", true, false, juce::Drawable::createFromImageData(BinaryData::VectorOscilloscopeComponent_png, BinaryData::VectorOscilloscopeComponent_pngSize));
-        menu.addItem(4, "WaveformChart", true, false, juce::Drawable::createFromImageData(BinaryData::WaveformChartComponent_png, BinaryData::WaveformChartComponent_pngSize));
-        menu.addItem(5, "RMSMeter", true, false, juce::Drawable::createFromImageData(BinaryData::RMSComponent_png, BinaryData::RMSComponent_pngSize));
+        menu.addItem(2, "SpectrumAnalyser(Mono)", true, false, juce::Drawable::createFromImageData(BinaryData::LRMono_png, BinaryData::LRMono_pngSize));
+        menu.addItem(3, "Waveform", true, false, juce::Drawable::createFromImageData(BinaryData::WaveformComponent_png, BinaryData::WaveformComponent_pngSize));
+        menu.addItem(4, "VectorOscilloscopeComponent", true, false, juce::Drawable::createFromImageData(BinaryData::VectorOscilloscopeComponent_png, BinaryData::VectorOscilloscopeComponent_pngSize));
+        menu.addItem(5, "WaveformChart", true, false, juce::Drawable::createFromImageData(BinaryData::WaveformChartComponent_png, BinaryData::WaveformChartComponent_pngSize));
+        menu.addItem(6, "RMSMeter", true, false, juce::Drawable::createFromImageData(BinaryData::RMSComponent_png, BinaryData::RMSComponent_pngSize));
 
         menu.showMenuAsync(
             juce::PopupMenu::Options(),
@@ -145,17 +146,21 @@ void MainComponent::mouseDown(const juce::MouseEvent& event)
                 }
                 else if (result == 2)
                 {
-                    openWaveformComponent(event.getMouseDownX(), event.getMouseDownY());
+                    openSpectrumAnalyserMono(event.getMouseDownX(), event.getMouseDownY());
                 }
                 else if (result == 3)
                 {
-                    openVectorOscilloscopeComponent(event.getMouseDownX(), event.getMouseDownY());
+                    openWaveformComponent(event.getMouseDownX(), event.getMouseDownY());
                 }
                 else if (result == 4)
                 {
-                    openWaveformChartComponent(event.getMouseDownX(), event.getMouseDownY());
+                    openVectorOscilloscopeComponent(event.getMouseDownX(), event.getMouseDownY());
                 }
                 else if (result == 5)
+                {
+                    openWaveformChartComponent(event.getMouseDownX(), event.getMouseDownY());
+                }
+                else if (result == 6)
                 {
 					openRMSMeterComponent(event.getMouseDownX(), event.getMouseDownY());
                 }
@@ -220,7 +225,6 @@ void MainComponent::openSpectrumAnalyser(int x, int y)
     spectrum->componentHeader.componentControl.setBounds(470, 20, 10, 10);
     spectrum->drawBounds.setBounds(0,0,500,150);
 
-    // 不统一
     std::weak_ptr<SpectrumAnalyser> weakSpectrum = spectrum;
     spectrum->componentHeader.componentControl.setCallBackFuntion([this, weakSpectrum]()
         {
@@ -243,10 +247,9 @@ void MainComponent::openSpectrumAnalyser(int x, int y)
             juce::PopupMenu modeMenu;
             modeMenu.addItem(3, "Left", true, false, juce::Drawable::createFromImageData(BinaryData::LAR_png, BinaryData::LAR_pngSize));
             modeMenu.addItem(4, "Right", true, false, juce::Drawable::createFromImageData(BinaryData::LAR2_png, BinaryData::LAR2_pngSize));
-			modeMenu.addItem(5, "Mono", true, false, juce::Drawable::createFromImageData(BinaryData::LRMono_png, BinaryData::LRMono_pngSize));
-            modeMenu.addItem(6, "Stereo", true, false, juce::Drawable::createFromImageData(BinaryData::LR2_png, BinaryData::LR2_pngSize));
-            modeMenu.addItem(7, "Side", true, false, juce::Drawable::createFromImageData(BinaryData::LR_png, BinaryData::LR_pngSize));
-            modeMenu.addItem(8, "Interleaved", true, false, juce::Drawable::createFromImageData(BinaryData::LRLRLRLR_png, BinaryData::LRLRLRLR_pngSize));
+            modeMenu.addItem(5, "Stereo", true, false, juce::Drawable::createFromImageData(BinaryData::LR2_png, BinaryData::LR2_pngSize));
+            modeMenu.addItem(6, "Side", true, false, juce::Drawable::createFromImageData(BinaryData::LR_png, BinaryData::LR_pngSize));
+            modeMenu.addItem(7, "Interleaved", true, false, juce::Drawable::createFromImageData(BinaryData::LRLRLRLR_png, BinaryData::LRLRLRLR_pngSize));
 			menu.addSubMenu("Mode", modeMenu);
 
             menu.showMenuAsync(
@@ -339,26 +342,19 @@ void MainComponent::openSpectrumAnalyser(int x, int y)
                         }
                         else if (result == 5)
                         {
-                            sp->setAnalysisMode(AnalysisMode::Mono);
-							sp->eqReferenceLines.informationText = "CurrentMode: Mono (L+R)";
-                            sp->eqReferenceLines.modeNum = 2;
-							sp->eqReferenceLines.repaint();
-                        }
-                        else if (result == 6)
-                        {
                             sp->setAnalysisMode(AnalysisMode::Stereo);
                             sp->eqReferenceLines.informationText = "CurrentMode: Stereo (L&R)";
                             sp->eqReferenceLines.modeNum = 3;
                             sp->eqReferenceLines.repaint();
                         }
-                        else if (result == 7)
+                        else if (result == 6)
                         {
                             sp->setAnalysisMode(AnalysisMode::LR);
                             sp->eqReferenceLines.informationText = "CurrentMode: Side (L-R)";
                             sp->eqReferenceLines.modeNum = 4;
                             sp->eqReferenceLines.repaint();
                         }
-                        else if (result == 8)
+                        else if (result == 7)
                         {
                             sp->setAnalysisMode(AnalysisMode::Interleaved);
                             sp->eqReferenceLines.informationText = "CurrentMode: Interleaved";
@@ -376,6 +372,159 @@ void MainComponent::openSpectrumAnalyser(int x, int y)
     spectrum->componentHeader.themeConfigButton.setBounds(10, 10, 30, 30);
     spectrum->componentHeader.themeConfigButton.setTooltip("Theme Configuration");
 	spectrum->componentHeader.headerFixedButton.setBounds(50, 10, 30, 30);
+    spectrum->componentHeader.headerFixedButton.setTooltip("Fixed Header");
+    spectrum->componentHeader.drawLinesButton.setBounds(90, 10, 30, 30);
+    spectrum->componentHeader.drawLinesButton.onClick = [weakSpectrum]()
+        {
+            if (auto sp = weakSpectrum.lock())
+            {
+                sp->eqReferenceLines.setVisible(!sp->eqReferenceLines.isVisible());
+            }
+        };
+}
+
+void MainComponent::openSpectrumAnalyserMono(int x, int y)
+{
+    auto spectrum = ComponentManagement::getInstance().getSpectrumAnalyserMono();
+
+    if (!spectrum->callbackId)
+    {
+        spectrum->callbackId = pushSampleIntoJuceAudioBuffer.add(
+            [this, spectrum]()
+            {
+                spectrum->activityCheck();
+            });
+    }
+
+    if (!spectrum->callbackIdS)
+    {
+        spectrum->callbackIdS = pushSampleIntoJuceAudioBuffer.addS(
+            [spectrum]()
+            {
+                spectrum->callstartTimerHz(60);
+            });
+    }
+
+    if (!spectrum->callbackIdM)
+    {
+        spectrum->callbackIdM = pushSampleIntoJuceAudioBuffer.addM(
+            [spectrum]()
+            {
+                spectrum->callStopTimer();
+                spectrum->scopeDataReset();
+                spectrum->repaint();
+            });
+    }
+
+    addAndMakeVisible(spectrum.get());
+    spectrum->componentHeader.componentControl.setBounds(470, 20, 10, 10);
+    spectrum->drawBounds.setBounds(0, 0, 500, 150);
+
+    std::weak_ptr<SpectrumAnalyserMono> weakSpectrum = spectrum;
+    spectrum->componentHeader.componentControl.setCallBackFuntion([this, weakSpectrum]()
+        {
+            if (auto sp = weakSpectrum.lock())
+            {
+                pushSampleIntoJuceAudioBuffer.remove(sp->callbackId);
+                pushSampleIntoJuceAudioBuffer.removeS(sp->callbackIdS);
+                pushSampleIntoJuceAudioBuffer.removeM(sp->callbackIdM);
+            }
+            ComponentManagement::getInstance().resetSpectrumAnalyserMono();
+        });
+
+    spectrum->cb = [weakSpectrum]()
+        {
+            juce::PopupMenu menu;
+
+            menu.addItem(1, "Position", true, false, juce::Drawable::createFromImageData(BinaryData::menuPosition_png, BinaryData::menuPosition_pngSize));
+            menu.addItem(2, "ComponentSize", true, false, juce::Drawable::createFromImageData(BinaryData::menuComponentSize_png, BinaryData::menuComponentSize_pngSize));
+
+            menu.showMenuAsync(
+                juce::PopupMenu::Options(),
+                [weakSpectrum](int result)
+                {
+                    if (auto sp = weakSpectrum.lock())
+                    {
+                        if (result == 0)
+                        {
+                        }
+                        else if (result == 1)
+                        {
+                            juce::AlertWindow* aw = new juce::AlertWindow(
+                                "Set position",
+                                "Enter X and Y coordinates,please don't input zero or any number smaller then 0 :)",
+                                juce::AlertWindow::QuestionIcon);
+
+                            aw->setOpaque(false);
+                            aw->setDropShadowEnabled(false);
+                            aw->addTextEditor("X", "", "X");
+                            aw->addTextEditor("Y", "", "Y");
+                            aw->getTextEditor("X")->setInputRestrictions(4, "0123456789");
+                            aw->getTextEditor("Y")->setInputRestrictions(4, "0123456789");
+                            aw->addButton("OK", 1, juce::KeyPress(juce::KeyPress::returnKey));
+                            aw->addButton("Cancel", 0, juce::KeyPress(juce::KeyPress::escapeKey));
+
+                            aw->enterModalState(true, juce::ModalCallbackFunction::create(
+                                [sp, aw](int result)
+                                {
+                                    if (result == 1)
+                                    {
+                                        int&& X = aw->getTextEditorContents("X").getIntValue();
+                                        int&& Y = aw->getTextEditorContents("Y").getIntValue();
+                                        if (X <= 0 || Y <= 0) return;
+                                        sp->setBounds(X, Y, sp->getWidth(), sp->getHeight());
+                                    }
+                                    delete aw;
+                                }
+                            ), true);
+                        }
+                        else if (result == 2)
+                        {
+                            juce::AlertWindow* aw = new juce::AlertWindow(
+                                "Resize Component",
+                                "Enter Width and Height,please don't input zero or any number smaller then 100 :)",
+                                juce::AlertWindow::QuestionIcon);
+
+                            aw->setOpaque(false);
+                            aw->setDropShadowEnabled(false);
+                            aw->addTextEditor("Width", "", "Width");
+                            aw->addTextEditor("Height", "", "Height");
+                            aw->getTextEditor("Width")->setInputRestrictions(3, "0123456789");
+                            aw->getTextEditor("Height")->setInputRestrictions(3, "0123456789");
+                            aw->addButton("OK", 1, juce::KeyPress(juce::KeyPress::returnKey));
+                            aw->addButton("Cancel", 0, juce::KeyPress(juce::KeyPress::escapeKey));
+
+                            aw->enterModalState(true, juce::ModalCallbackFunction::create(
+                                [sp, aw](int result)
+                                {
+                                    if (result == 1)
+                                    {
+                                        int&& Width = aw->getTextEditorContents("Width").getIntValue();
+                                        int&& Height = aw->getTextEditorContents("Height").getIntValue();
+                                        if (Width <= 100 || Height <= 100) return;
+                                        sp->setBounds(sp->getX(), sp->getY(), Width, Height);
+                                        sp->drawArea.setBounds(50, 65, Width - 65, Height - 100);
+                                        sp->eqReferenceLines.setBounds(0, 50, Width, Height - 50);
+                                        sp->componentHeader.setBounds(0, 0, Width, 50);
+                                        sp->componentHeader.componentControl.setBounds(Width - 30, 20, 10, 10);
+                                        sp->drawBounds.setBounds(0, 0, Width, Height);
+                                    }
+                                    delete aw;
+                                }
+                            ), true);
+                        }
+                    }
+                });
+        };
+
+    spectrum->setBounds(x, y, 500, 150);
+    spectrum->drawArea.setBounds(50, 65, 435, 50);
+    spectrum->eqReferenceLines.setBounds(0, 50, 500, 100);
+    spectrum->eqReferenceLines.informationText = "CurrentMode: Mono (L+R)";
+    spectrum->componentHeader.setBounds(0, 0, 500, 50);
+    spectrum->componentHeader.themeConfigButton.setBounds(10, 10, 30, 30);
+    spectrum->componentHeader.themeConfigButton.setTooltip("Theme Configuration");
+    spectrum->componentHeader.headerFixedButton.setBounds(50, 10, 30, 30);
     spectrum->componentHeader.headerFixedButton.setTooltip("Fixed Header");
     spectrum->componentHeader.drawLinesButton.setBounds(90, 10, 30, 30);
     spectrum->componentHeader.drawLinesButton.onClick = [weakSpectrum]()

@@ -66,18 +66,6 @@ void SpectrumAnalyser::processAudioBuffer(const juce::AudioBuffer<float>& buffer
             pushNextSampleIntoFifo(buffer.getReadPointer(1)[i], 0);
         }
     }
-    else if (currentMode == Mono)
-    {
-        const int channelsToMix = juce::jmin(buffer.getNumChannels(), 2);
-        for (int i = 0; i < numSamples; ++i)
-        {
-            float mixed = 0.0f;
-            for (int ch = 0; ch < channelsToMix; ++ch)
-                mixed += buffer.getReadPointer(ch)[i];
-            mixed /= static_cast<float>(channelsToMix);
-            pushNextSampleIntoFifo(mixed, 0);
-        }
-    }
     else if (currentMode == Stereo && numChannels >= 2)
     {
         const float* left = buffer.getReadPointer(0);
@@ -148,8 +136,8 @@ void SpectrumAnalyser::pushNextSampleIntoFifo(float sample, int channelIndex) no
 void SpectrumAnalyser::drawNextFrameOfSpectrum(int channelIndex)
 {
     float* fftBlock = (channelIndex == 0) ? fftData : fftData2;
-    float* destScope = (channelIndex == 0) ? scopeData : scopeData2;
-    float* destScopeGain = (channelIndex == 0) ? destScope1 : destScope2;
+    std::array<float, scopeSize>& destScope = (channelIndex == 0) ? scopeData : scopeData2;
+    std::array<float, scopeSize>& destScopeGain = (channelIndex == 0) ? destScope1 : destScope2;
 
     window.multiplyWithWindowingTable(fftBlock, fftSize);
     forwardFFT.performFrequencyOnlyForwardTransform(fftBlock);
@@ -185,7 +173,7 @@ void SpectrumAnalyser::drawNextFrameOfSpectrum(int channelIndex)
 
 void SpectrumAnalyser::drawFrame(juce::Graphics& g, juce::Rectangle<int> bounds)
 {
-    if (currentMode == Left || currentMode == Right || currentMode == Mono ||currentMode == Interleaved)
+    if (currentMode == Left || currentMode == Right || currentMode == Interleaved)
     {
         drawSingleCurve(g, bounds, scopeData, scopeDataStorage, destScope1,
             lineColor, fillColor);
@@ -211,9 +199,9 @@ void SpectrumAnalyser::drawFrame(juce::Graphics& g, juce::Rectangle<int> bounds)
 
 void SpectrumAnalyser::drawSingleCurve(juce::Graphics& g,
     juce::Rectangle<int> bounds,
-    const float* scopeData,
-    float* scopeDataStorage,
-    float* destScope,
+    const std::array<float, scopeSize>& scopeData,
+    std::array<float, scopeSize>& scopeDataStorage,
+    std::array<float, scopeSize>& destScope,
     juce::Colour lineColour,
     juce::Colour fillColour)
 {
@@ -280,9 +268,6 @@ void SpectrumAnalyser::drawSingleCurve(juce::Graphics& g,
 
         i = nextIdx;
     }
-
-    if (points.size() < 2)
-        return;
 
     juce::Path linePath;
     linePath.startNewSubPath(points[0]);

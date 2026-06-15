@@ -13,8 +13,14 @@ public:
     };
 
     struct PeakPoint {
+        int lowIndex;
+        float lowValue;
         int midIndex;
+        float midValue;
+        int highIndex;
+        float highValue;
         float value;
+        float index;
     };
 
     FftDataLayer()
@@ -31,6 +37,11 @@ public:
                 this->processAudioBuffer(instance.getLocalAudioBufferReference());
             }
         );
+
+        for (int i = 0; i < scopeSize; ++i)
+        {
+            scopeData[i] = mindB;
+        }
     }
 
     ~FftDataLayer()
@@ -58,11 +69,12 @@ public:
 
                 for (int j = 0; j < scopeSize; ++j)
                 {
-                    int bin = j * (fftSize / 2) / scopeSize;
-                    float level = fftData[bin] / (float)fftSize; 
-                    float decibels = juce::Decibels::gainToDecibels(level, mindB);
-                    scopeData[j] = decibels;
+                    auto skewedProportionX = j / (float)scopeSize;
+                    auto fftDataIndex = juce::jlimit(0, fftSize / 2, (int)(skewedProportionX * (float)fftSize * 0.5f));
+                    auto sourceDecibels = juce::Decibels::gainToDecibels(fftData[fftDataIndex]) - juce::Decibels::gainToDecibels((float)fftSize);
+                    scopeData[j] = sourceDecibels;
                 }
+                extractPeaks();
 
                 if (onFftReady) onFftReady();
                 fifoIndex = 0;
@@ -72,29 +84,80 @@ public:
 
     void extractPeaks()
     {
-        absoluteMaxPeak = { 0, 0.0f };
+        absoluteMaxPeak = { 0, mindB, 0, mindB, 0, mindB, mindB , 0.0f };
 
-        for (int i = 0; i < scopeSize; i++)
+        for (int i = 0; i < scopeSize / 16; i++)
         {
-            if (absoluteMaxPeak.value < scopeData[i])
+            if (absoluteMaxPeak.lowValue < scopeData[i])
             {
-                absoluteMaxPeak.midIndex = i;
-                absoluteMaxPeak.value = scopeData[i];
+                absoluteMaxPeak.lowIndex = i;
+                absoluteMaxPeak.lowValue = scopeData[i];
+                if (absoluteMaxPeak.value < scopeData[i])
+                {
+                    absoluteMaxPeak.value = scopeData[i];
+                    absoluteMaxPeak.index = i;
+                }
             }
         }
+        for (int i = scopeSize / 16; i < scopeSize / 2; i++)
+        {
+            if (absoluteMaxPeak.midValue < scopeData[i])
+            {
+                absoluteMaxPeak.midIndex = i;
+                absoluteMaxPeak.midValue = scopeData[i];
+                if (absoluteMaxPeak.value < scopeData[i])
+                {
+                    absoluteMaxPeak.value = scopeData[i];
+                    absoluteMaxPeak.index = i;
+                }
+            }
+        }
+        for (int i = scopeSize / 2; i < scopeSize; i++)
+        {
+            if (absoluteMaxPeak.highValue < scopeData[i])
+            {
+                absoluteMaxPeak.highIndex = i;
+                absoluteMaxPeak.highValue = scopeData[i];
+                if (absoluteMaxPeak.value < scopeData[i])
+                {
+                    absoluteMaxPeak.value = scopeData[i];
+                    absoluteMaxPeak.index = i;
+                }
+            }
+        }
+
+    }
+
+    T extractInterpolationFreq(int index)
+    {
+        const float sampleRate = 48000.0f;
+
+        float refinedBinIdx = static_cast<T>(index);
+
+        if (index > 0 && index < scopeSize - 1)
+        {
+            float y1 = scopeData[index - 1];
+            float y2 = scopeData[index];
+            float y3 = scopeData[index + 1];
+
+            float denominator = 2.0f * (2.0f * y2 - y1 - y3);
+            if (std::abs(denominator) > 1e-5f)
+            {
+                float delta = (y3 - y1) / denominator;
+
+                delta = juce::jlimit(-0.5f, 0.5f, delta);
+
+                refinedBinIdx += delta;
+            }
+        }
+
+        return (refinedBinIdx * (sampleRate * 0.5f)) / static_cast<float>(scopeSize);
     }
 
     void setOnFftReadyCallback(std::function<void()> callback) { onFftReady = std::move(callback); }
 
-    std::array<float, scopeSize> getScopeData() const { return scopeData; }
+    const std::array<float, scopeSize>& getScopeData() const { return scopeData; }
     PeakPoint getAbsoluteMaxPeak() const { return absoluteMaxPeak; }
-
-    void copyScopeDataTo(float* destination, int maxElements) const
-    {
-        const int elementsToCopy = std::min(static_cast<int>(scopeSize), maxElements);
-
-        std::copy(scopeData.begin(), scopeData.begin() + elementsToCopy, destination);
-    }
 
     uint16_t callBackId;
 

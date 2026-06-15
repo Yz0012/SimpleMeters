@@ -7,21 +7,13 @@
 #include "../../GUI/Components/DrawBounds.h"
 #include "../../GUI/Components/ComponentHeader.h"
 #include "EQReferenceLineComponent.h"
+#include "../../IntermediateDataLayer/AudioLayerManager.h"
 
-enum AnalysisMode
-{
-    Left,
-    Right,
-    Stereo,
-    LR,
-    Interleaved
-};
-
-class SpectrumAnalyser : public juce::Component, juce::Timer, private juce::ValueTree::Listener
+class SpectrumAnalyserMono : public juce::Component, juce::Timer, private juce::ValueTree::Listener
 {
 public:
-    SpectrumAnalyser();
-    ~SpectrumAnalyser();
+    SpectrumAnalyserMono();
+    ~SpectrumAnalyserMono();
 
     enum {
         fftOrder = 12,
@@ -34,9 +26,7 @@ public:
 
     float scopeSizeTransformed = std::log((float)scopeSize + std::exp(1.0f)) - 1;
 
-    void processAudioBuffer(const juce::AudioBuffer<float>& buffer);
-    void pushNextSampleIntoFifo(float sample, int channelIndex) noexcept;
-    void drawNextFrameOfSpectrum(int channelIndex);
+    void activityCheck();
     void drawFrame(juce::Graphics& g, juce::Rectangle<int> bounds);
     void drawSingleCurve(juce::Graphics& g,
         juce::Rectangle<int> bounds,
@@ -45,7 +35,6 @@ public:
         std::array<float, scopeSize>& destScope,
         juce::Colour lineColour,
         juce::Colour fillColour);
-    void setAnalysisMode(AnalysisMode mode);
 
     void paint(juce::Graphics& g) override;
     void timerCallback() override;
@@ -67,44 +56,28 @@ public:
     uint16_t callbackIdS = 0;
 
     DrawBounds drawBounds;
-    ComponentHeader componentHeader{ juce::String("SpectrumAnalyzer") };
+    ComponentHeader componentHeader{ juce::String("SpectrumAnalyzerMono") };
     EQReferenceLineComponent eqReferenceLines;
 
     using Callback = std::function<void()>;
     Callback cb = nullptr;
+
+    std::shared_ptr<FftDataLayer<float>> fftLayer;
 private:
+
     double lastProcessTime = 0;
 
     juce::ValueTree spectrumCat;
 
-    AnalysisMode currentMode = Interleaved;
-
     juce::Colour lineColor = juce::Colour(0xFF8400FF);
     juce::Colour fillColor = juce::Colour(0xFF8400FF);
 
-    juce::dsp::FFT forwardFFT;
-    juce::dsp::WindowingFunction<float> window;
-
-    float fifo[fftSize];
-    float fftData[2 * fftSize];
-    int fifoIndex = 0;
-    bool nextFFTBlockReady = false;
-
-    std::array<float, scopeSize> scopeData;
+    const std::array<float, scopeSize>& scopeData;
     std::array<float, scopeSize> scopeDataStorage;
 
-    float fifo2[fftSize];
-    float fftData2[fftSize * 2];
-    int fifoIndex2 = 0;
-    bool nextFFTBlockReady2 = false;
-
-    std::array<float, scopeSize> scopeData2;
-    std::array<float, scopeSize> scopeDataStorage2;
-
     std::array<float, scopeSize> destScope1;
-    std::array<float, scopeSize> destScope2;
 
     float level = 0.0f;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SpectrumAnalyser);
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SpectrumAnalyserMono);
 };

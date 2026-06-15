@@ -6,6 +6,13 @@
 #include "../../GUI/Components/DrawBounds.h"
 #include "../../GUI/Components/ComponentHeader.h"
 #include "ChartReferenceLine.h"
+#include "../../IntermediateDataLayer/AudioLayerManager.h"
+
+enum WaveformAnalysisMode
+{
+    Autoalign,
+    Normal
+};
 
 class WaveformChartComponent : public juce::Component, private juce::ValueTree::Listener
 {
@@ -23,6 +30,7 @@ public:
     void clear();
 
     void pushStereoBuffer(const juce::AudioBuffer<float>* localAudioBuffer, const float localAudioBufferRMS);
+    int WaveformChartComponent::findStartNumByRisingEdge(const juce::AudioBuffer<float>& buffer, int channel);
 
     const std::vector<float> dbValues = {
     -6.f, -12.f
@@ -38,7 +46,16 @@ public:
 
     using Callback = std::function<void()>;
     Callback cb = nullptr;
+
+    std::shared_ptr<FftDataLayer<float>> fftLayer;
 private:
+    int startNum = 0;
+    int scopeNum = 0;
+    int endNum = 0;
+    float smoothStartNum = 0.0f;
+
+    WaveformAnalysisMode currentMode = Autoalign;
+
     juce::ValueTree waveformChartCat;
 
     const juce::AudioBuffer<float>* localAudioBuffer = nullptr;

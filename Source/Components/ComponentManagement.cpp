@@ -61,6 +61,17 @@ std::shared_ptr<RMSMeterComponent> ComponentManagement::getRMSMeterComponent()
 	return rmsMeterComponent;
 }
 
+std::shared_ptr<SpectrumAnalyserMono> ComponentManagement::getSpectrumAnalyserMono()
+{
+    jassert(juce::MessageManager::getInstance()->isThisTheMessageThread());
+
+    if (spectrumAnalyserMono == nullptr)
+    {
+        spectrumAnalyserMono = std::make_shared<SpectrumAnalyserMono>();
+    }
+    return spectrumAnalyserMono;
+}
+
 void ComponentManagement::resetWaveformComponent()
 {
     waveformComponent.reset();
@@ -86,6 +97,11 @@ void ComponentManagement::resetRMSMeterComponent()
 	rmsMeterComponent.reset();
 }
 
+void ComponentManagement::resetSpectrumAnalyserMono()
+{
+    spectrumAnalyserMono.reset();
+}
+
 void ComponentManagement::resetAllComponents()
 {
     resetWaveformComponent();
@@ -93,4 +109,5 @@ void ComponentManagement::resetAllComponents()
     resetVectorOscilloscopes();
     resetWaveformChartComponent();
     resetRMSMeterComponent();
+    resetSpectrumAnalyserMono();
 }

@@ -7,6 +7,7 @@
 #include "../Components/Spectrum/SpectrumAnalyser.h"
 #include "../Components/WaveformComponent/WaveformChartComponent.h"
 #include "../Components/LoudnessMeterComponents/RMSMeterComponent.h"
+#include "../Components/Spectrum/SpectrumAnalyser(Mono).h"
 
 class ComponentManagement
 {
@@ -18,12 +19,14 @@ public:
     std::shared_ptr<VectorOscilloscopes> getVectorOscilloscopes();
     std::shared_ptr<WaveformChartComponent> getWaveformChartComponent();
 	std::shared_ptr<RMSMeterComponent> getRMSMeterComponent();
+    std::shared_ptr<SpectrumAnalyserMono> getSpectrumAnalyserMono();
 
     void resetWaveformComponent();
     void resetSpectrumAnalyser();
     void resetVectorOscilloscopes();
     void resetWaveformChartComponent();
 	void resetRMSMeterComponent();
+    void resetSpectrumAnalyserMono();
     void resetAllComponents();
 
 private:
@@ -37,4 +40,5 @@ private:
     std::shared_ptr<VectorOscilloscopes> vectorOscilloscopes;
     std::shared_ptr<WaveformChartComponent> waveformChartComponent;
 	std::shared_ptr<RMSMeterComponent> rmsMeterComponent;
+    std::shared_ptr<SpectrumAnalyserMono> spectrumAnalyserMono;
 };

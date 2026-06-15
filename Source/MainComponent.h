@@ -7,7 +7,7 @@
 #include "CreateConfiguration/CreateComponentsConfiguration.h"
 #include "CreatePushSampleIntoJuceAudioBufferInstance.h"
 #include "Components/ComponentManagement.h"
-#include "LookAndFeel/LookAndFeel.h"
+#include "LookAndFeel/LookAndFeel.h"   
 
 #include "GUI/Header.h"
 
@@ -29,6 +29,7 @@ public:
 	void valueTreePropertyChanged(juce::ValueTree& tree, const juce::Identifier& property) override;
 
 	void openSpectrumAnalyser(int x, int y);
+	void openSpectrumAnalyserMono(int x, int y);
 	void openWaveformComponent(int x, int y);
 	void openVectorOscilloscopeComponent(int x, int y);
 	void openWaveformChartComponent(int x, int y);

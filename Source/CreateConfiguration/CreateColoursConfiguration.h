@@ -32,6 +32,13 @@ public:
                 }
             },
 
+        { "Category", {{ "name", "SpectrumAnalyzerMono" }},
+            {
+                { "Colour", {{ "name", "BoundaryLine"}, { "hex", "#0091FF" }}},
+                { "Colour", {{ "name", "Fill"},        { "hex", "#0091FF" }}}
+            }
+        },
+
         { "Category", {{ "name", "Waveform" }},
             {
                 { "Colour", {{ "name", "BoundaryLineL"},          { "hex", "#0091FF" }}},
