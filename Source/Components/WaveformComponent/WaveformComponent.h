@@ -1,62 +1,48 @@
 #pragma once
 #include <JuceHeader.h>
+#include <vector>
 
-#include "../Source/CircularImageBuffer.h"
-#include "../../CreateConfiguration/CreateColoursConfiguration.h"
-#include "../../GUI/Components/DrawBounds.h"
-#include "../../GUI/Components/ComponentHeader.h"
-#include "WaveformComponentReferenceLine.h"
-
-class WaveformComponent : public juce::Component, private juce::ValueTree::Listener
+class WaveformComponent : public juce::Component
 {
 public:
+    struct Peak { float min = 0.0f; float max = 0.0f; };
+
     WaveformComponent();
-    ~WaveformComponent();
+    ~WaveformComponent() override = default;
 
-    void paint(juce::Graphics& g) override;
-    void mouseDown(const juce::MouseEvent& event) override;
-    void mouseEnter(const juce::MouseEvent& event) override;
-    void mouseExit(const juce::MouseEvent&) override;
-
-    void valueTreePropertyChanged(juce::ValueTree& tree, const juce::Identifier& property) override;
-
-    void clear();
-
-    void drawWaveform(
-        const juce::AudioBuffer<float>& localAudioBuffer,
+    void setWaveformData(const juce::AudioBuffer<float>& localAudioBuffer,
         const float& localAudioBufferRMS);
 
-    void renderNextFrame(juce::Graphics& g, juce::Rectangle<int> bounds);
+    void setTimeInterval(float seconds);
 
-    std::shared_ptr<CircularImageBuffer> imageRingBuffer;
-    std::weak_ptr<CircularImageBuffer> weakBuffer;
+    int getRmsIndexFromPeakIndex(int peakIndex, float currentWindowSize) const;
 
-    const std::vector<float> dbValues = {
-    -6.f, -12.f
-    };
-
-    juce::Rectangle<int> tileArea{ 0,0,8,150 };
-    juce::Rectangle<int> drawArea{ 0,0,500,150 };
+    void paint(juce::Graphics& g) override;
+    void resized() override;
 
     uint16_t callbackId = 0;
-
-    DrawBounds drawBounds;
-	ComponentHeader componentHeader{ juce::String("Waveform") };
-	WaveformComponentReferenceLine waveformReferenceLine;
-
-    using Callback = std::function<void()>;
-    Callback cb = nullptr;
 private:
-	juce::ValueTree waveformCat;
+    void extractPeaksToTier(const float* readPtr, int totalSamples, std::vector<Peak>& tierBuffer, int numPeaksToExtract, size_t maxCapacity);
+    void enforceCapacity(std::vector<Peak>& buffer, size_t maxCapacity, int numAdded);
 
-    juce::Colour lineColorL = juce::Colours::blueviolet;
-    juce::Colour fillColorL = juce::Colours::blueviolet;
-    juce::Colour gradientColorOfLinesL = juce::Colours::white;
+    static constexpr int MAX_BLOCKS_HIST = 500;
 
-    juce::Colour lineColorR = juce::Colours::blueviolet;
-    juce::Colour fillColorR = juce::Colours::blueviolet;
-    juce::Colour gradientColorOfLinesR = juce::Colours::white;
+    std::vector<Peak> highResPeaks;
+    static constexpr int PEAKS_PER_BLOCK_HIGH = 40;
 
-	int tileSize = 0;
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(WaveformComponent)
+    std::vector<Peak> midResPeaks;
+    static constexpr int PEAKS_PER_BLOCK_MID = 10;
+
+    std::vector<Peak> lowResPeaks;
+    static constexpr int PEAKS_PER_BLOCK_LOW = 2;
+
+    std::vector<float> rmsHistory;
+
+    float currentWindow = 7.5f;
+
+    int64_t totalBlocksReceived = 0;
+
+    static constexpr float SINGLE_BLOCK_DURATION = 0.02f;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(WaveformComponent);
 };

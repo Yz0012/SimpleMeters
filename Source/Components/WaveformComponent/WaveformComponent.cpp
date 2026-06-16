@@ -2,173 +2,153 @@
 
 WaveformComponent::WaveformComponent()
 {
-    CreateColoursConfiguration& createColoursConfiguration = CreateColoursConfiguration::getInstance();
-
-    waveformCat = createColoursConfiguration.currentColourTheme
-        .getChildWithProperty("name", "Waveform");
-    lineColorL = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
-        waveformCat.getChildWithProperty("name", "BoundaryLineL").getProperty("hex").toString(), true));
-    fillColorL = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
-        waveformCat.getChildWithProperty("name", "FillL").getProperty("hex").toString(), true));
-    gradientColorOfLinesL = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
-        waveformCat.getChildWithProperty("name", "GradientColorOfLinesL").getProperty("hex").toString(), true));
-    lineColorR = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
-        waveformCat.getChildWithProperty("name", "BoundaryLineR").getProperty("hex").toString(), true));
-    fillColorR = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
-        waveformCat.getChildWithProperty("name", "FillR").getProperty("hex").toString(), true));
-    gradientColorOfLinesR = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
-        waveformCat.getChildWithProperty("name", "GradientColorOfLinesR").getProperty("hex").toString(), true));
-
-    addAndMakeVisible(&drawBounds);
-	addAndMakeVisible(&componentHeader);
-	addAndMakeVisible(&waveformReferenceLine);
-
-	waveformCat.addListener(this);
+    highResPeaks.reserve(MAX_BLOCKS_HIST * PEAKS_PER_BLOCK_HIGH);
+    midResPeaks.reserve(MAX_BLOCKS_HIST * PEAKS_PER_BLOCK_MID);
+    lowResPeaks.reserve(MAX_BLOCKS_HIST * PEAKS_PER_BLOCK_LOW);
+    rmsHistory.reserve(MAX_BLOCKS_HIST);
 }
 
-WaveformComponent::~WaveformComponent()
-{
-	waveformCat.removeListener(this);
-	imageRingBuffer.reset();
-}
-
-void WaveformComponent::clear()
-{
-    DBG("waveformTile buffer clear.");
-}
-
-void WaveformComponent::drawWaveform(
-    const juce::AudioBuffer<float>& localAudioBuffer,
+void WaveformComponent::setWaveformData(const juce::AudioBuffer<float>& localAudioBuffer,
     const float& localAudioBufferRMS)
 {
-    const int width = tileArea.getWidth();
-    const int height = tileArea.getHeight();
-    if (width <= 0 || height <= 0)
-        return;
+    int numSamples = localAudioBuffer.getNumSamples();
+    if (numSamples <= 0) return;
 
-    juce::Image tile(juce::Image::ARGB, tileArea.getWidth(), tileArea.getHeight(), true);
-    juce::Graphics g(tile);
+    const float* readPtr = localAudioBuffer.getReadPointer(0);
 
-    const float midY = tileArea.getY() + height * 0.5f;
-    const float leftX = static_cast<float>(tileArea.getX());
+    extractPeaksToTier(readPtr, numSamples, highResPeaks, PEAKS_PER_BLOCK_HIGH, MAX_BLOCKS_HIST * PEAKS_PER_BLOCK_HIGH);
+    extractPeaksToTier(readPtr, numSamples, midResPeaks, PEAKS_PER_BLOCK_MID, MAX_BLOCKS_HIST * PEAKS_PER_BLOCK_MID);
+    extractPeaksToTier(readPtr, numSamples, lowResPeaks, PEAKS_PER_BLOCK_LOW, MAX_BLOCKS_HIST * PEAKS_PER_BLOCK_LOW);
 
-    for (int i = 0; i < localAudioBuffer.getNumChannels(); i++)
+    rmsHistory.push_back(localAudioBufferRMS);
+    if (rmsHistory.size() > MAX_BLOCKS_HIST)
+        rmsHistory.erase(rmsHistory.begin());
+
+    repaint();
+}
+
+void WaveformComponent::setTimeInterval(float seconds)
+{
+    currentWindow = juce::jlimit(0.5f, 10.0f, seconds);
+    repaint();
+}
+
+void WaveformComponent::resized()
+{
+    repaint();
+}
+
+void WaveformComponent::extractPeaksToTier(const float* readPtr, int totalSamples,
+    std::vector<Peak>& tierBuffer,
+    int numPeaksToExtract, size_t maxCapacity)
+{
+    float samplesPerSubBlock = static_cast<float>(totalSamples) / numPeaksToExtract;
+
+    for (int i = 0; i < numPeaksToExtract; ++i)
     {
-        juce::Path waveformPath;
-        waveformPath.preallocateSpace(localAudioBuffer.getNumSamples());
-        bool firstPoint = true;
-        const float* readPtr = localAudioBuffer.getReadPointer(i);
-        for (int x = 0; x < localAudioBuffer.getNumSamples(); ++x)
-        {
-            float y = midY - (readPtr[x] * (height * 0.5f));
-            float screenX = leftX + ((float)x * width) / localAudioBuffer.getNumSamples();
+        int s0 = static_cast<int>(i * samplesPerSubBlock);
+        int s1 = static_cast<int>((i + 1) * samplesPerSubBlock);
+        s1 = juce::jmin(s1, totalSamples);
+        if (s0 >= s1) s1 = s0 + 1;
 
-            if (firstPoint)
-            {
-                waveformPath.startNewSubPath(screenX, y);
-                firstPoint = false;
-            }
-            else
-            {
-                waveformPath.lineTo(screenX, y);
-            }
-        }
-        if (i)
+        float minVal = 1.0f;
+        float maxVal = -1.0f;
+
+        for (int s = s0; s < s1; ++s)
         {
-            g.setColour(lineColorR.interpolatedWith(gradientColorOfLinesR, localAudioBufferRMS));
-            g.strokePath(waveformPath, juce::PathStrokeType(2.0f));
+            float val = readPtr[s];
+            if (val < minVal) minVal = val;
+            if (val > maxVal) maxVal = val;
+        }
+
+        tierBuffer.push_back({ minVal, maxVal });
+    }
+
+    if (tierBuffer.size() > maxCapacity)
+    {
+        size_t eraseCount = tierBuffer.size() - maxCapacity;
+        tierBuffer.erase(tierBuffer.begin(), tierBuffer.begin() + eraseCount);
+    }
+}
+
+void WaveformComponent::paint(juce::Graphics& g)
+{
+
+    const std::vector<Peak>* activeBuffer = nullptr;
+    int peaksPerBlock = 1;
+
+    if (currentWindow < 2.0f) {
+        activeBuffer = &highResPeaks; peaksPerBlock = PEAKS_PER_BLOCK_HIGH;
+    }
+    else if (currentWindow < 5.0f) {
+        activeBuffer = &midResPeaks;  peaksPerBlock = PEAKS_PER_BLOCK_MID;
+    }
+    else {
+        activeBuffer = &lowResPeaks;  \
+            peaksPerBlock = PEAKS_PER_BLOCK_LOW;
+    }
+
+    if (activeBuffer->empty()) return;
+
+    float width = static_cast<float>(getWidth());
+    float height = static_cast<float>(getHeight());
+    float midY = height / 2.0f;
+
+    float pixelsPerBlock = width * (SINGLE_BLOCK_DURATION / currentWindow);
+
+    float pixelsPerPeak = pixelsPerBlock / peaksPerBlock;
+
+    juce::Path waveformPath;
+    int totalActivePeaks = static_cast<int>(activeBuffer->size());
+
+    for (int i = 0; i < totalActivePeaks; ++i)
+    {
+        int bufferIdx = totalActivePeaks - 1 - i;
+        const Peak& peak = (*activeBuffer)[bufferIdx];
+
+        float x = (width - 1.0f) - (i * pixelsPerPeak);
+
+        if (x < -5.0f) break;
+
+        float yTop = midY - (peak.max * midY);
+        float yBottom = midY - (peak.min * midY);
+
+        if (std::abs(yTop - yBottom) < 1.0f)
+        {
+            yTop -= 0.5f;
+            yBottom += 0.5f;
+        }
+
+        if (i == 0)
+        {
+            waveformPath.startNewSubPath(x, yTop);
         }
         else
         {
-            g.setColour(lineColorL.interpolatedWith(gradientColorOfLinesL, localAudioBufferRMS));
-            g.strokePath(waveformPath, juce::PathStrokeType(2.0f));
+            waveformPath.lineTo(x, yTop);
         }
+        waveformPath.lineTo(x, yBottom);
     }
 
-    weakBuffer = imageRingBuffer;
-
-    if (auto buffer = weakBuffer.lock())
-    {
-        imageRingBuffer->push(tile);
-    }
+    g.setColour(juce::Colours::lightgreen);
+    g.strokePath(waveformPath, juce::PathStrokeType(1.0f));
 }
 
-void WaveformComponent::renderNextFrame(juce::Graphics& g, juce::Rectangle<int> bounds)
+int WaveformComponent::getRmsIndexFromPeakIndex(int peakIndex, float currentWindowSize) const
 {
-    if (bounds.getWidth() <= 0 || bounds.getHeight() <= 0)
-        return;
+    if (rmsHistory.empty()) return -1;
+    int ratio = (currentWindowSize < 2.0f) ? PEAKS_PER_BLOCK_HIGH : ((currentWindowSize < 5.0f) ? PEAKS_PER_BLOCK_MID : PEAKS_PER_BLOCK_LOW);
 
-    //优化
-    int tileSize = (int)(bounds.getWidth() / tileArea.getWidth()) + 1;
-    if (this->tileSize != tileSize)
-    {
-		imageRingBuffer = std::make_shared<CircularImageBuffer>(tileSize);
-        this->tileSize = tileSize;
-    }
+    int activeBufferSize = 0;
+    if (currentWindowSize < 2.0f)      activeBufferSize = highResPeaks.size();
+    else if (currentWindowSize < 5.0f) activeBufferSize = midResPeaks.size();
+    else                               activeBufferSize = lowResPeaks.size();
 
-	if (!imageRingBuffer) return;
+    if (activeBufferSize == 0) return -1;
 
-	weakBuffer = imageRingBuffer;
+    int stepsFromEnd = activeBufferSize - 1 - peakIndex;
+    int rmsStepsFromEnd = stepsFromEnd / ratio;
+    int rmsIndex = static_cast<int>(rmsHistory.size() - 1) - rmsStepsFromEnd;
 
-    for (int i = 0; i < imageRingBuffer->size(); i++)
-    {
-        if (auto buffer = weakBuffer.lock())
-        {
-            int actualIndex = (buffer->getWriteIndex() + i) % buffer->size();
-            juce::Image imageTile = buffer->get(actualIndex);
-            if (imageTile.isValid()) {
-                //
-                g.drawImageAt(imageTile, bounds.getX() + i * (tileArea.getWidth() - 1), bounds.getY());
-            }
-        }
-    }
-}
-
-void WaveformComponent::paint(juce::Graphics&  g)
-{
-    renderNextFrame(g, drawArea);
-}
-
-void WaveformComponent::mouseDown(const juce::MouseEvent& event)
-{
-    if (event.mods.isPopupMenu())
-    {
-        if (cb == nullptr) return;
-        cb();
-    }
-}
-
-void WaveformComponent::mouseEnter(const juce::MouseEvent& event)
-{
-    drawBounds.setVisible(true);
-    componentHeader.setVisible(true);
-}
-
-void WaveformComponent::mouseExit(const juce::MouseEvent&)
-{ 
-    if (!componentHeader.isMouseOver() && !componentHeader.headerFixedButton.getHeaderFixed())
-    {
-        drawBounds.setVisible(false);
-        componentHeader.setVisible(false);
-    }
-}
-
-void WaveformComponent::valueTreePropertyChanged(juce::ValueTree& tree, const juce::Identifier& property)
-{
-    if (property == juce::Identifier("hex"))
-    {
-        lineColorL = juce::Colour(CreateColoursConfiguration::getInstance().colourHexToARGBInt(
-            waveformCat.getChildWithProperty("name", "BoundaryLineL").getProperty("hex").toString(), true));
-        fillColorL = juce::Colour(CreateColoursConfiguration::getInstance().colourHexToARGBInt(
-            waveformCat.getChildWithProperty("name", "FillL").getProperty("hex").toString(), true));
-        gradientColorOfLinesL = juce::Colour(CreateColoursConfiguration::getInstance().colourHexToARGBInt(
-            waveformCat.getChildWithProperty("name", "GradientColorOfLinesL").getProperty("hex").toString(), true));
-        lineColorR = juce::Colour(CreateColoursConfiguration::getInstance().colourHexToARGBInt(
-            waveformCat.getChildWithProperty("name", "BoundaryLineR").getProperty("hex").toString(), true));
-        fillColorR = juce::Colour(CreateColoursConfiguration::getInstance().colourHexToARGBInt(
-            waveformCat.getChildWithProperty("name", "FillR").getProperty("hex").toString(), true));
-        gradientColorOfLinesR = juce::Colour(CreateColoursConfiguration::getInstance().colourHexToARGBInt(
-            waveformCat.getChildWithProperty("name", "GradientColorOfLinesR").getProperty("hex").toString(), true));
-        repaint();
-    }
+    return juce::jlimit(0, static_cast<int>(rmsHistory.size() - 1), rmsIndex);
 }
