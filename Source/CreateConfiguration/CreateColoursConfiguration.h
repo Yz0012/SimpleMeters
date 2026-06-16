@@ -43,10 +43,8 @@ public:
             {
                 { "Colour", {{ "name", "BoundaryLineL"},          { "hex", "#0091FF" }}},
                 { "Colour", {{ "name", "GradientColorOfLinesL"},  { "hex", "#FFFFFF" }}},
-                { "Colour", {{ "name", "FillL"},                  { "hex", "#0091FF" }}},
                 { "Colour", {{ "name", "BoundaryLineR"},          { "hex", "#FF32D6" }}},
-                { "Colour", {{ "name", "GradientColorOfLinesR"},  { "hex", "#FFFFFF" }}},
-                { "Colour", {{ "name", "FillR"},                  { "hex", "#FF32D6" }}}
+                { "Colour", {{ "name", "GradientColorOfLinesR"},  { "hex", "#FFFFFF" }}}
             }
         },
 
