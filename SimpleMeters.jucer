@@ -85,6 +85,7 @@
               file="Source/Assets/DrawReferenceLine.png"/>
         <FILE id="xKOgwA" name="headerPinIcon.png" compile="0" resource="1"
               file="Source/Assets/headerPinIcon.png"/>
+        <FILE id="INwMM5" name="knob.png" compile="0" resource="1" file="Source/Assets/knob.png"/>
         <FILE id="elpz0r" name="L-R.png" compile="0" resource="1" file="Source/Assets/L-R.png"/>
         <FILE id="tmab0P" name="LAR.png" compile="0" resource="1" file="Source/Assets/LAR.png"/>
         <FILE id="vLOoHV" name="LAR2.png" compile="0" resource="1" file="Source/Assets/LAR2.png"/>
@@ -182,8 +183,6 @@
       </GROUP>
       <FILE id="oKsrfZ" name="PushSampleIntoJuceAudioBuffer.h" compile="0"
             resource="0" file="Source/PushSampleIntoJuceAudioBuffer.h"/>
-      <FILE id="DKlNfV" name="CircularImageBuffer.h" compile="0" resource="0"
-            file="Source/CircularImageBuffer.h"/>
       <GROUP id="{B8CD5EC4-3BD8-6C5E-0849-16A7C936AF48}" name="miniaudio">
         <FILE id="nhKgGA" name="miniaudio.h" compile="0" resource="0" file="Source/WASAPI/miniaudio.h"/>
         <FILE id="m0PO7i" name="MiniAudioWASAPI.cpp" compile="1" resource="0"

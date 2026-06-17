@@ -14,7 +14,7 @@ MainComponent::MainComponent()
         mainCategory.getChildWithProperty("name", "Background").getProperty("hex").toString(), false));
     mainCategory.addListener(this);
 
-    centreWithSize(600,400);
+    centreWithSize(1200,800);
     addAndMakeVisible(header);
     header.WASAPIButton.setBounds(20, 10, 30, 30);
     header.windowsSizeButton.setBounds(60, 10, 30, 30);
@@ -666,6 +666,9 @@ void MainComponent::openWaveformComponent(int x, int y)
                 sp->waveformReferenceLine.setVisible(!sp->waveformReferenceLine.isVisible());
             }
         };
+    waveform->componentHeader.addAndMakeVisible(waveform->componentHeader.knob);
+    waveform->componentHeader.knob.setBounds(130, 10, 30, 30);
+    waveform->componentHeader.knob.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
 }
 
 void MainComponent::openVectorOscilloscopeComponent(int x, int y)

@@ -1,6 +1,5 @@
 #pragma once
 #include <JuceHeader.h>
-#include "../Source/CircularImageBuffer.h"
 #include "../../CreateConfiguration/CreateColoursConfiguration.h"
 #include "../../GUI/Components/DrawBounds.h"
 #include "../../GUI/Components/ComponentHeader.h"
@@ -12,7 +11,7 @@ enum WaveformMode
     Separate
 };
 
-class WaveformComponent : public juce::Component, private juce::ValueTree::Listener
+class WaveformComponent : public juce::Component, private juce::ValueTree::Listener, juce::Slider::Listener
 {
 public:
     struct Peak { float min = 0.0f; float max = 0.0f; };
@@ -35,6 +34,7 @@ public:
     void mouseDown(const juce::MouseEvent& event) override;
     void mouseEnter(const juce::MouseEvent& event) override;
     void mouseExit(const juce::MouseEvent&) override;
+    void sliderValueChanged(juce::Slider* slider);
 
     DrawBounds drawBounds;
     ComponentHeader componentHeader{ juce::String("Waveform") };
@@ -56,7 +56,6 @@ private:
     WaveformMode currentMode = Merge;
 
     void extractPeaksToTier(const float* readPtr, int totalSamples, std::vector<Peak>& tierBuffer, int numPeaksToExtract, size_t maxCapacity);
-    void enforceCapacity(std::vector<Peak>& buffer, size_t maxCapacity, int numAdded);
 
     static constexpr int MAX_BLOCKS_HIST = 500;
 

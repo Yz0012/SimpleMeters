@@ -69,6 +69,8 @@ public:
 
         cascadiaTypeface = juce::Typeface::createSystemTypefaceFor(BinaryData::CascadiaMono_ttf, BinaryData::CascadiaMono_ttfSize);
         setDefaultSansSerifTypeface(cascadiaTypeface);
+
+        knobImage = juce::ImageCache::getFromMemory(BinaryData::knob_png, BinaryData::knob_pngSize);
     }
 
     void drawPopupMenuBackground(juce::Graphics& g, int width, int height) override
@@ -147,8 +149,32 @@ public:
 
     void drawCornerResizer(juce::Graphics&, int, int, bool, bool) override {}
 
+    void drawRotarySlider(juce::Graphics& g,
+        int x, int y,
+        int width, int height,
+        float sliderPos,
+        float rotaryStartAngle,
+        float rotaryEndAngle,
+        juce::Slider&) override
+    {
+        auto sourceRect = knobImage.getBounds().toFloat();
+        auto targetRect = juce::Rectangle<float>(x, y, width, height);
+
+        auto placement = juce::RectanglePlacement(juce::RectanglePlacement::xMid |
+            juce::RectanglePlacement::yMid);
+
+        auto transform = placement.getTransformToFit(sourceRect, targetRect);
+
+        auto centre = targetRect.getCentre();
+        auto angle = rotaryStartAngle + sliderPos * (rotaryEndAngle - rotaryStartAngle);
+        transform = transform.rotated(angle, centre.x, centre.y);
+
+        g.drawImageTransformed(knobImage, transform, false);
+    }
+
 private:
     juce::Typeface::Ptr cascadiaTypeface;
+    juce::Image knobImage;
 
     juce::Colour PopupMenuTextColour = juce::Colours::blue;
     juce::Colour PopupMenuBackgroundColour = juce::Colours::black;

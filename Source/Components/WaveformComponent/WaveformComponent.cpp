@@ -30,11 +30,16 @@ WaveformComponent::WaveformComponent()
     addAndMakeVisible(&waveformReferenceLine);
 
     waveformCat.addListener(this);
+    componentHeader.knob.setRotaryParameters(0.5f, 10.0f, true);
+    componentHeader.knob.setDoubleClickReturnValue(true, 0.5f);
+    sliderValueChanged(&componentHeader.knob);
+    componentHeader.knob.addListener(this);
 }
 
 WaveformComponent::~WaveformComponent()
 {
     waveformCat.removeListener(this);
+    componentHeader.knob.removeListener(this);
 }
 
 void WaveformComponent::setWaveformData(const juce::AudioBuffer<float>& localAudioBuffer,
@@ -218,13 +223,10 @@ int WaveformComponent::getRmsIndexFromPeakIndex(int peakIndex, float currentWind
 
     if (activeBufferSize == 0) return -1;
 
-    // 倒序推算：当前 peakIndex 距离 Buffer 尾部（最新数据）有多少个点
     int stepsFromEnd = activeBufferSize - 1 - peakIndex;
 
-    // 折算成 Block 数量
     int rmsStepsFromEnd = stepsFromEnd / ratio;
 
-    // 从 RMS 历史的尾部向前推
     int rmsIndex = static_cast<int>(rmsHistoryL.size() - 1) - rmsStepsFromEnd;
 
     return juce::jlimit(0, static_cast<int>(rmsHistoryL.size() - 1), rmsIndex);
@@ -268,4 +270,9 @@ void WaveformComponent::mouseExit(const juce::MouseEvent&)
         drawBounds.setVisible(false);
         componentHeader.setVisible(false);
     }
+}
+
+void WaveformComponent::sliderValueChanged(juce::Slider* slider)
+{
+    this->setTimeInterval(slider->getValue());
 }

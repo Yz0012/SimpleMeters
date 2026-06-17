@@ -21,6 +21,7 @@ public:
 	ComponentControl componentControl;
 	HeaderFixedButton headerFixedButton;
 	DrawLinesButton drawLinesButton;
+	juce::Slider knob{ juce::Slider::RotaryVerticalDrag, juce::Slider::TextBoxBelow };
 private:
 
 };
