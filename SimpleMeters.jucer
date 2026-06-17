@@ -8,6 +8,7 @@
         <FILE id="BgddM1" name="AudioLayerManager.h" compile="0" resource="0"
               file="Source/IntermediateDataLayer/AudioLayerManager.h"/>
         <FILE id="BuVRct" name="FftDataLayer.h" compile="0" resource="0" file="Source/IntermediateDataLayer/FftDataLayer.h"/>
+        <FILE id="tyHvsH" name="RMSDataLayer.h" compile="0" resource="0" file="Source/IntermediateDataLayer/RMSDataLayer.h"/>
         <FILE id="yW981h" name="TruePeak.h" compile="0" resource="0" file="Source/IntermediateDataLayer/TruePeak.h"/>
       </GROUP>
       <FILE id="vRjiPQ" name="CreatePushSampleIntoJuceAudioBufferInstance.h"

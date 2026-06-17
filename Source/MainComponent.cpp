@@ -14,7 +14,7 @@ MainComponent::MainComponent()
         mainCategory.getChildWithProperty("name", "Background").getProperty("hex").toString(), false));
     mainCategory.addListener(this);
 
-    centreWithSize(1200,800);
+    centreWithSize(800,400);
     addAndMakeVisible(header);
     header.WASAPIButton.setBounds(20, 10, 30, 30);
     header.windowsSizeButton.setBounds(60, 10, 30, 30);
@@ -545,11 +545,6 @@ void MainComponent::openWaveformComponent(int x, int y)
         waveform->callbackId = pushSampleIntoJuceAudioBuffer.add(
             [this, waveform]()
             {
-                waveform->setWaveformData(
-                    pushSampleIntoJuceAudioBuffer.getLocalAudioBufferReference(),
-                    pushSampleIntoJuceAudioBuffer.getLocalAudioBufferRMSReference(),
-                    pushSampleIntoJuceAudioBuffer.getLeftLocalAudioBufferRMSReference(),
-                    pushSampleIntoJuceAudioBuffer.getRightLocalAudioBufferRMSReference());
                 waveform->repaint(waveform->getLocalBounds());
             });
     }
@@ -638,6 +633,7 @@ void MainComponent::openWaveformComponent(int x, int y)
                                         int&& Height = aw->getTextEditorContents("Height").getIntValue();
                                         if (Width <= 100 || Height <= 100) return;
                                         wf->setBounds(wf->getX(), wf->getY(), Width, Height);
+                                        wf->drawArea.setBounds(50, 50, Width - 50, Height - 70);
                                         wf->waveformReferenceLine.setBounds(0, 50, Width, Height - 50);
                                         wf->componentHeader.setBounds(0, 0, Width, 50);
                                         wf->componentHeader.componentControl.setBounds(Width - 30, 20, 10, 10);
@@ -652,6 +648,7 @@ void MainComponent::openWaveformComponent(int x, int y)
         };
 
     waveform->setBounds(x, y, 500, 150);
+    waveform->drawArea.setBounds(50, 50, 450, 80);
     waveform->waveformReferenceLine.setBounds(0, 50, 500, 100);
     waveform->componentHeader.setBounds(0, 0, 500, 50);
     waveform->componentHeader.themeConfigButton.setBounds(10, 10, 30, 30);

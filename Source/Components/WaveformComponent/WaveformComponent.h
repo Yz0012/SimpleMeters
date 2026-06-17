@@ -4,6 +4,7 @@
 #include "../../GUI/Components/DrawBounds.h"
 #include "../../GUI/Components/ComponentHeader.h"
 #include "WaveformComponentReferenceLine.h"
+#include "../../IntermediateDataLayer/AudioLayerManager.h"
 
 enum WaveformMode
 {
@@ -14,19 +15,13 @@ enum WaveformMode
 class WaveformComponent : public juce::Component, private juce::ValueTree::Listener, juce::Slider::Listener
 {
 public:
-    struct Peak { float min = 0.0f; float max = 0.0f; };
 
     WaveformComponent();
     ~WaveformComponent();
 
-    void setWaveformData(const juce::AudioBuffer<float>& localAudioBuffer,
-        const float& localAudioBufferRMS,
-        const float& localAudioBufferRMSL,
-        const float& localAudioBufferRMSR);
-
     void setTimeInterval(float seconds);
 
-    int getRmsIndexFromPeakIndex(int peakIndex, float currentWindowSize) const;
+    int getRmsIndexFromPeakIndex(int peakIndex, float peaksPerBlock) const;
 
     void paint(juce::Graphics& g) override;
     void resized() override;
@@ -44,8 +39,12 @@ public:
 
     using Callback = std::function<void()>;
     Callback cb = nullptr;
+
+    juce::Rectangle<float> drawArea;
 private:
     juce::ValueTree waveformCat;
+    std::shared_ptr<RMSDataLayer<float>> rmsDataLayer;
+    std::shared_ptr<TruePeak<float>> truePeak;
 
     juce::Colour lineColorL = juce::Colours::blueviolet;
     juce::Colour gradientColorOfLinesL = juce::Colours::white;
@@ -55,27 +54,7 @@ private:
 
     WaveformMode currentMode = Merge;
 
-    void extractPeaksToTier(const float* readPtr, int totalSamples, std::vector<Peak>& tierBuffer, int numPeaksToExtract, size_t maxCapacity);
-
-    static constexpr int MAX_BLOCKS_HIST = 500;
-
-    std::vector<Peak> highResPeaks;
-    std::vector<Peak> highResPeaksR;
-    static constexpr int PEAKS_PER_BLOCK_HIGH = 40;
-
-    std::vector<Peak> midResPeaks;
-    std::vector<Peak> midResPeaksR;
-    static constexpr int PEAKS_PER_BLOCK_MID = 10;
-
-    std::vector<Peak> lowResPeaks;
-    std::vector<Peak> lowResPeaksR;
-    static constexpr int PEAKS_PER_BLOCK_LOW = 3;
-
-    std::vector<float> rmsHistory;
-    std::vector<float> rmsHistoryL;
-    std::vector<float> rmsHistoryR;
-
-    float currentWindow = 10.0f;
+    float currentWindow = 0.5f;
 
     int64_t totalBlocksReceived = 0;
 

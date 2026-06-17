@@ -1,6 +1,7 @@
 #pragma once
 #include "TruePeak.h"
 #include "FftDataLayer.h"
+#include "RMSDataLayer.h"
 
 template <typename T>
 class AudioLayerManager
@@ -32,6 +33,17 @@ public:
         return ptr;
     }
 
+    std::shared_ptr<RMSDataLayer<T>> getRMSDataLayer()
+    {
+        std::shared_ptr<RMSDataLayer<T>> ptr = rmsDataLayerWeak.lock();
+        if (!ptr)
+        {
+            ptr = std::make_shared<RMSDataLayer<T>>();
+            rmsDataLayerWeak = ptr;
+        }
+        return ptr;
+    }
+
 private:
     AudioLayerManager() = default;
     ~AudioLayerManager() = default;
@@ -41,4 +53,5 @@ private:
 
     std::weak_ptr<TruePeak<T>> truePeakWeak;
     std::weak_ptr<FftDataLayer<T>> fftDataLayerWeak;
+    std::weak_ptr<RMSDataLayer<T>> rmsDataLayerWeak;
 };
