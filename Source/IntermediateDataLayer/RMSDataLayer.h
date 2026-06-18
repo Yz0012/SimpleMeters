@@ -17,7 +17,7 @@ public:
             [this, &instance]() {
                 rmsHistory[writeIndex] = instance.getLeftLocalAudioBufferRMSReference();
                 rmsHistoryL[writeIndex] = instance.getRightLocalAudioBufferRMSReference();
-                rmsHistoryR[writeIndex] = instance.getLocalAudioBufferRMSReference();
+                rmsHistoryR[writeIndex] = instance.getRightLocalAudioBufferRMSReference();
 
                 writeIndex = (writeIndex + 1) % MAX_BLOCKS_HIST;
 
@@ -33,6 +33,16 @@ public:
         CreatePushSampleIntoJuceAudioBufferInstance::getInstance().remove(callBackId);
     }
 
+    T getRmsFromEnd(int blocksFromEnd) const
+    {
+        if (totalBlocks == 0) return 0.0f;
+
+        int validBlocks = juce::jmin(blocksFromEnd, totalBlocks - 1);
+
+        int targetIdx = (writeIndex - 1 - validBlocks + MAX_BLOCKS_HIST) % MAX_BLOCKS_HIST;
+        return rmsHistory[static_cast<size_t>(targetIdx)];
+    }
+
     T getRmsLFromEnd(int blocksFromEnd) const
     {
         if (totalBlocks == 0) return 0.0f;
@@ -41,6 +51,16 @@ public:
 
         int targetIdx = (writeIndex - 1 - validBlocks + MAX_BLOCKS_HIST) % MAX_BLOCKS_HIST;
         return rmsHistoryL[static_cast<size_t>(targetIdx)];
+    }
+
+    T getRmsRFromEnd(int blocksFromEnd) const
+    {
+        if (totalBlocks == 0) return 0.0f;
+
+        int validBlocks = juce::jmin(blocksFromEnd, totalBlocks - 1);
+
+        int targetIdx = (writeIndex - 1 - validBlocks + MAX_BLOCKS_HIST) % MAX_BLOCKS_HIST;
+        return rmsHistoryR[static_cast<size_t>(targetIdx)];
     }
 
     const std::vector<T>& getRMSHistory()  const { return rmsHistory; }

@@ -8,8 +8,11 @@
 
 enum WaveformMode
 {
-    Merge,
-    Separate
+    waveformLeft,
+    waveformRight,
+    waveformLR,
+    waveformMerge,
+    waveformSeparate
 };
 
 class WaveformComponent : public juce::Component, private juce::ValueTree::Listener, juce::Slider::Listener
@@ -20,9 +23,8 @@ public:
     ~WaveformComponent();
 
     void setTimeInterval(float seconds);
-
-    int getRmsIndexFromPeakIndex(int peakIndex, float peaksPerBlock) const;
-
+    void setWaveformMode(WaveformMode);
+    void exchangeLRposition();
     void paint(juce::Graphics& g) override;
     void resized() override;
     void valueTreePropertyChanged(juce::ValueTree& tree, const juce::Identifier& property);
@@ -52,13 +54,15 @@ private:
     juce::Colour lineColorR = juce::Colours::blueviolet;
     juce::Colour gradientColorOfLinesR = juce::Colours::white;
 
-    WaveformMode currentMode = Merge;
+    WaveformMode currentMode = waveformMerge;
 
     float currentWindow = 0.5f;
 
     int64_t totalBlocksReceived = 0;
 
     static constexpr float SINGLE_BLOCK_DURATION = 0.021333333f;
+
+    bool exchange = false;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(WaveformComponent);
 };

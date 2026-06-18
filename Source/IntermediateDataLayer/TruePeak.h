@@ -10,12 +10,23 @@ public:
 
     TruePeak()
     {
+        hyperResPeaks.resize(MAX_BLOCKS_HIST * PEAKS_PER_BLOCK_HYPER);
+        hyperResPeaksR.resize(MAX_BLOCKS_HIST * PEAKS_PER_BLOCK_HYPER);
+
+        ultraResPeaks.resize(MAX_BLOCKS_HIST * PEAKS_PER_BLOCK_ULTRA);
+        ultraResPeaksR.resize(MAX_BLOCKS_HIST * PEAKS_PER_BLOCK_ULTRA);
+
         highResPeaks.resize(MAX_BLOCKS_HIST * PEAKS_PER_BLOCK_HIGH);
         highResPeaksR.resize(MAX_BLOCKS_HIST * PEAKS_PER_BLOCK_HIGH);
+
         midResPeaks.resize(MAX_BLOCKS_HIST * PEAKS_PER_BLOCK_MID);
         midResPeaksR.resize(MAX_BLOCKS_HIST * PEAKS_PER_BLOCK_MID);
+
         lowResPeaks.resize(MAX_BLOCKS_HIST * PEAKS_PER_BLOCK_LOW);
         lowResPeaksR.resize(MAX_BLOCKS_HIST * PEAKS_PER_BLOCK_LOW);
+
+        leftTruePeak.resize(MAX_BLOCKS_HIST * PEAKS_PER_BLOCK_LOWEST);
+        rightTruePeak.resize(MAX_BLOCKS_HIST * PEAKS_PER_BLOCK_LOWEST);
 
         auto& instance = CreatePushSampleIntoJuceAudioBufferInstance::getInstance();
         callBackId = instance.add(
@@ -28,13 +39,19 @@ public:
 
                 int currentBlockIdx = blockWriteIndex;
 
-                extractPeaksToCircle(readPtr, numSamples, highResPeaks, PEAKS_PER_BLOCK_HIGH, currentBlockIdx);
+                extractPeaksToCircle(readPtr, numSamples, hyperResPeaks, PEAKS_PER_BLOCK_HYPER, currentBlockIdx);
+                extractPeaksFromUpperCircle(hyperResPeaks, PEAKS_PER_BLOCK_HYPER, ultraResPeaks, PEAKS_PER_BLOCK_ULTRA, currentBlockIdx);
+                extractPeaksFromUpperCircle(ultraResPeaks, PEAKS_PER_BLOCK_ULTRA, highResPeaks, PEAKS_PER_BLOCK_HIGH, currentBlockIdx);
                 extractPeaksFromUpperCircle(highResPeaks, PEAKS_PER_BLOCK_HIGH, midResPeaks, PEAKS_PER_BLOCK_MID, currentBlockIdx);
                 extractPeaksFromUpperCircle(midResPeaks, PEAKS_PER_BLOCK_MID, lowResPeaks, PEAKS_PER_BLOCK_LOW, currentBlockIdx);
+                extractPeaksFromUpperCircle(lowResPeaks, PEAKS_PER_BLOCK_LOW, leftTruePeak, PEAKS_PER_BLOCK_LOWEST, currentBlockIdx);
 
-                extractPeaksToCircle(readPtrR, numSamples, highResPeaksR, PEAKS_PER_BLOCK_HIGH, currentBlockIdx);
+                extractPeaksToCircle(readPtrR, numSamples, hyperResPeaksR, PEAKS_PER_BLOCK_HYPER, currentBlockIdx);
+                extractPeaksFromUpperCircle(hyperResPeaksR, PEAKS_PER_BLOCK_HYPER, ultraResPeaksR, PEAKS_PER_BLOCK_ULTRA, currentBlockIdx);
+                extractPeaksFromUpperCircle(ultraResPeaksR, PEAKS_PER_BLOCK_ULTRA, highResPeaksR, PEAKS_PER_BLOCK_HIGH, currentBlockIdx);
                 extractPeaksFromUpperCircle(highResPeaksR, PEAKS_PER_BLOCK_HIGH, midResPeaksR, PEAKS_PER_BLOCK_MID, currentBlockIdx);
                 extractPeaksFromUpperCircle(midResPeaksR, PEAKS_PER_BLOCK_MID, lowResPeaksR, PEAKS_PER_BLOCK_LOW, currentBlockIdx);
+                extractPeaksFromUpperCircle(lowResPeaksR, PEAKS_PER_BLOCK_LOW, rightTruePeak, PEAKS_PER_BLOCK_LOWEST, currentBlockIdx);
 
                 blockWriteIndex = (blockWriteIndex + 1) % MAX_BLOCKS_HIST;
                 if (totalBlocks < MAX_BLOCKS_HIST) {
@@ -53,22 +70,33 @@ public:
     {
         if (totalBlocks == 0) return { 0.0f, 0.0f };
         int validBlocks = juce::jmin(blocksFromEnd, totalBlocks - 1);
-
         int targetBlockIdx = (blockWriteIndex - 1 - validBlocks + MAX_BLOCKS_HIST) % MAX_BLOCKS_HIST;
-
         size_t absoluteIdx = static_cast<size_t>(targetBlockIdx * peaksPerBlock + juce::jlimit(0, peaksPerBlock - 1, peakIdxInBlock));
         return buffer[absoluteIdx];
     }
 
-    const std::vector<Peak>& getHighResPeaks() const { return highResPeaks; }
-    const std::vector<Peak>& getMidResPeaks()  const { return midResPeaks; }
-    const std::vector<Peak>& getLowResPeaks()  const { return lowResPeaks; }
+    const std::vector<Peak>& getHyperResPeaks()  const { return hyperResPeaks; }
+    const std::vector<Peak>& getHyperResPeaksR() const { return hyperResPeaksR; }
+    const std::vector<Peak>& getUltraResPeaks()  const { return ultraResPeaks; }
+    const std::vector<Peak>& getUltraResPeaksR() const { return ultraResPeaksR; }
+    const std::vector<Peak>& getHighResPeaks()   const { return highResPeaks; }
+    const std::vector<Peak>& getHighResPeaksR()  const { return highResPeaksR; }
+    const std::vector<Peak>& getMidResPeaks()    const { return midResPeaks; }
+    const std::vector<Peak>& getMidResPeaksR()   const { return midResPeaksR; }
+    const std::vector<Peak>& getLowResPeaks()    const { return lowResPeaks; }
+    const std::vector<Peak>& getLowResPeaksR()   const { return lowResPeaksR; }
+    const std::vector<Peak>& getLeftTruePeak()   const { return leftTruePeak; }
+    const std::vector<Peak>& getRightTruePeak()  const { return rightTruePeak; }
+
     int getTotalBlocks() const { return totalBlocks; }
 
     static constexpr int getMaxBlocksHist() { return MAX_BLOCKS_HIST; }
+    static constexpr int getPeaksPerBlockHyper() { return PEAKS_PER_BLOCK_HYPER; }
+    static constexpr int getPeaksPerBlockUltra() { return PEAKS_PER_BLOCK_ULTRA; }
     static constexpr int getPeaksPerBlockHigh() { return PEAKS_PER_BLOCK_HIGH; }
     static constexpr int getPeaksPerBlockMid() { return PEAKS_PER_BLOCK_MID; }
     static constexpr int getPeaksPerBlockLow() { return PEAKS_PER_BLOCK_LOW; }
+    static constexpr int getPeaksPerBlockLowest() { return PEAKS_PER_BLOCK_LOWEST; }
 
     uint16_t callBackId;
 
@@ -129,6 +157,14 @@ private:
 
     static constexpr int MAX_BLOCKS_HIST = 500;
 
+    std::vector<Peak> hyperResPeaks;
+    std::vector<Peak> hyperResPeaksR;
+    static constexpr int PEAKS_PER_BLOCK_HYPER = 400;
+
+    std::vector<Peak> ultraResPeaks;
+    std::vector<Peak> ultraResPeaksR;
+    static constexpr int PEAKS_PER_BLOCK_ULTRA = 200;
+
     std::vector<Peak> highResPeaks;
     std::vector<Peak> highResPeaksR;
     static constexpr int PEAKS_PER_BLOCK_HIGH = 40;
@@ -139,7 +175,11 @@ private:
 
     std::vector<Peak> lowResPeaks;
     std::vector<Peak> lowResPeaksR;
-    static constexpr int PEAKS_PER_BLOCK_LOW = 2;
+    static constexpr int PEAKS_PER_BLOCK_LOW = 3;
+
+    std::vector<Peak> leftTruePeak;
+    std::vector<Peak> rightTruePeak;
+    static constexpr int PEAKS_PER_BLOCK_LOWEST = 1;
 
     int blockWriteIndex = 0;
     int totalBlocks = 0;

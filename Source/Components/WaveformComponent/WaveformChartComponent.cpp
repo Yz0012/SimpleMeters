@@ -1,7 +1,7 @@
 
 #include "WaveformChartComponent.h"
 
-WaveformChartComponent::WaveformChartComponent() : fftLayer(AudioLayerManager<float>::getInstance().getFftDataLayer())
+WaveformChartComponent::WaveformChartComponent() : fftLayer(AudioLayerManager<float>::getInstance().getFftDataLayer()), rmsDataLayer(AudioLayerManager<float>::getInstance().getRMSDataLayer()), truePeak(AudioLayerManager<float>::getInstance().getTruePeak())
 {
     CreateColoursConfiguration& createColoursConfiguration = CreateColoursConfiguration::getInstance();
 

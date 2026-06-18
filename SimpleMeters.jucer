@@ -116,6 +116,13 @@
               resource="1" file="Source/Assets/VectorOscilloscopeComponent.png"/>
         <FILE id="pgn3Pf" name="WaveformComponent.png" compile="0" resource="1"
               file="Source/Assets/WaveformComponent.png"/>
+        <FILE id="aoYE7k" name="waveformL.png" compile="0" resource="1" file="Source/Assets/waveformL.png"/>
+        <FILE id="OBAmnA" name="waveformLR.png" compile="0" resource="1" file="Source/Assets/waveformLR.png"/>
+        <FILE id="wHEgtE" name="waveformMerge.png" compile="0" resource="1"
+              file="Source/Assets/waveformMerge.png"/>
+        <FILE id="rWXg1s" name="waveformR.png" compile="0" resource="1" file="Source/Assets/waveformR.png"/>
+        <FILE id="cvwtaV" name="waveformSeparate.png" compile="0" resource="1"
+              file="Source/Assets/waveformSeparate.png"/>
       </GROUP>
       <GROUP id="{EEE00817-5370-279A-C380-774ED0991585}" name="Components">
         <GROUP id="{8E61455B-5029-C950-78D3-89D0DB0861EC}" name="LoudnessMeterComponents">

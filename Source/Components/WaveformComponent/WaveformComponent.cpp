@@ -46,17 +46,24 @@ void WaveformComponent::resized()
 
 void WaveformComponent::paint(juce::Graphics& g)
 {
-    const std::vector<TruePeak<float>::Peak>* activeBuffer = nullptr;
+    const std::vector<TruePeak<float>::Peak>* activeBufferL = nullptr;
+    const std::vector<TruePeak<float>::Peak>* activeBufferR = nullptr;
     int peaksPerBlock = 1;
 
     if (currentWindow < 2.0f) {
-        activeBuffer = &truePeak->getHighResPeaks(); peaksPerBlock = truePeak->getPeaksPerBlockHigh();
+        activeBufferL = &truePeak->getHighResPeaks();
+        activeBufferR = &truePeak->getHighResPeaksR();
+        peaksPerBlock = truePeak->getPeaksPerBlockHigh();
     }
     else if (currentWindow < 5.0f) {
-        activeBuffer = &truePeak->getMidResPeaks();  peaksPerBlock = truePeak->getPeaksPerBlockMid();
+        activeBufferL = &truePeak->getMidResPeaks();
+        activeBufferR = &truePeak->getMidResPeaksR();
+        peaksPerBlock = truePeak->getPeaksPerBlockMid();
     }
     else {
-        activeBuffer = &truePeak->getLowResPeaks();  peaksPerBlock = truePeak->getPeaksPerBlockLow();
+        activeBufferL = &truePeak->getLowResPeaks();
+        activeBufferR = &truePeak->getLowResPeaksR();
+        peaksPerBlock = truePeak->getPeaksPerBlockLow();
     }
 
     int totalBlocks = truePeak->getTotalBlocks();
@@ -64,8 +71,8 @@ void WaveformComponent::paint(juce::Graphics& g)
 
     float width = static_cast<float>(drawArea.getWidth());
     float height = static_cast<float>(drawArea.getHeight());
-    float midY = drawArea.getY() + (height / 2.0f);
     float startX = static_cast<float>(drawArea.getX());
+    float baseY = static_cast<float>(drawArea.getY());
 
     float pixelsPerBlock = width * (SINGLE_BLOCK_DURATION / currentWindow);
     float pixelsPerPeak = pixelsPerBlock / peaksPerBlock;
@@ -74,65 +81,125 @@ void WaveformComponent::paint(juce::Graphics& g)
     int totalAvailablePeaks = totalBlocks * peaksPerBlock;
     int peaksToRender = juce::jmin(maxPeaksToDraw, totalAvailablePeaks);
 
-    juce::Path currentBlockPath;
+    juce::Path pathL;
+    juce::Path pathR;
     int lastBlocksFromEnd = -2;
     bool isFirstPointInPath = true;
 
     float absoluteRightX = startX + width - 1.0f;
 
+    auto strokeCurrentPaths = [&]()
+        {
+            if (lastBlocksFromEnd < 0) return;
+
+            float rmsL = rmsDataLayer->getRmsLFromEnd(lastBlocksFromEnd);
+            float rmsR = rmsDataLayer->getRmsRFromEnd(lastBlocksFromEnd);
+            float rmsLR = (rmsL + rmsR) / 2.0f;
+
+            if (exchange)
+            {
+                if ((currentMode == waveformRight || currentMode == waveformMerge || currentMode == waveformSeparate) && !pathR.isEmpty())
+                {
+
+                    g.setColour(lineColorR.interpolatedWith(gradientColorOfLinesR, juce::jlimit(0.0f, 1.0f, rmsR)));
+                    g.strokePath(pathR, juce::PathStrokeType(1.0f));
+                }
+
+                if ((currentMode == waveformLeft || currentMode == waveformLR || currentMode == waveformMerge || currentMode == waveformSeparate) && !pathL.isEmpty())
+                {
+                    float targetRms = (currentMode == waveformLR) ? rmsLR : rmsL;
+                    g.setColour(lineColorL.interpolatedWith(gradientColorOfLinesL, juce::jlimit(0.0f, 1.0f, targetRms)));
+                    g.strokePath(pathL, juce::PathStrokeType(1.0f));
+                }
+            }else
+            {
+                if ((currentMode == waveformLeft || currentMode == waveformLR || currentMode == waveformMerge || currentMode == waveformSeparate) && !pathL.isEmpty())
+                {
+                    float targetRms = (currentMode == waveformLR) ? rmsLR : rmsL;
+                    g.setColour(lineColorL.interpolatedWith(gradientColorOfLinesL, juce::jlimit(0.0f, 1.0f, targetRms)));
+                    g.strokePath(pathL, juce::PathStrokeType(1.0f));
+                }
+
+                if ((currentMode == waveformRight || currentMode == waveformMerge || currentMode == waveformSeparate) && !pathR.isEmpty())
+                {
+
+                    g.setColour(lineColorR.interpolatedWith(gradientColorOfLinesR, juce::jlimit(0.0f, 1.0f, rmsR)));
+                    g.strokePath(pathR, juce::PathStrokeType(1.0f));
+                }
+            }
+        };
+
+    float midY_Full = baseY + (height / 2.0f);
+    float scale_Full = height / 2.0f;
+
+    float midY_Top = baseY + (height / 4.0f);
+    float midY_Bottom = baseY + (height * 0.75f);
+    float scale_Half = height / 4.0f;
+
     for (int i = 0; i < peaksToRender; ++i)
     {
-
         float x = absoluteRightX - (i * pixelsPerPeak);
         if (x < startX - 10.0f) break;
 
         int currentBlocksFromEnd = i / peaksPerBlock;
         int peakIdxInBlock = (peaksPerBlock - 1) - (i % peaksPerBlock);
 
-        TruePeak<float>::Peak peak = truePeak->getPeakFromEnd(*activeBuffer, peaksPerBlock, currentBlocksFromEnd, peakIdxInBlock);
+        TruePeak<float>::Peak peakL = truePeak->getPeakFromEnd(*activeBufferL, peaksPerBlock, currentBlocksFromEnd, peakIdxInBlock);
+        TruePeak<float>::Peak peakR = truePeak->getPeakFromEnd(*activeBufferR, peaksPerBlock, currentBlocksFromEnd, peakIdxInBlock);
 
         if (currentBlocksFromEnd != lastBlocksFromEnd && lastBlocksFromEnd != -2)
         {
-            if (!currentBlockPath.isEmpty() && lastBlocksFromEnd >= 0)
-            {
-                float rmsVal = rmsDataLayer->getRmsLFromEnd(lastBlocksFromEnd);
-                g.setColour(lineColorL.interpolatedWith(gradientColorOfLinesL, juce::jlimit(0.0f, 1.0f, rmsVal)));
-                g.strokePath(currentBlockPath, juce::PathStrokeType(1.0f));
-            }
-
-            currentBlockPath.clear();
+            strokeCurrentPaths();
+            pathL.clear();
+            pathR.clear();
             isFirstPointInPath = true;
         }
 
         lastBlocksFromEnd = currentBlocksFromEnd;
 
-        float yTop = midY - (peak.max * (height / 2.0f));
-        float yBottom = midY - (peak.min * (height / 2.0f));
-        if (std::abs(yTop - yBottom) < 1.0f) { yTop -= 0.5f; yBottom += 0.5f; }
+        auto addPeakToPath = [&](juce::Path& p, float minVal, float maxVal, float anchorY, float scale) {
+            float yTop = anchorY - (maxVal * scale);
+            float yBottom = anchorY - (minVal * scale);
+            if (std::abs(yTop - yBottom) < 1.0f) { yTop -= 0.5f; yBottom += 0.5f; }
 
-        if (isFirstPointInPath)
+            if (isFirstPointInPath) p.startNewSubPath(x, yTop);
+            else p.lineTo(x, yTop);
+            p.lineTo(x, yBottom);
+            };
+
+        switch (currentMode)
         {
-            currentBlockPath.startNewSubPath(x, yTop);
-            isFirstPointInPath = false;
-        }
-        else
+        case waveformLeft:
+            addPeakToPath(pathL, peakL.min, peakL.max, midY_Full, scale_Full);
+            break;
+
+        case waveformRight:
+            addPeakToPath(pathR, peakR.min, peakR.max, midY_Full, scale_Full);
+            break;
+
+        case waveformLR:
         {
-            currentBlockPath.lineTo(x, yTop);
+            float diffMax = (peakL.max - peakR.max) / 2.0f;
+            float diffMin = (peakL.min - peakR.min) / 2.0f;
+            addPeakToPath(pathL, diffMin, diffMax, midY_Full, scale_Full);
+            break;
         }
-        currentBlockPath.lineTo(x, yBottom);
+
+        case waveformMerge:
+                addPeakToPath(pathL, peakL.min, peakL.max, midY_Full, scale_Full);
+                addPeakToPath(pathR, peakR.min, peakR.max, midY_Full, scale_Full);
+            break;
+
+        case waveformSeparate:
+                addPeakToPath(pathL, peakL.min, peakL.max, midY_Top, scale_Half);
+                addPeakToPath(pathR, peakR.min, peakR.max, midY_Bottom, scale_Half);
+            break;
+        }
+
+        isFirstPointInPath = false;
     }
 
-    if (!currentBlockPath.isEmpty() && lastBlocksFromEnd >= 0)
-    {
-        float rmsVal = rmsDataLayer->getRmsLFromEnd(lastBlocksFromEnd);
-        g.setColour(lineColorL.interpolatedWith(gradientColorOfLinesL, juce::jlimit(0.0f, 1.0f, rmsVal)));
-        g.strokePath(currentBlockPath, juce::PathStrokeType(1.0f));
-    }
-}
-
-int WaveformComponent::getRmsIndexFromPeakIndex(int peakIndex, float peaksPerBlock) const
-{
-    return peakIndex / peaksPerBlock;
+    strokeCurrentPaths();
 }
 
 void WaveformComponent::valueTreePropertyChanged(juce::ValueTree& tree, const juce::Identifier& property)
@@ -178,4 +245,17 @@ void WaveformComponent::mouseExit(const juce::MouseEvent&)
 void WaveformComponent::sliderValueChanged(juce::Slider* slider)
 {
     this->setTimeInterval(slider->getValue());
+}
+
+void WaveformComponent::setWaveformMode(WaveformMode mode)
+{
+    if (currentMode != mode)
+    {
+        currentMode = mode;
+    }
+}
+
+void WaveformComponent::exchangeLRposition()
+{
+    this->exchange = !exchange;
 }

@@ -47,8 +47,11 @@ public:
     using Callback = std::function<void()>;
     Callback cb = nullptr;
 
-    std::shared_ptr<FftDataLayer<float>> fftLayer;
 private:
+    std::shared_ptr<FftDataLayer<float>> fftLayer;
+    std::shared_ptr<RMSDataLayer<float>> rmsDataLayer;
+    std::shared_ptr<TruePeak<float>> truePeak;
+
     int startNum = 0;
     int scopeNum = 0;
     int endNum = 0;

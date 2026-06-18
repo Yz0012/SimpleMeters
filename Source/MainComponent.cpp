@@ -569,6 +569,16 @@ void MainComponent::openWaveformComponent(int x, int y)
             juce::PopupMenu menu;
             menu.addItem(1, "Position", true, false, juce::Drawable::createFromImageData(BinaryData::menuPosition_png, BinaryData::menuPosition_pngSize));
             menu.addItem(2, "ComponentSize", true, false, juce::Drawable::createFromImageData(BinaryData::menuComponentSize_png, BinaryData::menuComponentSize_pngSize));
+            menu.addItem(3, "exchangeLRposition", true, false);
+
+            juce::PopupMenu modeMenu;
+            modeMenu.addItem(4, "Left", true, false, juce::Drawable::createFromImageData(BinaryData::waveformL_png, BinaryData::waveformL_pngSize));
+            modeMenu.addItem(5, "Right", true, false, juce::Drawable::createFromImageData(BinaryData::waveformR_png, BinaryData::waveformR_pngSize));
+            modeMenu.addItem(6, "Side", true, false, juce::Drawable::createFromImageData(BinaryData::waveformLR_png, BinaryData::waveformLR_pngSize));
+            modeMenu.addItem(7, "Merge", true, false, juce::Drawable::createFromImageData(BinaryData::waveformMerge_png, BinaryData::waveformMerge_pngSize));
+            modeMenu.addItem(8, "Separate", true, false, juce::Drawable::createFromImageData(BinaryData::waveformSeparate_png, BinaryData::waveformSeparate_pngSize));
+            menu.addSubMenu("Mode", modeMenu);
+
             menu.showMenuAsync(
                 juce::PopupMenu::Options(),
                 [weakWaveform](int result)
@@ -643,6 +653,30 @@ void MainComponent::openWaveformComponent(int x, int y)
                                 }
                             ), true);
                         }
+                        else if (result == 3)
+                        {
+                            wf->exchangeLRposition();
+                        }
+                        else if (result == 4)
+                        {
+                            wf->setWaveformMode(WaveformMode::waveformLeft);
+                        }
+                        else if (result == 5)
+                        {
+                            wf->setWaveformMode(WaveformMode::waveformRight);
+                        }
+                        else if (result == 6)
+                        {
+                            wf->setWaveformMode(WaveformMode::waveformLR);
+                        }
+                        else if (result == 7)
+                        {
+                            wf->setWaveformMode(WaveformMode::waveformMerge);
+                        }
+                        else if (result == 8)
+                        {
+                            wf->setWaveformMode(WaveformMode::waveformSeparate);
+                        }
                     }
                 });
         };
@@ -665,7 +699,7 @@ void MainComponent::openWaveformComponent(int x, int y)
         };
     waveform->componentHeader.addAndMakeVisible(waveform->componentHeader.knob);
     waveform->componentHeader.knob.setBounds(130, 10, 30, 30);
-    waveform->componentHeader.knob.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    waveform->componentHeader.knob.setTextBoxStyle(juce::Slider::TextBoxLeft, false, 0, 0);
 }
 
 void MainComponent::openVectorOscilloscopeComponent(int x, int y)
