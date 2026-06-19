@@ -13,6 +13,7 @@ public:
     {
         setOpaque(false);
         setInterceptsMouseClicks(false, false);
+        setBufferedToImage(true);
 
         sampleRate = 48000.0f;
         scopeSize = 1024;

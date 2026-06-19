@@ -659,23 +659,33 @@ void MainComponent::openWaveformComponent(int x, int y)
                         }
                         else if (result == 4)
                         {
+                            wf->waveformReferenceLine.setWaveformMode(4);
                             wf->setWaveformMode(WaveformMode::waveformLeft);
+                            wf->waveformReferenceLine.repaint();
                         }
                         else if (result == 5)
                         {
+                            wf->waveformReferenceLine.setWaveformMode(5);
                             wf->setWaveformMode(WaveformMode::waveformRight);
+                            wf->waveformReferenceLine.repaint();
                         }
                         else if (result == 6)
                         {
+                            wf->waveformReferenceLine.setWaveformMode(6);
                             wf->setWaveformMode(WaveformMode::waveformLR);
+                            wf->waveformReferenceLine.repaint();
                         }
                         else if (result == 7)
                         {
+                            wf->waveformReferenceLine.setWaveformMode(7);
                             wf->setWaveformMode(WaveformMode::waveformMerge);
+                            wf->waveformReferenceLine.repaint();
                         }
                         else if (result == 8)
                         {
+                            wf->waveformReferenceLine.setWaveformMode(8);
                             wf->setWaveformMode(WaveformMode::waveformSeparate);
+                            wf->waveformReferenceLine.repaint();
                         }
                     }
                 });
@@ -684,6 +694,7 @@ void MainComponent::openWaveformComponent(int x, int y)
     waveform->setBounds(x, y, 500, 150);
     waveform->drawArea.setBounds(50, 50, 450, 80);
     waveform->waveformReferenceLine.setBounds(0, 50, 500, 100);
+    waveform->waveformReferenceLine.setWaveformMode(4);
     waveform->componentHeader.setBounds(0, 0, 500, 50);
     waveform->componentHeader.themeConfigButton.setBounds(10, 10, 30, 30);
     waveform->componentHeader.themeConfigButton.setTooltip("Theme Configuration");
@@ -697,9 +708,21 @@ void MainComponent::openWaveformComponent(int x, int y)
                 sp->waveformReferenceLine.setVisible(!sp->waveformReferenceLine.isVisible());
             }
         };
-    waveform->componentHeader.addAndMakeVisible(waveform->componentHeader.knob);
-    waveform->componentHeader.knob.setBounds(130, 10, 30, 30);
-    waveform->componentHeader.knob.setTextBoxStyle(juce::Slider::TextBoxLeft, false, 0, 0);
+    waveform->componentHeader.knob.setBounds(130, 10, 90, 30);
+    waveform->componentHeader.knob.setTextBoxStyle(juce::Slider::TextBoxRight, false, 60, 30);
+    waveform->componentHeader.knob.setNumDecimalPlacesToDisplay(2);
+    waveform->componentHeader.knob.textFromValueFunction = [](double value)
+        {
+            return juce::String(value, 2) + " s";
+        };
+
+    waveform->componentHeader.knobTwo.setBounds(230, 10, 90, 30);
+    waveform->componentHeader.knobTwo.setTextBoxStyle(juce::Slider::TextBoxRight, false, 60, 30);
+    waveform->componentHeader.knobTwo.setNumDecimalPlacesToDisplay(2);
+    waveform->componentHeader.knobTwo.textFromValueFunction = [](double value)
+        {
+            return juce::String(value, 2) + " dB";
+        };
 }
 
 void MainComponent::openVectorOscilloscopeComponent(int x, int y)

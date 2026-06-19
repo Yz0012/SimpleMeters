@@ -20,17 +20,31 @@ WaveformComponent::WaveformComponent() : rmsDataLayer(AudioLayerManager<float>::
     addAndMakeVisible(&componentHeader);
     addAndMakeVisible(&waveformReferenceLine);
 
+    componentHeader.addAndMakeVisible(&componentHeader.knob);
+    componentHeader.addAndMakeVisible(&componentHeader.knobTwo);
+
     waveformCat.addListener(this);
     componentHeader.knob.setDoubleClickReturnValue(true, 0.5f);
     componentHeader.knob.setRange(0.5f, 10.0f);
+    componentHeader.knob.setColour(juce::Slider::textBoxOutlineColourId, juce::Colour(0x00000000));
+    componentHeader.knob.setColour(juce::Slider::textBoxBackgroundColourId, juce::Colour(0x00000000));
+    componentHeader.knob.setColour(juce::Slider::textBoxTextColourId, juce::Colour(0xFFB7ED88));
     sliderValueChanged(&componentHeader.knob);
     componentHeader.knob.addListener(this);
+
+    componentHeader.knobTwo.setDoubleClickReturnValue(true, 0.0f);
+    componentHeader.knobTwo.setRange(-10.0f, 10.0f);
+    componentHeader.knobTwo.setColour(juce::Slider::textBoxOutlineColourId, juce::Colour(0x00000000));
+    componentHeader.knobTwo.setColour(juce::Slider::textBoxBackgroundColourId, juce::Colour(0x00000000));
+    componentHeader.knobTwo.setColour(juce::Slider::textBoxTextColourId, juce::Colour(0xFFB7ED88));
+    componentHeader.knobTwo.addListener(this);
 }
 
 WaveformComponent::~WaveformComponent()
 {
     waveformCat.removeListener(this);
     componentHeader.knob.removeListener(this);
+    componentHeader.knobTwo.removeListener(this);
 }
 
 void WaveformComponent::setTimeInterval(float seconds)
@@ -59,6 +73,11 @@ void WaveformComponent::paint(juce::Graphics& g)
         activeBufferL = &truePeak->getMidResPeaks();
         activeBufferR = &truePeak->getMidResPeaksR();
         peaksPerBlock = truePeak->getPeaksPerBlockMid();
+    }
+    else if (currentWindow < 8.0f) {
+        activeBufferL = &truePeak->getMidLowResPeaks();
+        activeBufferR = &truePeak->getMidLowResPeaksR();
+        peaksPerBlock = truePeak->getPeaksPerBlockMidLow();
     }
     else {
         activeBufferL = &truePeak->getLowResPeaks();
@@ -100,7 +119,6 @@ void WaveformComponent::paint(juce::Graphics& g)
             {
                 if ((currentMode == waveformRight || currentMode == waveformMerge || currentMode == waveformSeparate) && !pathR.isEmpty())
                 {
-
                     g.setColour(lineColorR.interpolatedWith(gradientColorOfLinesR, juce::jlimit(0.0f, 1.0f, rmsR)));
                     g.strokePath(pathR, juce::PathStrokeType(1.0f));
                 }
@@ -111,7 +129,8 @@ void WaveformComponent::paint(juce::Graphics& g)
                     g.setColour(lineColorL.interpolatedWith(gradientColorOfLinesL, juce::jlimit(0.0f, 1.0f, targetRms)));
                     g.strokePath(pathL, juce::PathStrokeType(1.0f));
                 }
-            }else
+            }
+            else
             {
                 if ((currentMode == waveformLeft || currentMode == waveformLR || currentMode == waveformMerge || currentMode == waveformSeparate) && !pathL.isEmpty())
                 {
@@ -122,7 +141,6 @@ void WaveformComponent::paint(juce::Graphics& g)
 
                 if ((currentMode == waveformRight || currentMode == waveformMerge || currentMode == waveformSeparate) && !pathR.isEmpty())
                 {
-
                     g.setColour(lineColorR.interpolatedWith(gradientColorOfLinesR, juce::jlimit(0.0f, 1.0f, rmsR)));
                     g.strokePath(pathR, juce::PathStrokeType(1.0f));
                 }
@@ -158,8 +176,11 @@ void WaveformComponent::paint(juce::Graphics& g)
         lastBlocksFromEnd = currentBlocksFromEnd;
 
         auto addPeakToPath = [&](juce::Path& p, float minVal, float maxVal, float anchorY, float scale) {
-            float yTop = anchorY - (maxVal * scale);
-            float yBottom = anchorY - (minVal * scale);
+            float gainedMax = juce::jlimit(-1.0f, 1.0f, maxVal * gain);
+            float gainedMin = juce::jlimit(-1.0f, 1.0f, minVal * gain);
+
+            float yTop = anchorY - (gainedMax * scale);
+            float yBottom = anchorY - (gainedMin * scale);
             if (std::abs(yTop - yBottom) < 1.0f) { yTop -= 0.5f; yBottom += 0.5f; }
 
             if (isFirstPointInPath) p.startNewSubPath(x, yTop);
@@ -186,13 +207,13 @@ void WaveformComponent::paint(juce::Graphics& g)
         }
 
         case waveformMerge:
-                addPeakToPath(pathL, peakL.min, peakL.max, midY_Full, scale_Full);
-                addPeakToPath(pathR, peakR.min, peakR.max, midY_Full, scale_Full);
+            addPeakToPath(pathL, peakL.min, peakL.max, midY_Full, scale_Full);
+            addPeakToPath(pathR, peakR.min, peakR.max, midY_Full, scale_Full);
             break;
 
         case waveformSeparate:
-                addPeakToPath(pathL, peakL.min, peakL.max, midY_Top, scale_Half);
-                addPeakToPath(pathR, peakR.min, peakR.max, midY_Bottom, scale_Half);
+            addPeakToPath(pathL, peakL.min, peakL.max, midY_Top, scale_Half);
+            addPeakToPath(pathR, peakR.min, peakR.max, midY_Bottom, scale_Half);
             break;
         }
 
@@ -244,7 +265,18 @@ void WaveformComponent::mouseExit(const juce::MouseEvent&)
 
 void WaveformComponent::sliderValueChanged(juce::Slider* slider)
 {
-    this->setTimeInterval(slider->getValue());
+    if (slider == &componentHeader.knob)
+    {
+        currentWindow = slider->getValue();
+        waveformReferenceLine.setTimeWindow(currentWindow);
+        repaint();
+    }
+    else if (slider == &componentHeader.knobTwo)
+    {
+        gain = std::pow(10.0f, slider->getValue() / 20.0f);
+        waveformReferenceLine.setGainDb(slider->getValue());
+        repaint();
+    }
 }
 
 void WaveformComponent::setWaveformMode(WaveformMode mode)

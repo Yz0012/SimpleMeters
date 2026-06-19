@@ -9,6 +9,7 @@ public:
     {
         setOpaque(false);
         setInterceptsMouseClicks(false, false);
+        setBufferedToImage(true);
     }
 
     void paint(juce::Graphics& g) override

@@ -8,6 +8,7 @@ public:
     {
         setOpaque(false);
         setInterceptsMouseClicks(false, false);
+        setBufferedToImage(true);
     }
 
     ~ChartReferenceLine() override = default;

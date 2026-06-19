@@ -54,9 +54,11 @@ private:
     juce::Colour lineColorR = juce::Colours::blueviolet;
     juce::Colour gradientColorOfLinesR = juce::Colours::white;
 
-    WaveformMode currentMode = waveformMerge;
+    WaveformMode currentMode = waveformLeft;
 
     float currentWindow = 0.5f;
+
+    float gain = 1.0f;
 
     int64_t totalBlocksReceived = 0;
 

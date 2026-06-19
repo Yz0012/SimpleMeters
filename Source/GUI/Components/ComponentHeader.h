@@ -22,6 +22,7 @@ public:
 	HeaderFixedButton headerFixedButton;
 	DrawLinesButton drawLinesButton;
 	juce::Slider knob{ juce::Slider::RotaryVerticalDrag, juce::Slider::TextBoxBelow };
+	juce::Slider knobTwo{ juce::Slider::RotaryVerticalDrag, juce::Slider::TextBoxBelow };
 private:
 
 };
