@@ -8,10 +8,12 @@
 #include "ChartReferenceLine.h"
 #include "../../IntermediateDataLayer/AudioLayerManager.h"
 
-enum WaveformAnalysisMode
+enum WaveformChartMode
 {
-    Autoalign,
-    Normal
+    waveformChartLeft,
+    waveformChartRight,
+    waveformChartLR,
+    waveformChartMerge
 };
 
 class WaveformChartComponent : public juce::Component, private juce::ValueTree::Listener
@@ -29,8 +31,7 @@ public:
 
     void clear();
 
-    void pushStereoBuffer(const juce::AudioBuffer<float>* localAudioBuffer, const float localAudioBufferRMS);
-    int WaveformChartComponent::findStartNumByRisingEdge(const juce::AudioBuffer<float>& buffer, int channel);
+    int findTriggerOffset(const std::vector<TruePeak<float>::Peak>* buffer, int& firstPointIndex, int peaksPerBlock, int limitedPeaks, int targetPeriods);
 
     const std::vector<float> dbValues = {
     -6.f, -12.f
@@ -48,22 +49,25 @@ public:
     Callback cb = nullptr;
 
 private:
-    std::shared_ptr<FftDataLayer<float>> fftLayer;
     std::shared_ptr<RMSDataLayer<float>> rmsDataLayer;
     std::shared_ptr<TruePeak<float>> truePeak;
 
     int startNum = 0;
-    int scopeNum = 0;
     int endNum = 0;
-    float smoothStartNum = 0.0f;
 
-    WaveformAnalysisMode currentMode = Autoalign;
+    int totalReadSamples = 2000;
+    int totalChannels = 2;
+
+    float currentWindow = 0.064f;
+
+    bool exchange = false;
+    bool trigger = true;
+
+    static constexpr float SINGLE_BLOCK_DURATION = 0.021333333f;
+
+    WaveformChartMode currentMode = waveformChartLeft;
 
     juce::ValueTree waveformChartCat;
-
-    const juce::AudioBuffer<float>* localAudioBuffer = nullptr;
-    //消除拷贝
-    float localAudioBufferRMS;
 
     juce::Colour lineColorL = juce::Colours::blueviolet;
     juce::Colour fillColorL = juce::Colours::blueviolet;

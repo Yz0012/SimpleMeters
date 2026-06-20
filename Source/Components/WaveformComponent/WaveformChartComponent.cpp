@@ -1,7 +1,7 @@
 
 #include "WaveformChartComponent.h"
 
-WaveformChartComponent::WaveformChartComponent() : fftLayer(AudioLayerManager<float>::getInstance().getFftDataLayer()), rmsDataLayer(AudioLayerManager<float>::getInstance().getRMSDataLayer()), truePeak(AudioLayerManager<float>::getInstance().getTruePeak())
+WaveformChartComponent::WaveformChartComponent() : rmsDataLayer(AudioLayerManager<float>::getInstance().getRMSDataLayer()), truePeak(AudioLayerManager<float>::getInstance().getTruePeak())
 {
     CreateColoursConfiguration& createColoursConfiguration = CreateColoursConfiguration::getInstance();
 
@@ -25,149 +25,256 @@ WaveformChartComponent::WaveformChartComponent() : fftLayer(AudioLayerManager<fl
 	addAndMakeVisible(&chartReferenceLine);
 
 	waveformChartCat.addListener(this);
+
+    this->totalReadSamples = truePeak->getPeaksPerBlockHyper() * 5;
 }
 
 WaveformChartComponent::~WaveformChartComponent()
 {
     waveformChartCat.removeListener(this);
-    fftLayer->setOnFftReadyCallback(nullptr);
 }
 
 void WaveformChartComponent::clear()
 {
-    DBG("waveformchart buffer clear.");
+    DBG("waveformchart buffer clear?");
 }
 
-void WaveformChartComponent::pushStereoBuffer(const juce::AudioBuffer<float>* localAudioBuffer,const float localAudioBufferRMS)
+int WaveformChartComponent::findTriggerOffset(const std::vector<TruePeak<float>::Peak>* buffer, int& firstPointIndex, int peaksPerBlock, int limitedPeaks, int targetPeriods)
 {
-    this->localAudioBuffer = localAudioBuffer;
-    this->localAudioBufferRMS = localAudioBufferRMS;
-}
+    if (totalReadSamples < 2 || buffer == nullptr) return 0;
 
-int WaveformChartComponent::findStartNumByRisingEdge(const juce::AudioBuffer<float>& buffer, int channel)
-{
-    const int numSamples = buffer.getNumSamples();
-    const float* data = buffer.getReadPointer(channel);
+    int risingEdgesFound = 0;
+    int lastEdgeIndex = -1000;
+    firstPointIndex = 0;
+    bool isFirstPoint = true;
 
-    int bestTriggerIndex = 0;
-    float maxSlope = 0.0f;
+    double audioFs = 44100.0;
+    double peakFs = audioFs * (static_cast<double>(peaksPerBlock) / 1024.0);
+    double cutoffHz = 100.0;
 
-    for (int i = 1; i < numSamples; ++i)
+    double ff = std::tan(juce::MathConstants<double>::pi * cutoffHz / peakFs);
+    double sqrt2 = std::sqrt(2.0);
+    double norm = 1.0 / (1.0 + sqrt2 * ff + ff * ff);
+
+    float b0 = static_cast<float>(ff * ff * norm);
+    float b1 = static_cast<float>(2.0 * b0);
+    float b2 = static_cast<float>(b0);
+    float a1 = static_cast<float>(2.0 * (ff * ff - 1.0) * norm);
+    float a2 = static_cast<float>((1.0 - sqrt2 * ff + ff * ff) * norm);
+
+    TruePeak<float>::Peak latestPeak = truePeak->getPeakFromEnd(*buffer, peaksPerBlock, 0, peaksPerBlock - 1);
+    float initialMid = (latestPeak.min + latestPeak.max) * 0.5f;
+
+    float x1 = initialMid, x2 = initialMid;
+    float y1 = initialMid, y2 = initialMid;
+    float smoothedPrevMid = initialMid;
+
+    for (int i = 1; i < totalReadSamples; ++i)
     {
-        if (data[i - 1] < 0.0f && data[i] >= 0.0f)
-        {
-            float currentSlope = data[i] - data[i - 1];
+        int blocksFromEnd = i / peaksPerBlock;
+        int peakIdx = (peaksPerBlock - 1) - (i % peaksPerBlock);
 
-            if (currentSlope > maxSlope)
+        TruePeak<float>::Peak currentPeak = truePeak->getPeakFromEnd(*buffer, peaksPerBlock, blocksFromEnd, peakIdx);
+        float currentMid = (currentPeak.min + currentPeak.max) * 0.5f;
+
+        float smoothedMid = (b0 * currentMid) + (b1 * x1) + (b2 * x2) - (a1 * y1) - (a2 * y2);
+
+        x2 = x1;
+        x1 = currentMid;
+        y2 = y1;
+        y1 = smoothedMid;
+
+        if (smoothedMid <= 0.0f && smoothedPrevMid > 0.0f)
+        {
+            if (i - lastEdgeIndex > 100)
             {
-                maxSlope = currentSlope;
-                bestTriggerIndex = i;
+                if (isFirstPoint)
+                {
+                    firstPointIndex = i;
+                    isFirstPoint = false;
+                }
+
+                risingEdgesFound++;
+                lastEdgeIndex = i;
+
+                if (risingEdgesFound == targetPeriods)
+                {
+                    int periodLength = i - firstPointIndex;
+                    if (periodLength < limitedPeaks) return limitedPeaks;
+                    return periodLength;
+                }
             }
         }
+
+        smoothedPrevMid = smoothedMid;
     }
 
-    return (maxSlope > 0.001f) ? bestTriggerIndex : 0;
+    return limitedPeaks;
 }
 
 void WaveformChartComponent::paint(juce::Graphics& g)
 {
-    if (localAudioBuffer == nullptr) return;
-    if (fftLayer->getAbsoluteMaxPeak().midIndex <= 0) return;
-    const int numSamples = localAudioBuffer->getNumSamples();
-    if (numSamples == 0) return;
+    int totalBlocks = truePeak->getTotalBlocks();
+    if (totalBlocks == 0 || rmsDataLayer->getTotalBlocks() == 0) return;
 
-    const int width = drawArea.getWidth();
-    const int height = drawArea.getHeight();
-    if (width <= 0 || height <= 0)
-        return;
+    int peaksPerBlock = 400;
+    int lastBlocksFromEnd = -2;
+    bool isFirstPointInPath = true;
+    int firstPointIndex = 0;
 
-    const float midY = drawArea.getY() + height * 0.5f;
-    const float leftX = static_cast<float>(drawArea.getX());
+    const std::vector<TruePeak<float>::Peak>* activeBufferL = nullptr;
+    const std::vector<TruePeak<float>::Peak>* activeBufferR = nullptr;
 
-    if (currentMode == Autoalign)
+    activeBufferL = &truePeak->getHyperResPeaks();
+    activeBufferR = &truePeak->getHyperResPeaksR();
+    peaksPerBlock = truePeak->getPeaksPerBlockHyper();
+
+    float width = static_cast<float>(drawArea.getWidth());
+    float height = static_cast<float>(drawArea.getHeight());
+    float startX = static_cast<float>(drawArea.getX());
+    float baseY = static_cast<float>(drawArea.getY());
+    float absoluteRightX = startX + width - 1.0f;
+
+    float pixelsPerBlock = width * (SINGLE_BLOCK_DURATION / currentWindow);
+    float pixelsPerPeak = pixelsPerBlock / peaksPerBlock;
+
+    int maxPeaksToDraw = juce::roundToInt(width / pixelsPerPeak);
+    int totalAvailablePeaks = totalBlocks * peaksPerBlock;
+    int peaksToRender = juce::jmin(maxPeaksToDraw, totalAvailablePeaks);
+
+    if ((currentMode == waveformChartLeft || currentMode == waveformChartRight) && trigger)
     {
-        int scopeSize = fftLayer->scopeSize;
-        float freq = fftLayer->extractInterpolationFreq(fftLayer->getAbsoluteMaxPeak().lowIndex);
-        scopeNum = 48000 / (freq > 0 ? freq : 1);
-        if (scopeNum >= localAudioBuffer->getNumSamples()) scopeNum = localAudioBuffer->getNumSamples();
-        startNum = findStartNumByRisingEdge(*localAudioBuffer, 0);
-        if (startNum >= localAudioBuffer->getNumSamples()) startNum = 0;
-        if (scopeNum + startNum > 1024) scopeNum = localAudioBuffer->getNumSamples() - startNum;
+        const auto* triggerBuffer = (currentMode == waveformChartRight) ? activeBufferR : activeBufferL;
+        peaksToRender = findTriggerOffset(triggerBuffer, firstPointIndex, peaksPerBlock, peaksPerBlock, 3);
+        pixelsPerPeak = width / static_cast<float>(peaksToRender);
     }
-    else if (currentMode == Normal)
+    else
     {
-        startNum = 0;
-        endNum = localAudioBuffer->getNumSamples();
-        scopeNum = endNum - startNum;
+        maxPeaksToDraw = juce::roundToInt(width / pixelsPerPeak);
+        peaksToRender = juce::jmin(maxPeaksToDraw, totalAvailablePeaks);
+        firstPointIndex = 0;
     }
 
-    for (int i = 0; i < localAudioBuffer->getNumChannels(); i++)
-    {
-        juce::Path waveformPath;
-        juce::Path fillPath;
+    int estimatedPoints = peaksToRender * 2;
 
-        waveformPath.preallocateSpace(scopeNum);
-        fillPath.preallocateSpace(scopeNum + 2);
+    float midY_Full = baseY + (height / 2.0f);
+    float scale_Full = height / 2.0f;
 
-        std::vector<juce::Point<float>> points;
-        points.reserve(scopeNum);
-        bool firstPoint = true;
-        const float* readPtr = localAudioBuffer->getReadPointer(i);
-        for (int x = 0; x < scopeNum; ++x)
+    juce::Path waveformPath;
+    juce::Path waveformPathR;
+    juce::Path fillPath;
+
+    waveformPath.preallocateSpace(estimatedPoints);
+    waveformPathR.preallocateSpace(estimatedPoints);
+    fillPath.preallocateSpace(estimatedPoints + 2);
+
+    auto strokeCurrentPaths = [&]()
         {
+            if (lastBlocksFromEnd < 0) return;
 
-            float y = midY - (readPtr[startNum + x] * (height * 0.5f));
-            float screenX = leftX + ((float)x * width) / scopeNum;
+            float rmsL = rmsDataLayer->getRmsLFromEnd(lastBlocksFromEnd);
+            float rmsR = rmsDataLayer->getRmsRFromEnd(lastBlocksFromEnd);
+            float rmsLR = (rmsL + rmsR) / 2.0f;
 
-            if (firstPoint)
+            if (exchange)
             {
-                waveformPath.startNewSubPath(screenX, y);
-                firstPoint = false;
-                points.emplace_back(screenX, y);
+                if ((currentMode == waveformChartRight || currentMode == waveformChartMerge) && !waveformPathR.isEmpty())
+                {
+                    g.setColour(lineColorR.interpolatedWith(gradientColorOfLinesR, juce::jlimit(0.0f, 1.0f, rmsR)));
+                    g.strokePath(waveformPathR, juce::PathStrokeType(1.0f));
+                }
+
+                if ((currentMode == waveformChartLeft || currentMode == waveformChartLR || currentMode == waveformChartMerge) && !waveformPath.isEmpty())
+                {
+                    float targetRms = (currentMode == waveformChartLR) ? rmsLR : rmsL;
+                    g.setColour(lineColorL.interpolatedWith(gradientColorOfLinesL, juce::jlimit(0.0f, 1.0f, targetRms)));
+                    g.strokePath(waveformPath, juce::PathStrokeType(1.0f));
+                }
             }
             else
             {
-                waveformPath.lineTo(screenX, y);
-                points.emplace_back(screenX, y);
+                if ((currentMode == waveformChartLeft || currentMode == waveformChartLR || currentMode == waveformChartMerge) && !waveformPath.isEmpty())
+                {
+                    float targetRms = (currentMode == waveformChartLR) ? rmsLR : rmsL;
+                    g.setColour(lineColorL.interpolatedWith(gradientColorOfLinesL, juce::jlimit(0.0f, 1.0f, targetRms)));
+                    g.strokePath(waveformPath, juce::PathStrokeType(1.0f));
+                }
+
+                if ((currentMode == waveformChartRight || currentMode == waveformChartMerge) && !waveformPathR.isEmpty())
+                {
+                    g.setColour(lineColorR.interpolatedWith(gradientColorOfLinesR, juce::jlimit(0.0f, 1.0f, rmsR)));
+                    g.strokePath(waveformPathR, juce::PathStrokeType(1.0f));
+                }
             }
-        }
-        if (i)
+        };
+
+    int renderIndex = 0;
+
+    int endIndex = juce::jmin(firstPointIndex + peaksToRender, totalReadSamples);
+
+    for (int x = firstPointIndex; x < endIndex; ++x)
+    {
+        float i = absoluteRightX - (renderIndex * pixelsPerPeak);
+        if (i < startX - 10.0f) break;
+        ++renderIndex;
+
+        int currentBlocksFromEnd = x / peaksPerBlock;
+        int peakIdxInBlock = (peaksPerBlock - 1) - (x % peaksPerBlock);
+
+        if (currentBlocksFromEnd != lastBlocksFromEnd && lastBlocksFromEnd != -2)
         {
-            if (!points.empty())
-            {
-                fillPath.startNewSubPath(points[0]);
-                for (size_t i = 1; i < points.size(); ++i)
-                    fillPath.lineTo(points[i]);
-
-                fillPath.lineTo(points.back().x, midY);
-                fillPath.lineTo(leftX, midY);
-                fillPath.closeSubPath();
-
-                g.setColour(fillColorR.withAlpha(0.3f));
-                g.fillPath(fillPath);
-            }
-            g.setColour(lineColorR.interpolatedWith(gradientColorOfLinesR, localAudioBufferRMS));
-            g.strokePath(waveformPath, juce::PathStrokeType(2.0f));
+            strokeCurrentPaths();
+            waveformPath.clear();
+            waveformPathR.clear();
+            fillPath.clear();
+            isFirstPointInPath = true;
         }
-        else
+
+        lastBlocksFromEnd = currentBlocksFromEnd;
+
+        auto addPeakToPath = [&](juce::Path& p, float minVal, float maxVal, float anchorY, float scale) {
+            float gainedMax = juce::jlimit(-1.0f, 1.0f, maxVal);
+            float gainedMin = juce::jlimit(-1.0f, 1.0f, minVal);
+
+            float yTop = anchorY - (gainedMax * scale);
+            float yBottom = anchorY - (gainedMin * scale);
+            if (std::abs(yTop - yBottom) < 1.0f) { yTop -= 0.5f; yBottom += 0.5f; }
+
+            if (isFirstPointInPath) p.startNewSubPath(i, yTop);
+            else p.lineTo(i, yTop);
+            p.lineTo(i, yBottom);
+            };
+
+        TruePeak<float>::Peak peakL = truePeak->getPeakFromEnd(*activeBufferL, peaksPerBlock, currentBlocksFromEnd, peakIdxInBlock);
+        TruePeak<float>::Peak peakR = truePeak->getPeakFromEnd(*activeBufferR, peaksPerBlock, currentBlocksFromEnd, peakIdxInBlock);
+
+        switch (currentMode)
         {
-            if (!points.empty())
-            {
-                fillPath.startNewSubPath(points[0]);
-                for (size_t i = 1; i < points.size(); ++i)
-                    fillPath.lineTo(points[i]);
+        case waveformChartLeft:
+            addPeakToPath(waveformPath, peakL.min, peakL.max, midY_Full, scale_Full);
+            break;
 
-                fillPath.lineTo(points.back().x, midY);
-                fillPath.lineTo(leftX, midY);
-                fillPath.closeSubPath();
+        case waveformChartRight:
+            addPeakToPath(waveformPath, peakR.min, peakR.max, midY_Full, scale_Full);
+            break;
 
-                g.setColour(fillColorL.withAlpha(0.3f));
-                g.fillPath(fillPath);
-            }
-            g.setColour(lineColorL.interpolatedWith(gradientColorOfLinesL, localAudioBufferRMS));
-            g.strokePath(waveformPath, juce::PathStrokeType(2.0f));
+        case waveformChartLR:
+        {
+            float diffMax = (peakL.max - peakR.max) / 2.0f;
+            float diffMin = (peakL.min - peakR.min) / 2.0f;
+            addPeakToPath(waveformPath, diffMin, diffMax, midY_Full, scale_Full);
+            break;
         }
+
+        case waveformChartMerge:
+            addPeakToPath(waveformPath, peakL.min, peakL.max, midY_Full, scale_Full);
+            addPeakToPath(waveformPathR, peakR.min, peakR.max, midY_Full, scale_Full);
+            break;
+        }
+
+        isFirstPointInPath = false;
     }
+    strokeCurrentPaths();
 }
 
 void WaveformChartComponent::mouseDown(const juce::MouseEvent& event)

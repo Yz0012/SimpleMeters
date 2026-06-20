@@ -102,6 +102,12 @@ void WaveformComponent::paint(juce::Graphics& g)
 
     juce::Path pathL;
     juce::Path pathR;
+
+    int estimatedPoints = peaksToRender * 2;
+
+    pathL.preallocateSpace(estimatedPoints);
+    pathR.preallocateSpace(estimatedPoints);
+
     int lastBlocksFromEnd = -2;
     bool isFirstPointInPath = true;
 
@@ -162,9 +168,6 @@ void WaveformComponent::paint(juce::Graphics& g)
         int currentBlocksFromEnd = i / peaksPerBlock;
         int peakIdxInBlock = (peaksPerBlock - 1) - (i % peaksPerBlock);
 
-        TruePeak<float>::Peak peakL = truePeak->getPeakFromEnd(*activeBufferL, peaksPerBlock, currentBlocksFromEnd, peakIdxInBlock);
-        TruePeak<float>::Peak peakR = truePeak->getPeakFromEnd(*activeBufferR, peaksPerBlock, currentBlocksFromEnd, peakIdxInBlock);
-
         if (currentBlocksFromEnd != lastBlocksFromEnd && lastBlocksFromEnd != -2)
         {
             strokeCurrentPaths();
@@ -187,6 +190,9 @@ void WaveformComponent::paint(juce::Graphics& g)
             else p.lineTo(x, yTop);
             p.lineTo(x, yBottom);
             };
+
+        TruePeak<float>::Peak peakL = truePeak->getPeakFromEnd(*activeBufferL, peaksPerBlock, currentBlocksFromEnd, peakIdxInBlock);
+        TruePeak<float>::Peak peakR = truePeak->getPeakFromEnd(*activeBufferR, peaksPerBlock, currentBlocksFromEnd, peakIdxInBlock);
 
         switch (currentMode)
         {

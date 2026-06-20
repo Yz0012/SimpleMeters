@@ -863,9 +863,6 @@ void MainComponent::openWaveformChartComponent(int x, int y)
         chart->callbackId = pushSampleIntoJuceAudioBuffer.add(
             [this, chart]()
             {
-                chart->pushStereoBuffer(
-                    pushSampleIntoJuceAudioBuffer.getLocalAudioBufferReadPointer(),
-                    pushSampleIntoJuceAudioBuffer.getLocalAudioBufferRMS());
                 chart->repaint(chart->getLocalBounds());
             });
     }

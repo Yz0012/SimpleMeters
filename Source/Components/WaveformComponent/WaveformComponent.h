@@ -42,7 +42,7 @@ public:
     using Callback = std::function<void()>;
     Callback cb = nullptr;
 
-    juce::Rectangle<float> drawArea;
+    juce::Rectangle<int> drawArea;
 private:
     juce::ValueTree waveformCat;
     std::shared_ptr<RMSDataLayer<float>> rmsDataLayer;
