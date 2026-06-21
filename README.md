@@ -34,9 +34,9 @@ Features currently being developed or already completed include:
 - [ ] Adjustable waveform scroll speed
 - [ ] Optimize waveform ring buffer
 - [ ] Chart range selection
-- [ ] Chart range selection based on fundamental frequency
+- [x] Chart range selection based on fundamental frequency
 - [x] Waveform reference lines
-- [ ] Waveform L-R
+- [x] Waveform L-R
 - [ ] Stereo analysis mode
 - [ ] Stereo analysis graph rotation
 - [ ] Stereo analysis graph color change over time
