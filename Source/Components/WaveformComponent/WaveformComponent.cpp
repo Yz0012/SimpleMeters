@@ -26,6 +26,7 @@ WaveformComponent::WaveformComponent() : rmsDataLayer(AudioLayerManager<float>::
     waveformCat.addListener(this);
     componentHeader.knob.setDoubleClickReturnValue(true, 0.5f);
     componentHeader.knob.setRange(0.5f, 10.0f);
+    componentHeader.knob.setValue(2.0f);
     componentHeader.knob.setColour(juce::Slider::textBoxOutlineColourId, juce::Colour(0x00000000));
     componentHeader.knob.setColour(juce::Slider::textBoxBackgroundColourId, juce::Colour(0x00000000));
     componentHeader.knob.setColour(juce::Slider::textBoxTextColourId, juce::Colour(0xFFB7ED88));
@@ -34,6 +35,7 @@ WaveformComponent::WaveformComponent() : rmsDataLayer(AudioLayerManager<float>::
 
     componentHeader.knobTwo.setDoubleClickReturnValue(true, 0.0f);
     componentHeader.knobTwo.setRange(-10.0f, 10.0f);
+    componentHeader.knobTwo.setValue(0.0f);
     componentHeader.knobTwo.setColour(juce::Slider::textBoxOutlineColourId, juce::Colour(0x00000000));
     componentHeader.knobTwo.setColour(juce::Slider::textBoxBackgroundColourId, juce::Colour(0x00000000));
     componentHeader.knobTwo.setColour(juce::Slider::textBoxTextColourId, juce::Colour(0xFFB7ED88));

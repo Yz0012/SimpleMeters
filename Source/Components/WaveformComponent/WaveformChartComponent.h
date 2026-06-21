@@ -16,7 +16,7 @@ enum WaveformChartMode
     waveformChartMerge
 };
 
-class WaveformChartComponent : public juce::Component, private juce::ValueTree::Listener
+class WaveformChartComponent : public juce::Component, private juce::ValueTree::Listener, juce::Slider::Listener
 {
 public:
 	WaveformChartComponent();
@@ -28,8 +28,13 @@ public:
     void mouseExit(const juce::MouseEvent&) override;
 
     void valueTreePropertyChanged(juce::ValueTree& tree, const juce::Identifier& property) override;
+    void sliderValueChanged(juce::Slider* slider);
 
     void clear();
+    void setWaveformChartMode(WaveformChartMode);
+    void exchangeLRposition();
+    void reversePolarityFunction();
+    void openOrCloseTrigger();
 
     int findTriggerOffset(const std::vector<TruePeak<float>::Peak>* buffer, int& firstPointIndex, int peaksPerBlock, int limitedPeaks, int targetPeriods);
 
@@ -62,6 +67,9 @@ private:
 
     bool exchange = false;
     bool trigger = true;
+    float reversePolarity = 1.0f;
+    int pointNum = 3;
+    float gain = 1.0f;
 
     static constexpr float SINGLE_BLOCK_DURATION = 0.021333333f;
 

@@ -24,7 +24,26 @@ WaveformChartComponent::WaveformChartComponent() : rmsDataLayer(AudioLayerManage
 	addAndMakeVisible(&componentHeader);
 	addAndMakeVisible(&chartReferenceLine);
 
+    componentHeader.addAndMakeVisible(&componentHeader.knob);
+    componentHeader.addAndMakeVisible(&componentHeader.knobTwo);
+
 	waveformChartCat.addListener(this);
+    componentHeader.knob.setDoubleClickReturnValue(true, 3.0f);
+    componentHeader.knob.setRange(2.0f, 5.0f, 1.0f);
+    componentHeader.knob.setValue(3.0f);
+    componentHeader.knob.setColour(juce::Slider::textBoxOutlineColourId, juce::Colour(0x00000000));
+    componentHeader.knob.setColour(juce::Slider::textBoxBackgroundColourId, juce::Colour(0x00000000));
+    componentHeader.knob.setColour(juce::Slider::textBoxTextColourId, juce::Colour(0xFFB7ED88));
+    sliderValueChanged(&componentHeader.knob);
+    componentHeader.knob.addListener(this);
+
+    componentHeader.knobTwo.setDoubleClickReturnValue(true, 0.0f);
+    componentHeader.knobTwo.setRange(-10.0f, 10.0f);
+    componentHeader.knobTwo.setValue(0.0f);
+    componentHeader.knobTwo.setColour(juce::Slider::textBoxOutlineColourId, juce::Colour(0x00000000));
+    componentHeader.knobTwo.setColour(juce::Slider::textBoxBackgroundColourId, juce::Colour(0x00000000));
+    componentHeader.knobTwo.setColour(juce::Slider::textBoxTextColourId, juce::Colour(0xFFB7ED88));
+    componentHeader.knobTwo.addListener(this);
 
     this->totalReadSamples = truePeak->getPeaksPerBlockHyper() * 5;
 }
@@ -145,7 +164,7 @@ void WaveformChartComponent::paint(juce::Graphics& g)
     if ((currentMode == waveformChartLeft || currentMode == waveformChartRight) && trigger)
     {
         const auto* triggerBuffer = (currentMode == waveformChartRight) ? activeBufferR : activeBufferL;
-        peaksToRender = findTriggerOffset(triggerBuffer, firstPointIndex, peaksPerBlock, peaksPerBlock, 3);
+        peaksToRender = findTriggerOffset(triggerBuffer, firstPointIndex, peaksPerBlock, peaksPerBlock, pointNum);
         pixelsPerPeak = width / static_cast<float>(peaksToRender);
     }
     else
@@ -233,8 +252,8 @@ void WaveformChartComponent::paint(juce::Graphics& g)
         lastBlocksFromEnd = currentBlocksFromEnd;
 
         auto addPeakToPath = [&](juce::Path& p, float minVal, float maxVal, float anchorY, float scale) {
-            float gainedMax = juce::jlimit(-1.0f, 1.0f, maxVal);
-            float gainedMin = juce::jlimit(-1.0f, 1.0f, minVal);
+            float gainedMax = juce::jlimit(-1.0f, 1.0f, maxVal * gain * reversePolarity);
+            float gainedMin = juce::jlimit(-1.0f, 1.0f, minVal * gain * reversePolarity);
 
             float yTop = anchorY - (gainedMax * scale);
             float yBottom = anchorY - (gainedMin * scale);
@@ -255,7 +274,7 @@ void WaveformChartComponent::paint(juce::Graphics& g)
             break;
 
         case waveformChartRight:
-            addPeakToPath(waveformPath, peakR.min, peakR.max, midY_Full, scale_Full);
+            addPeakToPath(waveformPathR, peakR.min, peakR.max, midY_Full, scale_Full);
             break;
 
         case waveformChartLR:
@@ -301,6 +320,19 @@ void WaveformChartComponent::mouseExit(const juce::MouseEvent&)
     }
 }
 
+void WaveformChartComponent::sliderValueChanged(juce::Slider* slider)
+{
+    if (slider == &componentHeader.knob)
+    {
+        this->pointNum = slider->getValue();
+    }
+    else if (slider == &componentHeader.knobTwo)
+    {
+        gain = std::pow(10.0f, slider->getValue() / 20.0f);
+        this->gain = gain;
+    }
+}
+
 void WaveformChartComponent::valueTreePropertyChanged(juce::ValueTree& tree, const juce::Identifier& property)
 {
     if (property == juce::Identifier("hex"))
@@ -319,4 +351,27 @@ void WaveformChartComponent::valueTreePropertyChanged(juce::ValueTree& tree, con
             waveformChartCat.getChildWithProperty("name", "GradientColorOfLinesR").getProperty("hex").toString(), true));
         repaint();
     }
+}
+
+void WaveformChartComponent::exchangeLRposition()
+{
+    this->exchange = !exchange;
+}
+
+void WaveformChartComponent::setWaveformChartMode(WaveformChartMode mode)
+{
+    if (currentMode != mode)
+    {
+        currentMode = mode;
+    }
+}
+
+void WaveformChartComponent::reversePolarityFunction()
+{
+    this->reversePolarity = reversePolarity * -1.0f;
+}
+
+void WaveformChartComponent::openOrCloseTrigger()
+{
+    this->trigger = !trigger;
 }

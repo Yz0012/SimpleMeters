@@ -886,6 +886,17 @@ void MainComponent::openWaveformChartComponent(int x, int y)
             juce::PopupMenu menu;
             menu.addItem(1, "Position", true, false, juce::Drawable::createFromImageData(BinaryData::menuPosition_png, BinaryData::menuPosition_pngSize));
             menu.addItem(2, "ComponentSize", true, false, juce::Drawable::createFromImageData(BinaryData::menuComponentSize_png, BinaryData::menuComponentSize_pngSize));
+            menu.addItem(3, "exchangeLRposition", true, false);
+            menu.addItem(4, "reversePolarity", true, false);
+            menu.addItem(5, "open/closeTrigger", true, false);
+
+            juce::PopupMenu modeMenu;
+            modeMenu.addItem(6, "Left", true, false, juce::Drawable::createFromImageData(BinaryData::waveformL_png, BinaryData::waveformL_pngSize));
+            modeMenu.addItem(7, "Right", true, false, juce::Drawable::createFromImageData(BinaryData::waveformR_png, BinaryData::waveformR_pngSize));
+            modeMenu.addItem(8, "Side", true, false, juce::Drawable::createFromImageData(BinaryData::waveformLR_png, BinaryData::waveformLR_pngSize));
+            modeMenu.addItem(9, "Merge", true, false, juce::Drawable::createFromImageData(BinaryData::waveformMerge_png, BinaryData::waveformMerge_pngSize));
+            menu.addSubMenu("Mode", modeMenu);
+
             menu.showMenuAsync(
                 juce::PopupMenu::Options(),
                 [weakChart](int result)
@@ -960,6 +971,34 @@ void MainComponent::openWaveformChartComponent(int x, int y)
                                 }
                             ), true);
                         }
+                        else if (result == 3)
+                        {
+                            ch->exchangeLRposition();
+                        }
+                        else if (result == 4)
+                        {
+                            ch->reversePolarityFunction();
+                        }
+                        else if (result == 5)
+                        {
+                            ch->openOrCloseTrigger();
+                        }
+                        else if (result == 6)
+                        {
+                            ch->setWaveformChartMode(WaveformChartMode::waveformChartLeft);
+                        }
+                        else if (result == 7)
+                        {
+                            ch->setWaveformChartMode(WaveformChartMode::waveformChartRight);
+                        }
+                        else if (result == 8)
+                        {
+                            ch->setWaveformChartMode(WaveformChartMode::waveformChartLR);
+                        }
+                        else if (result == 9)
+                        {
+                            ch->setWaveformChartMode(WaveformChartMode::waveformChartMerge);
+                        }
                     }
                 });
         };
@@ -979,6 +1018,21 @@ void MainComponent::openWaveformChartComponent(int x, int y)
             {
                 sp->chartReferenceLine.setVisible(!sp->chartReferenceLine.isVisible());
             }
+        };
+    chart->componentHeader.knob.setBounds(130, 10, 90, 30);
+    chart->componentHeader.knob.setTextBoxStyle(juce::Slider::TextBoxRight, false, 60, 30);
+    chart->componentHeader.knob.setNumDecimalPlacesToDisplay(0);
+    chart->componentHeader.knobTwo.textFromValueFunction = [](double value)
+        {
+            return juce::String(value, 1);
+        };
+
+    chart->componentHeader.knobTwo.setBounds(230, 10, 90, 30);
+    chart->componentHeader.knobTwo.setTextBoxStyle(juce::Slider::TextBoxRight, false, 60, 30);
+    chart->componentHeader.knobTwo.setNumDecimalPlacesToDisplay(2);
+    chart->componentHeader.knobTwo.textFromValueFunction = [](double value)
+        {
+            return juce::String(value, 2) + " dB";
         };
 }
 
