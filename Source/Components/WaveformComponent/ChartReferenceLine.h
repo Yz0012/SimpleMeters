@@ -13,6 +13,15 @@ public:
 
     ~ChartReferenceLine() override = default;
 
+    void setGainDb(float newGainDb)
+    {
+        if (currentGainDb != newGainDb)
+        {
+            currentGainDb = newGainDb;
+            repaint();
+        }
+    }
+
     void paint(juce::Graphics& g) override
     {
         const float marginLeft = 45.0f;
@@ -36,30 +45,33 @@ public:
         g.setColour(juce::Colour(0xFFB7ED88));
         g.drawText("-inf", bounds.getX(), centerY - 6.0f, marginLeft - 5.0f, 12.0f, juce::Justification::centredRight, false);
 
-        const float dbValues[] = { 0.0f, -3.0f };
+        auto drawDbTick = [&](float tickDb, const juce::String& text, bool isCenter = false)
+            {
+                float amplitude = std::pow(10.0f, (tickDb + currentGainDb) / 20.0f);
+                float yTop = centerY - amplitude * halfHeight;
+                float yBottom = centerY + amplitude * halfHeight;
 
-        for (float db : dbValues)
-        {
-            float amplitude = std::pow(10.0f, db / 20.0f);
-            float yTop = centerY - (amplitude * halfHeight);
-            float yBottom = centerY + (amplitude * halfHeight);
-            if (db == 0.0f)
-            {
-                g.setColour(juce::Colour(0xFFFF32D6));
-                g.drawLine(plotArea.getX(), yBottom, plotArea.getRight(), yBottom);
-            }
-            else
-            {
-                juce::String dbStr = juce::String(db, 0) + " dB";
+                if (yTop < 0.0f || yBottom > plotArea.getBottom()) return;
+                if (std::abs(yTop - centerY) < 12.0f) return;
+
+                juce::String dbStr = juce::String(tickDb, 0) + " dB";
                 g.setColour(juce::Colour(0xFFB7ED88));
-                g.drawText(dbStr, bounds.getX(), yTop - 6.0f, marginLeft - 5.0f, 12.0f, juce::Justification::centredRight, false);
-                g.drawText(dbStr, bounds.getX(), yBottom - 6.0f, marginLeft - 5.0f, 12.0f, juce::Justification::centredRight, false);
+                g.drawText(dbStr, bounds.getX(), yTop - 6.0f, marginLeft - 5.0f, 12.0f,
+                    juce::Justification::centredRight, false);
+                g.drawText(dbStr, bounds.getX(), yBottom - 6.0f, marginLeft - 5.0f, 12.0f,
+                    juce::Justification::centredRight, false);
 
                 g.setColour(juce::Colour(0xFF8400FF).withAlpha(0.6f));
-                g.drawDashedLine(juce::Line<float>(plotArea.getX(), yTop, plotArea.getRight(), yTop), dashLengths, 2, 1.0f);
-                g.drawDashedLine(juce::Line<float>(plotArea.getX(), yBottom, plotArea.getRight(), yBottom), dashLengths, 2, 1.0f);
-            }
-        }
+                g.drawDashedLine(juce::Line<float>(plotArea.getX(), yTop, plotArea.getRight(), yTop),
+                    dashLengths, 2, 1.0f);
+                g.drawDashedLine(juce::Line<float>(plotArea.getX(), yBottom, plotArea.getRight(), yBottom),
+                    dashLengths, 2, 1.0f);
+            };
+
+        drawDbTick(6.0f, "+6 dB");
+        drawDbTick(-3.0f, "-3 dB");
+        drawDbTick(-12.0f, "-12 dB");
+        drawDbTick(-24.0f, "-24 dB");
 
         g.setColour(juce::Colour(0xFFFF32D6));
         g.drawLine(plotArea.getX(), plotArea.getY(), plotArea.getX(), plotArea.getBottom());
@@ -69,4 +81,7 @@ public:
         g.setColour(juce::Colour(0xFFFF32D6));
         g.drawText("- R", bounds.getX(), (int)plotArea.getBottom() + 6, 50, 11, juce::Justification::centredTop, false);
     }
+
+private:
+    float currentGainDb = 0.0f;
 };

@@ -157,7 +157,7 @@ public:
     }
 
 private:
-    float timeWindowSeconds = 2.0f;
+    float timeWindowSeconds = 0.5f;
     float currentGainDb = 0.0f;
 
     uint16_t waveformMode;

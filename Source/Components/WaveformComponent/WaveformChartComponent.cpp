@@ -128,6 +128,8 @@ int WaveformChartComponent::findTriggerOffset(const std::vector<TruePeak<float>:
         smoothedPrevMid = smoothedMid;
     }
 
+    if (risingEdgesFound > 0)
+        return lastEdgeIndex - firstPointIndex;
     return limitedPeaks;
 }
 
@@ -329,7 +331,8 @@ void WaveformChartComponent::sliderValueChanged(juce::Slider* slider)
     else if (slider == &componentHeader.knobTwo)
     {
         gain = std::pow(10.0f, slider->getValue() / 20.0f);
-        this->gain = gain;
+        chartReferenceLine.setGainDb(slider->getValue());
+        repaint();
     }
 }
 
