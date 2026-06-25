@@ -5,7 +5,7 @@ WaveformComponent::WaveformComponent() : rmsDataLayer(AudioLayerManager<float>::
 
     CreateColoursConfiguration& createColoursConfiguration = CreateColoursConfiguration::getInstance();
 
-    waveformCat = createColoursConfiguration.currentColourTheme
+    waveformCat = createColoursConfiguration.getCurrentValueTree()
         .getChildWithProperty("name", "Waveform");
     lineColorL = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
         waveformCat.getChildWithProperty("name", "BoundaryLineL").getProperty("hex").toString(), true));

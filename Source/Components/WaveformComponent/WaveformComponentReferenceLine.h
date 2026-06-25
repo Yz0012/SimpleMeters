@@ -101,6 +101,7 @@ public:
             drawDbTick(0.0f, "0 dB");
             drawDbTick(-12.0f, "-12 dB");
             drawDbTick(-24.0f, "-24 dB");
+            drawDbTick(-48.0f, "-48 db");
             drawDbTick(-100.0f, "-inf", true);
         }
 

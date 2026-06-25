@@ -5,7 +5,7 @@ WaveformChartComponent::WaveformChartComponent() : rmsDataLayer(AudioLayerManage
 {
     CreateColoursConfiguration& createColoursConfiguration = CreateColoursConfiguration::getInstance();
 
-    waveformChartCat = createColoursConfiguration.currentColourTheme
+    waveformChartCat = createColoursConfiguration.getCurrentValueTree()
         .getChildWithProperty("name", "WaveformChart");
     lineColorL = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
         waveformChartCat.getChildWithProperty("name", "BoundaryLineL").getProperty("hex").toString(), true));

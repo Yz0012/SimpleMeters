@@ -5,7 +5,7 @@ SpectrumAnalyserMono::SpectrumAnalyserMono() : fftLayer(AudioLayerManager<float>
 {
     CreateColoursConfiguration& createColoursConfiguration = CreateColoursConfiguration::getInstance();
 
-    spectrumCat = createColoursConfiguration.currentColourTheme
+    spectrumCat = createColoursConfiguration.getCurrentValueTree()
         .getChildWithProperty("name", "SpectrumAnalyzerMono");
     lineColor = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
         spectrumCat.getChildWithProperty("name", "BoundaryLine").getProperty("hex").toString(), false));

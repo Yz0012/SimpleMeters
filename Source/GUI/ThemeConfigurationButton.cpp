@@ -18,7 +18,7 @@ void ThemeConfigurationButton::mouseDown(const juce::MouseEvent& event)
 {
     CreateColoursConfiguration& createColoursConfiguration = CreateColoursConfiguration::getInstance();
 
-    juce::ValueTree mainCategory = createColoursConfiguration.currentColourTheme
+    juce::ValueTree mainCategory = createColoursConfiguration.getCurrentValueTree()
         .getChildWithProperty("name", "MainComponent");
 
     if (!mainCategory.isValid())

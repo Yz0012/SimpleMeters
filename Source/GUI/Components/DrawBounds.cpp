@@ -3,7 +3,7 @@
 
 DrawBounds::DrawBounds()
 {
-	auto drawBoundsCat = CreateColoursConfiguration::getInstance().currentColourTheme
+	auto drawBoundsCat = CreateColoursConfiguration::getInstance().getCurrentValueTree()
 		.getChildWithProperty("name", "ComponentBounds");
 	boundsColour = juce::Colour(CreateColoursConfiguration::getInstance().colourHexToARGBInt(
 		drawBoundsCat.getChildWithProperty("name", "ComponentBoundsColour").getProperty("hex").toString(), true));

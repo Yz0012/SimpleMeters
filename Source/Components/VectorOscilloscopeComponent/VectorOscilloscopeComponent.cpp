@@ -4,7 +4,7 @@ VectorOscilloscopes::VectorOscilloscopes()
 {
     CreateColoursConfiguration& createColoursConfiguration = CreateColoursConfiguration::getInstance();
 
-    vectorCat = createColoursConfiguration.currentColourTheme
+    vectorCat = createColoursConfiguration.getCurrentValueTree()
         .getChildWithProperty("name", "SpectrumAnalyzer");
     addAndMakeVisible(&drawBounds);
     addAndMakeVisible(&componentHeader);

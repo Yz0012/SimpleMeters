@@ -7,12 +7,18 @@ MainComponent::MainComponent()
     juce::LookAndFeel::setDefaultLookAndFeel(&lookAndFeel);
 
     CreateColoursConfiguration& createColoursConfiguration = CreateColoursConfiguration::getInstance();
+    StartUpConfiguration& startUpConfiguration = StartUpConfiguration::getInstance();
 
-    mainCategory = createColoursConfiguration.currentColourTheme
+    mainCategory = createColoursConfiguration.getCurrentValueTree()
         .getChildWithProperty("name", "MainComponent");
     mainComponentBackgroundColour = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
         mainCategory.getChildWithProperty("name", "Background").getProperty("hex").toString(), false));
     mainCategory.addListener(this);
+
+    config = startUpConfiguration.getCurrentValueTree();
+    startUpConfig = config.getChildWithProperty("name", "StartUpConfig");
+    componentPosition = config.getChildWithProperty("name", "Position");
+    startUpComponent();
 
     centreWithSize(800,400);
     addAndMakeVisible(header);
@@ -190,6 +196,10 @@ void MainComponent::mouseExit(const juce::MouseEvent&)
 void MainComponent::openSpectrumAnalyser(int x, int y)
 {
     auto spectrum = ComponentManagement::getInstance().getSpectrumAnalyser();
+    startUpConfig.setProperty("SpectrumAnalyser", "1", nullptr);
+    componentPosition.setProperty("SpectrumAnalyserX", x, nullptr);
+    componentPosition.setProperty("SpectrumAnalyserY", y, nullptr);
+    StartUpConfiguration::getInstance().saveConfig(config);
 
     if (!spectrum->callbackId)
     {
@@ -234,6 +244,7 @@ void MainComponent::openSpectrumAnalyser(int x, int y)
                 pushSampleIntoJuceAudioBuffer.removeS(sp->callbackIdS);
                 pushSampleIntoJuceAudioBuffer.removeM(sp->callbackIdM);
             }
+            startUpConfig.setProperty("SpectrumAnalyser", "0", nullptr);
             ComponentManagement::getInstance().resetSpectrumAnalyser();
         });
 
@@ -539,6 +550,9 @@ void MainComponent::openSpectrumAnalyserMono(int x, int y)
 void MainComponent::openWaveformComponent(int x, int y)
 {
     auto waveform = ComponentManagement::getInstance().getWaveformComponent();
+    startUpConfig.setProperty("WaveformComponent", "1", nullptr);
+    componentPosition.setProperty("WaveformComponentX", x, nullptr);
+    componentPosition.setProperty("WaveformComponentY", y, nullptr);
 
     if (!waveform->callbackId)
     {
@@ -561,6 +575,7 @@ void MainComponent::openWaveformComponent(int x, int y)
             {
                 pushSampleIntoJuceAudioBuffer.remove(wf->callbackId);
             }
+            startUpConfig.setProperty("WaveformComponent", "0", nullptr);
             ComponentManagement::getInstance().resetWaveformComponent();
         });
 
@@ -728,6 +743,9 @@ void MainComponent::openWaveformComponent(int x, int y)
 void MainComponent::openVectorOscilloscopeComponent(int x, int y)
 {
     auto vector = ComponentManagement::getInstance().getVectorOscilloscopes();
+    startUpConfig.setProperty("VectorOscilloscope", "1", nullptr);
+    componentPosition.setProperty("VectorOscilloscopeX", x, nullptr);
+    componentPosition.setProperty("VectorOscilloscopeY", y, nullptr);
 
     if (!vector->callbackId)
     {
@@ -751,6 +769,7 @@ void MainComponent::openVectorOscilloscopeComponent(int x, int y)
             {
                 pushSampleIntoJuceAudioBuffer.remove(vec->callbackId);
             }
+            startUpConfig.setProperty("VectorOscilloscope", "0", nullptr);
             ComponentManagement::getInstance().resetVectorOscilloscopes();
         });
 
@@ -856,10 +875,12 @@ void MainComponent::openVectorOscilloscopeComponent(int x, int y)
 void MainComponent::openWaveformChartComponent(int x, int y)
 {
     auto chart = ComponentManagement::getInstance().getWaveformChartComponent();
+    startUpConfig.setProperty("WaveformChartComponent", "1", nullptr);
+    componentPosition.setProperty("WaveformChartComponentX", x, nullptr);
+    componentPosition.setProperty("WaveformChartComponentY", y, nullptr);
 
     if (!chart->callbackId)
     {
-
         chart->callbackId = pushSampleIntoJuceAudioBuffer.add(
             [this, chart]()
             {
@@ -878,6 +899,7 @@ void MainComponent::openWaveformChartComponent(int x, int y)
             {
                 pushSampleIntoJuceAudioBuffer.remove(ch->callbackId);
             }
+            startUpConfig.setProperty("WaveformChartComponent", "0", nullptr);
             ComponentManagement::getInstance().resetWaveformChartComponent();
         });
 
@@ -1039,6 +1061,9 @@ void MainComponent::openWaveformChartComponent(int x, int y)
 void MainComponent::openRMSMeterComponent(int x, int y)
 {
 	auto rmsMeter = ComponentManagement::getInstance().getRMSMeterComponent();
+    startUpConfig.setProperty("RMSMeter", "1", nullptr);
+    componentPosition.setProperty("RMSMeterX", x, nullptr);
+    componentPosition.setProperty("RMSMeterY", y, nullptr);
 
     if (!rmsMeter->callbackId)
     {
@@ -1057,6 +1082,7 @@ void MainComponent::openRMSMeterComponent(int x, int y)
             {
                 pushSampleIntoJuceAudioBuffer.remove(rms->callbackId);
             }
+            startUpConfig.setProperty("RMSMeter", "0", nullptr);
             ComponentManagement::getInstance().resetRMSMeterComponent();
         });
 
@@ -1188,4 +1214,13 @@ void MainComponent::valueTreePropertyChanged(juce::ValueTree& tree, const juce::
             mainCategory.getChildWithProperty("name", "Background").getProperty("hex").toString(), false));
 		repaint();
     }
+}
+
+void MainComponent::startUpComponent()
+{
+    if ((int)startUpConfig.getProperty("SpectrumAnalyser")) openSpectrumAnalyser((int)componentPosition.getProperty("SpectrumAnalyserX"), (int)componentPosition.getProperty("SpectrumAnalyserY"));
+    if ((int)startUpConfig.getProperty("WaveformComponent")) openWaveformComponent((int)componentPosition.getProperty("WaveformComponentX"), (int)componentPosition.getProperty("WaveformComponentY"));
+    if ((int)startUpConfig.getProperty("VectorOscilloscope")) openVectorOscilloscopeComponent((int)componentPosition.getProperty("VectorOscilloscopeX"), (int)componentPosition.getProperty("VectorOscilloscopeY"));
+    if ((int)startUpConfig.getProperty("WaveformChartComponent")) openWaveformChartComponent((int)componentPosition.getProperty("WaveformChartComponentX"), (int)componentPosition.getProperty("WaveformChartComponentY"));
+    if ((int)startUpConfig.getProperty("RMSMeter")) openRMSMeterComponent((int)componentPosition.getProperty("RMSMeterX"), (int)componentPosition.getProperty("RMSMeterY"));
 }

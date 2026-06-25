@@ -72,6 +72,7 @@ public:
         drawDbTick(-3.0f, "-3 dB");
         drawDbTick(-12.0f, "-12 dB");
         drawDbTick(-24.0f, "-24 dB");
+        drawDbTick(-48.0f, "-48 db");
 
         g.setColour(juce::Colour(0xFFFF32D6));
         g.drawLine(plotArea.getX(), plotArea.getY(), plotArea.getX(), plotArea.getBottom());

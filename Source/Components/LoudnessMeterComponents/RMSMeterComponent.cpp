@@ -4,7 +4,7 @@ RMSMeterComponent::RMSMeterComponent()
 {
     CreateColoursConfiguration& createColoursConfiguration = CreateColoursConfiguration::getInstance();
 
-    rmsMeterCat = createColoursConfiguration.currentColourTheme
+    rmsMeterCat = createColoursConfiguration.getCurrentValueTree()
         .getChildWithProperty("name", "RMSMeterComponent");
     
     buttomColor = juce::Colour(createColoursConfiguration.colourHexToARGBInt(

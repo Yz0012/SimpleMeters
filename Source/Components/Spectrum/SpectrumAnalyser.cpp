@@ -5,7 +5,7 @@ SpectrumAnalyser::SpectrumAnalyser() : forwardFFT(fftOrder), window(fftSize, juc
 {
     CreateColoursConfiguration& createColoursConfiguration = CreateColoursConfiguration::getInstance();
 
-    spectrumCat = createColoursConfiguration.currentColourTheme
+    spectrumCat = createColoursConfiguration.getCurrentValueTree()
         .getChildWithProperty("name", "SpectrumAnalyzer");
     lineColor = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
         spectrumCat.getChildWithProperty("name", "BoundaryLine").getProperty("hex").toString(), false));

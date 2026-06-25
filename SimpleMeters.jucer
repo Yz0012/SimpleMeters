@@ -180,10 +180,10 @@
               resource="0" file="Source/CreateConfiguration/CreateColoursConfiguration.cpp"/>
         <FILE id="ihImCL" name="CreateColoursConfiguration.h" compile="0" resource="0"
               file="Source/CreateConfiguration/CreateColoursConfiguration.h"/>
-        <FILE id="aX1Tjz" name="CreateComponentsConfiguration.cpp" compile="1"
-              resource="0" file="Source/CreateConfiguration/CreateComponentsConfiguration.cpp"/>
-        <FILE id="wnclgp" name="CreateComponentsConfiguration.h" compile="0"
-              resource="0" file="Source/CreateConfiguration/CreateComponentsConfiguration.h"/>
+        <FILE id="pMnIS7" name="StartUpConfiguration.cpp" compile="1" resource="0"
+              file="Source/CreateConfiguration/StartUpConfiguration.cpp"/>
+        <FILE id="qjljab" name="StartUpConfiguration.h" compile="0" resource="0"
+              file="Source/CreateConfiguration/StartUpConfiguration.h"/>
       </GROUP>
       <GROUP id="{1158B803-6465-F95A-D409-A757FA613C41}" name="AudioSourceInterface">
         <FILE id="zQwILh" name="AudioSourceCreatorInterface.h" compile="0"

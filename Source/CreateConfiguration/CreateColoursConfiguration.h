@@ -13,12 +13,15 @@ public:
 	juce::File getConfigFile();
 	void saveConfig(const juce::ValueTree& tree);
 	juce::ValueTree loadConfig();
+    juce::ValueTree getCurrentValueTree();
 
 	static CreateColoursConfiguration& getInstance()
 	{
 		static CreateColoursConfiguration instance;
 		return instance;
 	}
+
+private:
 
     juce::ValueTree initColourTheme
     {
@@ -122,9 +125,7 @@ public:
     }
     };
 
-	juce::ValueTree currentColourTheme;
-
-private:
+    juce::ValueTree currentColourTheme;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(CreateColoursConfiguration)
 };

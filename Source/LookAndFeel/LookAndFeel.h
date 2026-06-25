@@ -12,21 +12,21 @@ public:
     {
         CreateColoursConfiguration& createColoursConfiguration = CreateColoursConfiguration::getInstance();
 
-        auto popupMenuCat = createColoursConfiguration.currentColourTheme
+        auto popupMenuCat = createColoursConfiguration.getCurrentValueTree()
             .getChildWithProperty("name", "PopupMenu");
         PopupMenuTextColour = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
             popupMenuCat.getChildWithProperty("name", "Text").getProperty("hex").toString(), true));
         PopupMenuBackgroundColour = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
             popupMenuCat.getChildWithProperty("name", "Background").getProperty("hex").toString(), true));
 
-        auto messageWindowCat = createColoursConfiguration.currentColourTheme
+        auto messageWindowCat = createColoursConfiguration.getCurrentValueTree()
             .getChildWithProperty("name", "MessageWindow");
         MessageWindowTextColour = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
             messageWindowCat.getChildWithProperty("name", "Text").getProperty("hex").toString(), true));
         MessageWindowBackgroundColour = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
             messageWindowCat.getChildWithProperty("name", "Background").getProperty("hex").toString(), true));
 
-        auto buttonCat = createColoursConfiguration.currentColourTheme
+        auto buttonCat = createColoursConfiguration.getCurrentValueTree()
             .getChildWithProperty("name", "Button");
         ButtonBackgroundColour = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
             buttonCat.getChildWithProperty("name", "Background").getProperty("hex").toString(), true));
@@ -37,7 +37,7 @@ public:
         ButtonHoverBackgroundColour = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
             buttonCat.getChildWithProperty("name", "HoverBackground").getProperty("hex").toString(), true));
 
-        auto textEditorCat = createColoursConfiguration.currentColourTheme
+        auto textEditorCat = createColoursConfiguration.getCurrentValueTree()
             .getChildWithProperty("name", "TextEditor");
         TextEditorBackgroundColour = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
             textEditorCat.getChildWithProperty("name", "Background").getProperty("hex").toString(), true));

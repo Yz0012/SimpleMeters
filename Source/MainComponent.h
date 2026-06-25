@@ -4,7 +4,7 @@
 
 #include "WASAPI/MiniAudioWASAPI.h"
 #include "CreateConfiguration/CreateColoursConfiguration.h"
-#include "CreateConfiguration/CreateComponentsConfiguration.h"
+#include "CreateConfiguration/StartUpConfiguration.h"
 #include "CreatePushSampleIntoJuceAudioBufferInstance.h"
 #include "Components/ComponentManagement.h"
 #include "LookAndFeel/LookAndFeel.h"   
@@ -38,9 +38,14 @@ public:
 	void stopAndCloseWASAPIDevice();
 	void stopWASAPIDevice();
 
+	void startUpComponent();
+
 	juce::ComponentDragger dragger;
 private:
 	juce::ValueTree mainCategory;
+	juce::ValueTree config;
+	juce::ValueTree startUpConfig;
+	juce::ValueTree componentPosition;
 
 	PushSampleIntoJuceAudioBuffer<float>& pushSampleIntoJuceAudioBuffer = CreatePushSampleIntoJuceAudioBufferInstance::getInstance();
 
@@ -55,5 +60,5 @@ private:
 	std::shared_ptr<MiniAudioWASAPI> miniAudioWASAPI;
 	std::weak_ptr<MiniAudioWASAPI> weakMiniAudioWASAPI;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
 };

@@ -55,6 +55,11 @@ juce::uint32 CreateColoursConfiguration::colourHexToARGBInt(const juce::String& 
     }
 }
 
+/*
+* @~chinese 获取默认文件夹下的配置文件
+*
+* @return File
+*/
 juce::File CreateColoursConfiguration::getConfigFile()
 {
     auto dir = juce::File::getSpecialLocation(juce::File::userApplicationDataDirectory)
@@ -63,6 +68,12 @@ juce::File CreateColoursConfiguration::getConfigFile()
     return dir.getChildFile("coloursconfig.xml");
 }
 
+/*
+* @~chinese 保存配置文件到默认文件夹
+*
+* @param[in] ValueTree
+* @return ValueTree
+*/
 void CreateColoursConfiguration::saveConfig(const juce::ValueTree& tree)
 {
     auto xml = tree.createXml();
@@ -70,6 +81,12 @@ void CreateColoursConfiguration::saveConfig(const juce::ValueTree& tree)
         xml->writeTo(getConfigFile());
 }
 
+/*
+* @~chinese 将读取到的配置文件转换为ValueTree类型，并返回该ValueTree，若配置损坏或不存在
+* 则返回默认配置的ValueTree
+*
+* @return ValueTree
+*/
 juce::ValueTree CreateColoursConfiguration::loadConfig()
 {
     juce::File file = getConfigFile();
@@ -82,4 +99,15 @@ juce::ValueTree CreateColoursConfiguration::loadConfig()
     }
 
     return initColourTheme;
+}
+
+/*
+* @~chinese 获取当前的ValueTree，如果当前的ValueTree未初始化，则返回默认ValueTree
+* 
+* @return ValueTree
+*/
+juce::ValueTree CreateColoursConfiguration::getCurrentValueTree()
+{
+    if (!currentColourTheme.isValid()) return initColourTheme;
+    return currentColourTheme;
 }
