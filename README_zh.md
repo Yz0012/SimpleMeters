@@ -2,7 +2,7 @@
 
 [English](README.md)
 
-<img width="2004" height="1341" alt="2026-06-05 232329" src="https://github.com/user-attachments/assets/2c7e00a5-56dc-46db-abbb-fa595d24be56" />
+<img width="2250" height="600" alt="屏幕截图 2026-06-27 233133" src="https://github.com/user-attachments/assets/99a1410b-e0a0-481d-8583-9e4b10785401" />
 
 SimpleMeters是一个Windows平台上的音频分析工具
 
@@ -12,8 +12,8 @@ SimpleMeters是一个Windows平台上的音频分析工具
 # 开发内容
 正在开发的部分和已经完成的部分内容有
 
-- [ ] 配置文件
-- [ ] 组件位置配置
+- [x] 配置文件
+- [x] 组件位置配置
 - [x] 组件大小配置
 - [ ] 组件内点击输入文字
 - [ ] 组件Hover效果
