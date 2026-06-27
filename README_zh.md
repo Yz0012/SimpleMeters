@@ -2,7 +2,7 @@
 
 [English](README.md)
 
-<img width="2250" height="600" alt="屏幕截图 2026-06-27 233133" src="https://github.com/user-attachments/assets/99a1410b-e0a0-481d-8583-9e4b10785401" />
+<img width="2250" height="600" alt="image" src="https://github.com/user-attachments/assets/dc3a871c-790e-4130-8032-5f0af7f90a15" />
 
 SimpleMeters是一个Windows平台上的音频分析工具
 
