@@ -81,6 +81,10 @@ private:
 
     juce::Colour lineColor = juce::Colour(0xFF8400FF);
     juce::Colour fillColor = juce::Colour(0xFF8400FF);
+    juce::Colour lineColorR = juce::Colour(0xFF8400FF);
+    juce::Colour fillColorR = juce::Colour(0xFF8400FF);
+    juce::Colour lineColorSide = juce::Colour(0xFF8400FF);
+    juce::Colour fillColorSide = juce::Colour(0xFF8400FF);
 
     juce::dsp::FFT forwardFFT;
     juce::dsp::WindowingFunction<float> window;

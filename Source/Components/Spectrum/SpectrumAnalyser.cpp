@@ -11,6 +11,15 @@ SpectrumAnalyser::SpectrumAnalyser() : forwardFFT(fftOrder), window(fftSize, juc
         spectrumCat.getChildWithProperty("name", "BoundaryLine").getProperty("hex").toString(), false));
     fillColor = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
         spectrumCat.getChildWithProperty("name", "Fill").getProperty("hex").toString(), false));
+    lineColorR = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
+        spectrumCat.getChildWithProperty("name", "BoundaryLineR").getProperty("hex").toString(), false));
+    fillColorR = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
+        spectrumCat.getChildWithProperty("name", "FillR").getProperty("hex").toString(), false));
+    lineColorSide = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
+        spectrumCat.getChildWithProperty("name", "BoundaryLineSide").getProperty("hex").toString(), false));
+    fillColorSide = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
+        spectrumCat.getChildWithProperty("name", "FillSide").getProperty("hex").toString(), false));
+
 
     for (int i = 0; i < scopeSize; ++i)
     {
@@ -180,19 +189,15 @@ void SpectrumAnalyser::drawFrame(juce::Graphics& g, juce::Rectangle<int> bounds)
     }
     else if (currentMode == LR)
     {
-        juce::Colour line2 = juce::Colours::orange;
-        juce::Colour fill2 = line2.withAlpha(0.3f);
         drawSingleCurve(g, bounds, scopeData2, scopeDataStorage2, destScope2,
-            line2, fill2);
+            lineColorR, fillColorR);
     }
     else if (currentMode == Stereo)
     {
         drawSingleCurve(g, bounds, scopeData, scopeDataStorage, destScope1,
             lineColor, fillColor);
-        juce::Colour line2 = juce::Colours::greenyellow;
-        juce::Colour fill2 = line2.withAlpha(0.3f);
         drawSingleCurve(g, bounds, scopeData2, scopeDataStorage2, destScope2,
-            line2, fill2);
+            lineColorSide, fillColorSide);
     }
 
 }

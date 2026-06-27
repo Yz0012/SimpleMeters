@@ -31,7 +31,11 @@ private:
             { "Category", {{ "name", "SpectrumAnalyzer" }},
                 {
                     { "Colour", {{ "name", "BoundaryLine"}, { "hex", "#0091FF" }}},
-                    { "Colour", {{ "name", "Fill"},        { "hex", "#0091FF" }}}
+                    { "Colour", {{ "name", "Fill"},        { "hex", "#0091FF" }}},
+                    { "Colour", {{ "name", "BoundaryLineR"}, { "hex", "#FF32D6" }}},
+                    { "Colour", {{ "name", "FillR"},        { "hex", "#FF32D6" }}},
+                    { "Colour", {{ "name", "BoundaryLineSide"}, { "hex", "#DEAC47" }}},
+                    { "Colour", {{ "name", "FillSide"},        { "hex", "#DEAC47" }}},
                 }
             },
 

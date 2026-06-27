@@ -18,9 +18,11 @@ MainComponent::MainComponent()
     config = startUpConfiguration.getCurrentValueTree();
     startUpConfig = config.getChildWithProperty("name", "StartUpConfig");
     componentPosition = config.getChildWithProperty("name", "Position");
+    componentSize = config.getChildWithProperty("name", "ComponentSize");
+    mainComponentSize = config.getChildWithProperty("name", "MainComponentSize");
     startUpComponent();
 
-    centreWithSize(800,400);
+    centreWithSize((int)mainComponentSize.getProperty("MainComponentWidth"), (int)mainComponentSize.getProperty("MainComponentHeight"));
     addAndMakeVisible(header);
     header.WASAPIButton.setBounds(20, 10, 30, 30);
     header.windowsSizeButton.setBounds(60, 10, 30, 30);
@@ -59,7 +61,11 @@ MainComponent::MainComponent()
                         int width = rawPtr->getTextEditorContents("Width").getIntValue();
                         int height = rawPtr->getTextEditorContents("Height").getIntValue();
                         if (width > 200 && height > 200)
+                        {
                             setSize(width, height);
+                            mainComponentSize.setProperty("MainComponentWidth", width, nullptr);
+                            mainComponentSize.setProperty("MainComponentHeight", height, nullptr);
+                        } 
                     }
                     delete rawPtr;
                 }
@@ -199,6 +205,8 @@ void MainComponent::openSpectrumAnalyser(int x, int y)
     startUpConfig.setProperty("SpectrumAnalyser", "1", nullptr);
     componentPosition.setProperty("SpectrumAnalyserX", x, nullptr);
     componentPosition.setProperty("SpectrumAnalyserY", y, nullptr);
+    int spectrumAnalyserWidth = componentSize.getProperty("SpectrumAnalyserWidth");
+    int spectrumAnalyserHeight = componentSize.getProperty("SpectrumAnalyserHeight");
     StartUpConfiguration::getInstance().saveConfig(config);
 
     if (!spectrum->callbackId)
@@ -232,8 +240,6 @@ void MainComponent::openSpectrumAnalyser(int x, int y)
     }
 
     addAndMakeVisible(spectrum.get());
-    spectrum->componentHeader.componentControl.setBounds(470, 20, 10, 10);
-    spectrum->drawBounds.setBounds(0,0,500,150);
 
     std::weak_ptr<SpectrumAnalyser> weakSpectrum = spectrum;
     spectrum->componentHeader.componentControl.setCallBackFuntion([this, weakSpectrum]()
@@ -248,7 +254,7 @@ void MainComponent::openSpectrumAnalyser(int x, int y)
             ComponentManagement::getInstance().resetSpectrumAnalyser();
         });
 
-    spectrum->cb = [weakSpectrum]()
+    spectrum->cb = [weakSpectrum, this]()
         {
             juce::PopupMenu menu;
 
@@ -265,7 +271,7 @@ void MainComponent::openSpectrumAnalyser(int x, int y)
 
             menu.showMenuAsync(
                 juce::PopupMenu::Options(),
-                [weakSpectrum](int result)
+                [weakSpectrum, this](int result)
                 {
                     if (auto sp = weakSpectrum.lock())
                     {
@@ -289,7 +295,7 @@ void MainComponent::openSpectrumAnalyser(int x, int y)
                             aw->addButton("Cancel", 0, juce::KeyPress(juce::KeyPress::escapeKey));
 
                             aw->enterModalState(true, juce::ModalCallbackFunction::create(
-                                [sp, aw](int result)
+                                [sp, aw, this](int result)
                                 {
                                     if (result == 1)
                                     {
@@ -297,6 +303,8 @@ void MainComponent::openSpectrumAnalyser(int x, int y)
                                         int&& Y = aw->getTextEditorContents("Y").getIntValue();
                                         if (X <= 0 || Y <= 0) return;
 										sp->setBounds(X, Y, sp->getWidth(), sp->getHeight());
+                                        componentSize.setProperty("SpectrumAnalyserWidth", sp->getWidth(), nullptr);
+                                        componentSize.setProperty("SpectrumAnalyserHeight", sp->getHeight(), nullptr);
                                     }
                                     delete aw;
                                 }
@@ -376,15 +384,17 @@ void MainComponent::openSpectrumAnalyser(int x, int y)
                 });
         };
 
-    spectrum->setBounds(x, y, 500, 150);
-    spectrum->drawArea.setBounds(50, 65, 435, 50);
-    spectrum->eqReferenceLines.setBounds(0, 50, 500, 100);
-    spectrum->componentHeader.setBounds(0, 0, 500, 50);
+    spectrum->setBounds(x, y, spectrumAnalyserWidth, spectrumAnalyserHeight);
+    spectrum->drawArea.setBounds(50, 65, spectrumAnalyserWidth - 65, spectrumAnalyserHeight - 100);
+    spectrum->eqReferenceLines.setBounds(0, 50, spectrumAnalyserWidth, spectrumAnalyserHeight - 50);
+    spectrum->componentHeader.setBounds(0, 0, spectrumAnalyserWidth, 50);
     spectrum->componentHeader.themeConfigButton.setBounds(10, 10, 30, 30);
     spectrum->componentHeader.themeConfigButton.setTooltip("Theme Configuration");
 	spectrum->componentHeader.headerFixedButton.setBounds(50, 10, 30, 30);
     spectrum->componentHeader.headerFixedButton.setTooltip("Fixed Header");
     spectrum->componentHeader.drawLinesButton.setBounds(90, 10, 30, 30);
+    spectrum->componentHeader.componentControl.setBounds(spectrumAnalyserWidth - 30, 20, 10, 10);
+    spectrum->drawBounds.setBounds(0, 0, spectrumAnalyserWidth, spectrumAnalyserHeight);
     spectrum->componentHeader.drawLinesButton.onClick = [weakSpectrum]()
         {
             if (auto sp = weakSpectrum.lock())
@@ -397,6 +407,11 @@ void MainComponent::openSpectrumAnalyser(int x, int y)
 void MainComponent::openSpectrumAnalyserMono(int x, int y)
 {
     auto spectrum = ComponentManagement::getInstance().getSpectrumAnalyserMono();
+    startUpConfig.setProperty("SpectrumAnalyserMono", "1", nullptr);
+    componentPosition.setProperty("SpectrumAnalyserMonoX", x, nullptr);
+    componentPosition.setProperty("SpectrumAnalyserMonoY", y, nullptr);
+    int spectrumAnalyserMonoWidth = componentSize.getProperty("SpectrumAnalyserMonoWidth");
+    int spectrumAnalyserMonoHeight = componentSize.getProperty("SpectrumAnalyserMonoHeight");
 
     if (!spectrum->callbackId)
     {
@@ -428,8 +443,6 @@ void MainComponent::openSpectrumAnalyserMono(int x, int y)
     }
 
     addAndMakeVisible(spectrum.get());
-    spectrum->componentHeader.componentControl.setBounds(470, 20, 10, 10);
-    spectrum->drawBounds.setBounds(0, 0, 500, 150);
 
     std::weak_ptr<SpectrumAnalyserMono> weakSpectrum = spectrum;
     spectrum->componentHeader.componentControl.setCallBackFuntion([this, weakSpectrum]()
@@ -440,10 +453,11 @@ void MainComponent::openSpectrumAnalyserMono(int x, int y)
                 pushSampleIntoJuceAudioBuffer.removeS(sp->callbackIdS);
                 pushSampleIntoJuceAudioBuffer.removeM(sp->callbackIdM);
             }
+            startUpConfig.setProperty("SpectrumAnalyserMono", "0", nullptr);
             ComponentManagement::getInstance().resetSpectrumAnalyserMono();
         });
 
-    spectrum->cb = [weakSpectrum]()
+    spectrum->cb = [weakSpectrum, this]()
         {
             juce::PopupMenu menu;
 
@@ -452,7 +466,7 @@ void MainComponent::openSpectrumAnalyserMono(int x, int y)
 
             menu.showMenuAsync(
                 juce::PopupMenu::Options(),
-                [weakSpectrum](int result)
+                [weakSpectrum, this](int result)
                 {
                     if (auto sp = weakSpectrum.lock())
                     {
@@ -476,7 +490,7 @@ void MainComponent::openSpectrumAnalyserMono(int x, int y)
                             aw->addButton("Cancel", 0, juce::KeyPress(juce::KeyPress::escapeKey));
 
                             aw->enterModalState(true, juce::ModalCallbackFunction::create(
-                                [sp, aw](int result)
+                                [sp, aw, this](int result)
                                 {
                                     if (result == 1)
                                     {
@@ -484,6 +498,8 @@ void MainComponent::openSpectrumAnalyserMono(int x, int y)
                                         int&& Y = aw->getTextEditorContents("Y").getIntValue();
                                         if (X <= 0 || Y <= 0) return;
                                         sp->setBounds(X, Y, sp->getWidth(), sp->getHeight());
+                                        componentSize.setProperty("SpectrumAnalyserMonoWidth", sp->getWidth(), nullptr);
+                                        componentSize.setProperty("SpectrumAnalyserMonoHeight", sp->getHeight(), nullptr);
                                     }
                                     delete aw;
                                 }
@@ -528,16 +544,18 @@ void MainComponent::openSpectrumAnalyserMono(int x, int y)
                 });
         };
 
-    spectrum->setBounds(x, y, 500, 150);
-    spectrum->drawArea.setBounds(50, 65, 435, 50);
-    spectrum->eqReferenceLines.setBounds(0, 50, 500, 100);
+    spectrum->setBounds(x, y, spectrumAnalyserMonoWidth, spectrumAnalyserMonoHeight);
+    spectrum->drawArea.setBounds(50, 65, spectrumAnalyserMonoWidth - 65, spectrumAnalyserMonoHeight - 100);
+    spectrum->eqReferenceLines.setBounds(0, 50, spectrumAnalyserMonoWidth, spectrumAnalyserMonoHeight - 50);
     spectrum->eqReferenceLines.informationText = "CurrentMode: Mono (L+R)";
-    spectrum->componentHeader.setBounds(0, 0, 500, 50);
+    spectrum->componentHeader.setBounds(0, 0, spectrumAnalyserMonoWidth, 50);
     spectrum->componentHeader.themeConfigButton.setBounds(10, 10, 30, 30);
     spectrum->componentHeader.themeConfigButton.setTooltip("Theme Configuration");
     spectrum->componentHeader.headerFixedButton.setBounds(50, 10, 30, 30);
     spectrum->componentHeader.headerFixedButton.setTooltip("Fixed Header");
     spectrum->componentHeader.drawLinesButton.setBounds(90, 10, 30, 30);
+    spectrum->componentHeader.componentControl.setBounds(spectrumAnalyserMonoWidth - 30, 20, 10, 10);
+    spectrum->drawBounds.setBounds(0, 0, spectrumAnalyserMonoWidth, spectrumAnalyserMonoHeight);
     spectrum->componentHeader.drawLinesButton.onClick = [weakSpectrum]()
         {
             if (auto sp = weakSpectrum.lock())
@@ -553,6 +571,8 @@ void MainComponent::openWaveformComponent(int x, int y)
     startUpConfig.setProperty("WaveformComponent", "1", nullptr);
     componentPosition.setProperty("WaveformComponentX", x, nullptr);
     componentPosition.setProperty("WaveformComponentY", y, nullptr);
+    int waveformComponentWidth = componentSize.getProperty("WaveformComponentWidth");
+    int waveformComponentHeight = componentSize.getProperty("WaveformComponentHeight");
 
     if (!waveform->callbackId)
     {
@@ -565,9 +585,6 @@ void MainComponent::openWaveformComponent(int x, int y)
 
     addAndMakeVisible(waveform.get());
 
-    waveform->componentHeader.componentControl.setBounds(470, 20, 10, 10);
-    waveform->drawBounds.setBounds(0, 0, 500, 150);
-
     std::weak_ptr<WaveformComponent> weakWaveform = waveform;
     waveform->componentHeader.componentControl.setCallBackFuntion([this, weakWaveform]()
         {
@@ -579,7 +596,7 @@ void MainComponent::openWaveformComponent(int x, int y)
             ComponentManagement::getInstance().resetWaveformComponent();
         });
 
-    waveform->cb = [weakWaveform]()
+    waveform->cb = [weakWaveform, this]()
         {
             juce::PopupMenu menu;
             menu.addItem(1, "Position", true, false, juce::Drawable::createFromImageData(BinaryData::menuPosition_png, BinaryData::menuPosition_pngSize));
@@ -596,7 +613,7 @@ void MainComponent::openWaveformComponent(int x, int y)
 
             menu.showMenuAsync(
                 juce::PopupMenu::Options(),
-                [weakWaveform](int result)
+                [weakWaveform, this](int result)
                 {
                     if (auto wf = weakWaveform.lock())
                     {
@@ -620,7 +637,7 @@ void MainComponent::openWaveformComponent(int x, int y)
                             aw->addButton("Cancel", 0, juce::KeyPress(juce::KeyPress::escapeKey));
 
                             aw->enterModalState(true, juce::ModalCallbackFunction::create(
-                                [wf, aw](int result)
+                                [wf, aw, this](int result)
                                 {
                                     if (result == 1)
                                     {
@@ -628,6 +645,8 @@ void MainComponent::openWaveformComponent(int x, int y)
                                         int&& Y = aw->getTextEditorContents("Y").getIntValue();
                                         if (X <= 0 || Y <= 0) return;
                                         wf->setBounds(X, Y, wf->getWidth(), wf->getHeight());
+                                        componentSize.setProperty("WaveformComponentWidth", wf->getWidth(), nullptr);
+                                        componentSize.setProperty("WaveformComponentHeight", wf->getHeight(), nullptr);
                                     }
                                     delete aw;
                                 }
@@ -706,16 +725,18 @@ void MainComponent::openWaveformComponent(int x, int y)
                 });
         };
 
-    waveform->setBounds(x, y, 500, 150);
-    waveform->drawArea.setBounds(50, 50, 450, 80);
-    waveform->waveformReferenceLine.setBounds(0, 50, 500, 100);
+    waveform->setBounds(x, y, waveformComponentWidth, waveformComponentHeight);
+    waveform->drawArea.setBounds(50, 50, waveformComponentWidth - 50, waveformComponentHeight - 70);
+    waveform->waveformReferenceLine.setBounds(0, 50, waveformComponentWidth, waveformComponentHeight - 50);
     waveform->waveformReferenceLine.setWaveformMode(4);
-    waveform->componentHeader.setBounds(0, 0, 500, 50);
+    waveform->componentHeader.setBounds(0, 0, waveformComponentWidth, 50);
     waveform->componentHeader.themeConfigButton.setBounds(10, 10, 30, 30);
     waveform->componentHeader.themeConfigButton.setTooltip("Theme Configuration");
     waveform->componentHeader.headerFixedButton.setBounds(50, 10, 30, 30);
     waveform->componentHeader.headerFixedButton.setTooltip("Fixed Header");
     waveform->componentHeader.drawLinesButton.setBounds(90, 10, 30, 30);
+    waveform->componentHeader.componentControl.setBounds(waveformComponentWidth - 30, 20, 10, 10);
+    waveform->drawBounds.setBounds(0, 0, waveformComponentWidth, waveformComponentHeight);
     waveform->componentHeader.drawLinesButton.onClick = [weakWaveform]()
         {
             if (auto sp = weakWaveform.lock())
@@ -746,6 +767,8 @@ void MainComponent::openVectorOscilloscopeComponent(int x, int y)
     startUpConfig.setProperty("VectorOscilloscope", "1", nullptr);
     componentPosition.setProperty("VectorOscilloscopeX", x, nullptr);
     componentPosition.setProperty("VectorOscilloscopeY", y, nullptr);
+    int vectorOscilloscopeWidth = componentSize.getProperty("VectorOscilloscopeWidth");
+    int vectorOscilloscopeHeight = componentSize.getProperty("VectorOscilloscopeHeight");
 
     if (!vector->callbackId)
     {
@@ -759,8 +782,6 @@ void MainComponent::openVectorOscilloscopeComponent(int x, int y)
     }
 
     addAndMakeVisible(vector.get());
-    vector->componentHeader.componentControl.setBounds(270, 20, 10, 10);
-    vector->drawBounds.setBounds(0, 0, 300, 300);
 
     std::weak_ptr<VectorOscilloscopes> weakVector = vector;
     vector->componentHeader.componentControl.setCallBackFuntion([this, weakVector]()
@@ -773,14 +794,14 @@ void MainComponent::openVectorOscilloscopeComponent(int x, int y)
             ComponentManagement::getInstance().resetVectorOscilloscopes();
         });
 
-    vector->cb = [weakVector]()
+    vector->cb = [weakVector, this]()
         {
             juce::PopupMenu menu;
             menu.addItem(1, "Position", true, false, juce::Drawable::createFromImageData(BinaryData::menuPosition_png, BinaryData::menuPosition_pngSize));
             menu.addItem(2, "ComponentSize", true, false, juce::Drawable::createFromImageData(BinaryData::menuComponentSize_png, BinaryData::menuComponentSize_pngSize));
             menu.showMenuAsync(
                 juce::PopupMenu::Options(),
-                [weakVector](int result)
+                [weakVector, this](int result)
                 {
                     if (auto vec = weakVector.lock())
                     {
@@ -804,7 +825,7 @@ void MainComponent::openVectorOscilloscopeComponent(int x, int y)
                             aw->addButton("Cancel", 0, juce::KeyPress(juce::KeyPress::escapeKey));
 
                             aw->enterModalState(true, juce::ModalCallbackFunction::create(
-                                [vec, aw](int result)
+                                [vec, aw, this](int result)
                                 {
                                     if (result == 1)
                                     {
@@ -812,6 +833,8 @@ void MainComponent::openVectorOscilloscopeComponent(int x, int y)
                                         int&& Y = aw->getTextEditorContents("Y").getIntValue();
                                         if (X <= 0 || Y <= 0) return;
                                         vec->setBounds(X, Y, vec->getWidth(), vec->getHeight());
+                                        componentSize.setProperty("VectorOscilloscopeWidth", vec->getWidth(), nullptr);
+                                        componentSize.setProperty("VectorOscilloscopeHeight", vec->getHeight(), nullptr);
                                     }
                                     delete aw;
                                 }
@@ -855,14 +878,16 @@ void MainComponent::openVectorOscilloscopeComponent(int x, int y)
                 });
         };
 
-    vector->setBounds(x, y, 300, 300);
-    vector->componentHeader.setBounds(0, 0, 300, 50);
-    vector->oscilloscopeReferenceLines.setBounds(0, 0, 300, 300);
+    vector->setBounds(x, y, vectorOscilloscopeWidth, vectorOscilloscopeHeight);
+    vector->componentHeader.setBounds(0, 0, vectorOscilloscopeWidth, 50);
+    vector->oscilloscopeReferenceLines.setBounds(0, 0, vectorOscilloscopeWidth, vectorOscilloscopeHeight);
     vector->componentHeader.themeConfigButton.setBounds(10, 10, 30, 30);
     vector->componentHeader.themeConfigButton.setTooltip("Theme Configuration");
     vector->componentHeader.headerFixedButton.setBounds(50, 10, 30, 30);
     vector->componentHeader.headerFixedButton.setTooltip("Fixed Header");
     vector->componentHeader.drawLinesButton.setBounds(90, 10, 30, 30);
+    vector->componentHeader.componentControl.setBounds(vectorOscilloscopeWidth - 30, 20, 10, 10);
+    vector->drawBounds.setBounds(0, 0, vectorOscilloscopeWidth, vectorOscilloscopeHeight);
     vector->componentHeader.drawLinesButton.onClick = [weakVector]()
         {
             if (auto sp = weakVector.lock())
@@ -878,6 +903,8 @@ void MainComponent::openWaveformChartComponent(int x, int y)
     startUpConfig.setProperty("WaveformChartComponent", "1", nullptr);
     componentPosition.setProperty("WaveformChartComponentX", x, nullptr);
     componentPosition.setProperty("WaveformChartComponentY", y, nullptr);
+    int waveformChartComponentWidth = componentSize.getProperty("WaveformChartComponentWidth");
+    int waveformChartComponentHeight = componentSize.getProperty("WaveformChartComponentHeight");
 
     if (!chart->callbackId)
     {
@@ -889,8 +916,6 @@ void MainComponent::openWaveformChartComponent(int x, int y)
     }
 
     addAndMakeVisible(chart.get());
-    chart->componentHeader.componentControl.setBounds(470, 20, 10, 10);
-    chart->drawBounds.setBounds(0, 0, 500, 150);
 
     std::weak_ptr<WaveformChartComponent> weakChart = chart;
     chart->componentHeader.componentControl.setCallBackFuntion([this, weakChart]()
@@ -903,7 +928,7 @@ void MainComponent::openWaveformChartComponent(int x, int y)
             ComponentManagement::getInstance().resetWaveformChartComponent();
         });
 
-    chart->cb = [weakChart]()
+    chart->cb = [weakChart, this]()
         {
             juce::PopupMenu menu;
             menu.addItem(1, "Position", true, false, juce::Drawable::createFromImageData(BinaryData::menuPosition_png, BinaryData::menuPosition_pngSize));
@@ -921,7 +946,7 @@ void MainComponent::openWaveformChartComponent(int x, int y)
 
             menu.showMenuAsync(
                 juce::PopupMenu::Options(),
-                [weakChart](int result)
+                [weakChart, this](int result)
                 {
                     if (auto ch = weakChart.lock())
                     {
@@ -945,7 +970,7 @@ void MainComponent::openWaveformChartComponent(int x, int y)
                             aw->addButton("Cancel", 0, juce::KeyPress(juce::KeyPress::escapeKey));
 
                             aw->enterModalState(true, juce::ModalCallbackFunction::create(
-                                [ch, aw](int result)
+                                [ch, aw, this](int result)
                                 {
                                     if (result == 1)
                                     {
@@ -953,6 +978,8 @@ void MainComponent::openWaveformChartComponent(int x, int y)
                                         int&& Y = aw->getTextEditorContents("Y").getIntValue();
                                         if (X <= 0 || Y <= 0) return;
                                         ch->setBounds(X, Y, ch->getWidth(), ch->getHeight());
+                                        componentSize.setProperty("WaveformChartComponentWidth", aw->getWidth(), nullptr);
+                                        componentSize.setProperty("WaveformChartComponentHeight", aw->getHeight(), nullptr);
                                     }
                                     delete aw;
                                 }
@@ -1025,15 +1052,17 @@ void MainComponent::openWaveformChartComponent(int x, int y)
                 });
         };
 
-    chart->setBounds(x, y, 500, 150);
-    chart->drawArea.setBounds(45, 50, 455, 80);
-    chart->chartReferenceLine.setBounds(0, 50, 500, 100);
-    chart->componentHeader.setBounds(0, 0, 500, 50);
+    chart->setBounds(x, y, waveformChartComponentWidth, waveformChartComponentHeight);
+    chart->drawArea.setBounds(45, 50, waveformChartComponentWidth - 45, waveformChartComponentHeight - 70);
+    chart->chartReferenceLine.setBounds(0, 50, waveformChartComponentWidth, waveformChartComponentHeight - 50);
+    chart->componentHeader.setBounds(0, 0, waveformChartComponentWidth, 50);
     chart->componentHeader.themeConfigButton.setBounds(10, 10, 30, 30);
     chart->componentHeader.themeConfigButton.setTooltip("Theme Configuration");
     chart->componentHeader.headerFixedButton.setBounds(50, 10, 30, 30);
     chart->componentHeader.headerFixedButton.setTooltip("Fixed Header");
     chart->componentHeader.drawLinesButton.setBounds(90, 10, 30, 30);
+    chart->componentHeader.componentControl.setBounds(waveformChartComponentWidth - 30, 20, 10, 10);
+    chart->drawBounds.setBounds(0, 0, waveformChartComponentWidth, waveformChartComponentHeight);
     chart->componentHeader.drawLinesButton.onClick = [weakChart]()
         {
             if (auto sp = weakChart.lock())
@@ -1064,6 +1093,8 @@ void MainComponent::openRMSMeterComponent(int x, int y)
     startUpConfig.setProperty("RMSMeter", "1", nullptr);
     componentPosition.setProperty("RMSMeterX", x, nullptr);
     componentPosition.setProperty("RMSMeterY", y, nullptr);
+    int rmsMeterComponentWidth = componentSize.getProperty("RMSMeterWidth");
+    int rmsMeterComponentHeight = componentSize.getProperty("RMSMeterHeight");
 
     if (!rmsMeter->callbackId)
     {
@@ -1075,7 +1106,6 @@ void MainComponent::openRMSMeterComponent(int x, int y)
     }
 
     std::weak_ptr<RMSMeterComponent> weakRMSMeter = rmsMeter;
-    rmsMeter->componentHeader.componentControl.setBounds(140, 20, 10, 10);
     rmsMeter->componentHeader.componentControl.setCallBackFuntion([this, weakRMSMeter]()
         {
             if (auto rms = weakRMSMeter.lock())
@@ -1086,14 +1116,14 @@ void MainComponent::openRMSMeterComponent(int x, int y)
             ComponentManagement::getInstance().resetRMSMeterComponent();
         });
 
-    rmsMeter->cb = [weakRMSMeter]()
+    rmsMeter->cb = [weakRMSMeter, this]()
         {
             juce::PopupMenu menu;
             menu.addItem(1, "Position", true, false, juce::Drawable::createFromImageData(BinaryData::menuPosition_png, BinaryData::menuPosition_pngSize));
             menu.addItem(2, "ComponentSize", true, false, juce::Drawable::createFromImageData(BinaryData::menuComponentSize_png, BinaryData::menuComponentSize_pngSize));
             menu.showMenuAsync(
                 juce::PopupMenu::Options(),
-                [weakRMSMeter](int result)
+                [weakRMSMeter, this](int result)
                 {
                     if (auto rms = weakRMSMeter.lock())
                     {
@@ -1117,7 +1147,7 @@ void MainComponent::openRMSMeterComponent(int x, int y)
                             aw->addButton("Cancel", 0, juce::KeyPress(juce::KeyPress::escapeKey));
 
                             aw->enterModalState(true, juce::ModalCallbackFunction::create(
-                                [rms, aw](int result)
+                                [rms, aw, this](int result)
                                 {
                                     if (result == 1)
                                     {
@@ -1125,6 +1155,8 @@ void MainComponent::openRMSMeterComponent(int x, int y)
                                         int&& Y = aw->getTextEditorContents("Y").getIntValue();
                                         if (X <= 0 || Y <= 0) return;
                                         rms->setBounds(X, Y, rms->getWidth(), rms->getHeight());
+                                        componentSize.setProperty("RMSMeterWidth", rms->getWidth(), nullptr);
+                                        componentSize.setProperty("RMSMeterHeight", rms->getHeight(), nullptr);
                                     }
                                     delete aw;
                                 }
@@ -1169,15 +1201,16 @@ void MainComponent::openRMSMeterComponent(int x, int y)
                 });
         };
     addAndMakeVisible(rmsMeter.get());
-    rmsMeter->setBounds(x, y, 150, 500);
-    rmsMeter->drawBounds.setBounds(0, 0, 150, 500);
-    rmsMeter->ticksComponent.setBounds(0, 0, 150, 500);
-    rmsMeter->componentHeader.setBounds(0, 0, 150, 50);
+    rmsMeter->setBounds(x, y, rmsMeterComponentWidth, rmsMeterComponentHeight);
+    rmsMeter->drawBounds.setBounds(0, 0, rmsMeterComponentWidth, rmsMeterComponentHeight);
+    rmsMeter->ticksComponent.setBounds(0, 0, rmsMeterComponentWidth, rmsMeterComponentHeight);
+    rmsMeter->componentHeader.setBounds(0, 0, rmsMeterComponentWidth, 50);
     rmsMeter->componentHeader.themeConfigButton.setBounds(10, 10, 30, 30);
     rmsMeter->componentHeader.themeConfigButton.setTooltip("Theme Configuration");
     rmsMeter->componentHeader.headerFixedButton.setBounds(50, 10, 30, 30);
     rmsMeter->componentHeader.headerFixedButton.setTooltip("Fixed Header");
     rmsMeter->componentHeader.drawLinesButton.setBounds(90, 10, 30, 30);
+    rmsMeter->componentHeader.componentControl.setBounds(rmsMeterComponentWidth - 10, 20, 10, 10);
     rmsMeter->componentHeader.drawLinesButton.onClick = [weakRMSMeter]()
         {
             if (auto rms = weakRMSMeter.lock())

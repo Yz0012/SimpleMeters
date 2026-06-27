@@ -46,6 +46,8 @@ private:
 	juce::ValueTree config;
 	juce::ValueTree startUpConfig;
 	juce::ValueTree componentPosition;
+	juce::ValueTree componentSize;
+	juce::ValueTree mainComponentSize;
 
 	PushSampleIntoJuceAudioBuffer<float>& pushSampleIntoJuceAudioBuffer = CreatePushSampleIntoJuceAudioBufferInstance::getInstance();
 
