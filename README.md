@@ -2,7 +2,7 @@
 
 [中文](README_zh.md)
 
-<img width="2004" height="1341" alt="2026-06-05 232329" src="https://github.com/user-attachments/assets/2c7e00a5-56dc-46db-abbb-fa595d24be56" />
+<img width="2250" height="600" alt="image" src="https://github.com/user-attachments/assets/dc3a871c-790e-4130-8032-5f0af7f90a15" />
 
 SimpleMeters is an audio analysis tool for the Windows platform.
 
@@ -13,9 +13,9 @@ SimpleMeters is an audio analysis tool for the Windows platform.
 
 Features currently being developed or already completed include:
 
-- [ ] Configuration file
-- [ ] Component position configuration
-- [ ] Component size configuration
+- [x] Configuration file
+- [x] Component position configuration
+- [x] Component size configuration
 - [ ] In-component text input on click
 - [ ] Component hover effect
 - [ ] Component pause functionality
