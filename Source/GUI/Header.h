@@ -9,6 +9,7 @@
 #include "HeaderFixedButton.h"
 #include "ThemeConfigurationButton.h"
 #include "PinOnTopButton.h"
+#include "SaveConfigButton.h"
 
 class Header : public juce::Component , public juce::SettableTooltipClient
 {
@@ -22,6 +23,7 @@ public:
 	HeaderFixedButton headerFixedButton;
 	ThemeConfigurationButton themeConfigurationButton;
 	PinOnTopButton pinOnTopButton;
+	SaveConfigButton saveConfigButton;
 
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Header);

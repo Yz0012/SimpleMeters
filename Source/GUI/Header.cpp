@@ -9,6 +9,7 @@ Header::Header()
 	addAndMakeVisible(&headerFixedButton);
 	addAndMakeVisible(&themeConfigurationButton);
 	addAndMakeVisible(&pinOnTopButton);
+	addAndMakeVisible(&saveConfigButton);
 }
 
 Header::~Header()

@@ -5,6 +5,7 @@ class ColourThemeEditor : public juce::Component
 {
 public:
     ColourThemeEditor(juce::ValueTree& categoryNode);
+    ~ColourThemeEditor();
     void applyChanges();
     int getRequiredHeight() const;
 
@@ -23,4 +24,6 @@ private:
     juce::OwnedArray<ColourRow> rows;
 
     void resized() override;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ColourThemeEditor);
 };

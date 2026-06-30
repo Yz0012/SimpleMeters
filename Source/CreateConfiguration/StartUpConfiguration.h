@@ -33,9 +33,9 @@ private:
 			{"Position", {
 				{ "name", "Position"},
 				{ "SpectrumAnalyserX", "50"},
-				{"SpectrumAnalyserY", "50"}
+				{ "SpectrumAnalyserY", "50"}
 			}, {} },
-			{ "ComponentSize",{
+			{"ComponentSize",{
 				{"name", "ComponentSize"},
 				{"SpectrumAnalyserWidth", "500"},
 				{"SpectrumAnalyserHeight", "300"},

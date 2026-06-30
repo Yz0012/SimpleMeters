@@ -14,6 +14,10 @@
       <FILE id="vRjiPQ" name="CreatePushSampleIntoJuceAudioBufferInstance.h"
             compile="0" resource="0" file="Source/CreatePushSampleIntoJuceAudioBufferInstance.h"/>
       <GROUP id="{CBAFAF3B-058A-6BB7-DDA1-0AB3F1C79541}" name="GUI">
+        <FILE id="shcENT" name="SaveConfigButton.cpp" compile="1" resource="0"
+              file="Source/GUI/SaveConfigButton.cpp"/>
+        <FILE id="re52Or" name="SaveConfigButton.h" compile="0" resource="0"
+              file="Source/GUI/SaveConfigButton.h"/>
         <FILE id="QipF6T" name="PinOnTopButton.cpp" compile="1" resource="0"
               file="Source/GUI/PinOnTopButton.cpp"/>
         <FILE id="ZDJvGt" name="PinOnTopButton.h" compile="0" resource="0"
@@ -108,6 +112,10 @@
               file="Source/Assets/resizeWindowIcon.png"/>
         <FILE id="WB8mMJ" name="RMSComponent.png" compile="0" resource="1"
               file="Source/Assets/RMSComponent.png"/>
+        <FILE id="GuZNnl" name="SaveConfigIcon.png" compile="0" resource="1"
+              file="Source/Assets/SaveConfigIcon.png"/>
+        <FILE id="B3zMDc" name="SaveConfigIconTwo.png" compile="0" resource="1"
+              file="Source/Assets/SaveConfigIconTwo.png"/>
         <FILE id="F7wIHS" name="spectrumAnalyzerIcon.png" compile="0" resource="1"
               file="Source/Assets/spectrumAnalyzerIcon.png"/>
         <FILE id="CKL69P" name="themeConfigurationIcon.png" compile="0" resource="1"

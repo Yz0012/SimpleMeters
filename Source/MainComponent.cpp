@@ -20,21 +20,25 @@ MainComponent::MainComponent()
     componentPosition = config.getChildWithProperty("name", "Position");
     componentSize = config.getChildWithProperty("name", "ComponentSize");
     mainComponentSize = config.getChildWithProperty("name", "MainComponentSize");
+    config.addListener(this);
     startUpComponent();
 
     centreWithSize((int)mainComponentSize.getProperty("MainComponentWidth"), (int)mainComponentSize.getProperty("MainComponentHeight"));
+
     addAndMakeVisible(header);
     header.WASAPIButton.setBounds(20, 10, 30, 30);
     header.windowsSizeButton.setBounds(60, 10, 30, 30);
     header.headerFixedButton.setBounds(100, 10, 30, 30);
     header.themeConfigurationButton.setBounds(180, 10, 30, 30);
 	header.pinOnTopButton.setBounds(140, 10, 30, 30);
+    header.saveConfigButton.setBounds(220, 10, 30, 30);
     header.windowControl.setTooltip("Close");
     header.WASAPIButton.setTooltip("Enable or disable miniaudio WASAPI loopback");
     header.windowsSizeButton.setTooltip("Resize Window");
 	header.headerFixedButton.setTooltip("Pinned header");
     header.pinOnTopButton.setTooltip("Pinned window");
 	header.themeConfigurationButton.setTooltip("Open theme configuration");
+    header.saveConfigButton.setTooltip("Save config as you can see");
     header.windowsSizeButton.onClick = [this]
         {
             auto aw = std::make_unique<juce::AlertWindow>(
@@ -47,7 +51,7 @@ MainComponent::MainComponent()
             aw->addTextEditor("Width", "", "Width");
             aw->addTextEditor("Height", "", "Height");
             aw->getTextEditor("Width")->setInputRestrictions(4, "0123456789");
-            aw->getTextEditor("Height")->setInputRestrictions(4, "0123456789");
+            aw->getTextEditor("Height")->setInputRestrictions(4, "0123456789"); 
             aw->addButton("OK", 1, juce::KeyPress(juce::KeyPress::returnKey));
             aw->addButton("Cancel", 0, juce::KeyPress(juce::KeyPress::escapeKey));
 
@@ -207,7 +211,6 @@ void MainComponent::openSpectrumAnalyser(int x, int y)
     componentPosition.setProperty("SpectrumAnalyserY", y, nullptr);
     int spectrumAnalyserWidth = componentSize.getProperty("SpectrumAnalyserWidth");
     int spectrumAnalyserHeight = componentSize.getProperty("SpectrumAnalyserHeight");
-    StartUpConfiguration::getInstance().saveConfig(config);
 
     if (!spectrum->callbackId)
     {
@@ -303,8 +306,8 @@ void MainComponent::openSpectrumAnalyser(int x, int y)
                                         int&& Y = aw->getTextEditorContents("Y").getIntValue();
                                         if (X <= 0 || Y <= 0) return;
 										sp->setBounds(X, Y, sp->getWidth(), sp->getHeight());
-                                        componentSize.setProperty("SpectrumAnalyserWidth", sp->getWidth(), nullptr);
-                                        componentSize.setProperty("SpectrumAnalyserHeight", sp->getHeight(), nullptr);
+                                        componentPosition.setProperty("SpectrumAnalyserX", X, nullptr);
+                                        componentPosition.setProperty("SpectrumAnalyserY", Y, nullptr);
                                     }
                                     delete aw;
                                 }
@@ -327,7 +330,7 @@ void MainComponent::openSpectrumAnalyser(int x, int y)
                             aw->addButton("Cancel", 0, juce::KeyPress(juce::KeyPress::escapeKey));
 
                             aw->enterModalState(true, juce::ModalCallbackFunction::create(
-                                [sp, aw](int result)
+                                [sp, aw, this](int result)
                                 {
                                     if (result == 1)
                                     {
@@ -340,6 +343,8 @@ void MainComponent::openSpectrumAnalyser(int x, int y)
 										sp->componentHeader.setBounds(0, 0, Width, 50);
                                         sp->componentHeader.componentControl.setBounds(Width - 30, 20, 10, 10);
                                         sp->drawBounds.setBounds(0, 0, Width, Height);
+                                        componentSize.setProperty("SpectrumAnalyserWidth", Width, nullptr);
+                                        componentSize.setProperty("SpectrumAnalyserHeight", Height, nullptr);
                                     }
                                     delete aw;
                                 }
@@ -498,8 +503,8 @@ void MainComponent::openSpectrumAnalyserMono(int x, int y)
                                         int&& Y = aw->getTextEditorContents("Y").getIntValue();
                                         if (X <= 0 || Y <= 0) return;
                                         sp->setBounds(X, Y, sp->getWidth(), sp->getHeight());
-                                        componentSize.setProperty("SpectrumAnalyserMonoWidth", sp->getWidth(), nullptr);
-                                        componentSize.setProperty("SpectrumAnalyserMonoHeight", sp->getHeight(), nullptr);
+                                        componentPosition.setProperty("SpectrumAnalyserMonoX", X, nullptr);
+                                        componentPosition.setProperty("SpectrumAnalyserMonoY", Y, nullptr);
                                     }
                                     delete aw;
                                 }
@@ -522,7 +527,7 @@ void MainComponent::openSpectrumAnalyserMono(int x, int y)
                             aw->addButton("Cancel", 0, juce::KeyPress(juce::KeyPress::escapeKey));
 
                             aw->enterModalState(true, juce::ModalCallbackFunction::create(
-                                [sp, aw](int result)
+                                [sp, aw, this](int result)
                                 {
                                     if (result == 1)
                                     {
@@ -535,6 +540,8 @@ void MainComponent::openSpectrumAnalyserMono(int x, int y)
                                         sp->componentHeader.setBounds(0, 0, Width, 50);
                                         sp->componentHeader.componentControl.setBounds(Width - 30, 20, 10, 10);
                                         sp->drawBounds.setBounds(0, 0, Width, Height);
+                                        componentSize.setProperty("SpectrumAnalyserMonoWidth", Width, nullptr);
+                                        componentSize.setProperty("SpectrumAnalyserMonoHeight", Height, nullptr);
                                     }
                                     delete aw;
                                 }
@@ -645,8 +652,8 @@ void MainComponent::openWaveformComponent(int x, int y)
                                         int&& Y = aw->getTextEditorContents("Y").getIntValue();
                                         if (X <= 0 || Y <= 0) return;
                                         wf->setBounds(X, Y, wf->getWidth(), wf->getHeight());
-                                        componentSize.setProperty("WaveformComponentWidth", wf->getWidth(), nullptr);
-                                        componentSize.setProperty("WaveformComponentHeight", wf->getHeight(), nullptr);
+                                        componentPosition.setProperty("WaveformComponentX", X, nullptr);
+                                        componentPosition.setProperty("WaveformComponentY", Y, nullptr);
                                     }
                                     delete aw;
                                 }
@@ -669,7 +676,7 @@ void MainComponent::openWaveformComponent(int x, int y)
                             aw->addButton("Cancel", 0, juce::KeyPress(juce::KeyPress::escapeKey));
 
                             aw->enterModalState(true, juce::ModalCallbackFunction::create(
-                                [wf, aw](int result)
+                                [wf, aw, this](int result)
                                 {
                                     if (result == 1)
                                     {
@@ -682,6 +689,8 @@ void MainComponent::openWaveformComponent(int x, int y)
                                         wf->componentHeader.setBounds(0, 0, Width, 50);
                                         wf->componentHeader.componentControl.setBounds(Width - 30, 20, 10, 10);
                                         wf->drawBounds.setBounds(0, 0, Width, Height);
+                                        componentSize.setProperty("WaveformComponentWidth", Width, nullptr);
+                                        componentSize.setProperty("WaveformComponentHeight", Height, nullptr);
                                     }
                                     delete aw;
                                 }
@@ -833,8 +842,8 @@ void MainComponent::openVectorOscilloscopeComponent(int x, int y)
                                         int&& Y = aw->getTextEditorContents("Y").getIntValue();
                                         if (X <= 0 || Y <= 0) return;
                                         vec->setBounds(X, Y, vec->getWidth(), vec->getHeight());
-                                        componentSize.setProperty("VectorOscilloscopeWidth", vec->getWidth(), nullptr);
-                                        componentSize.setProperty("VectorOscilloscopeHeight", vec->getHeight(), nullptr);
+                                        componentPosition.setProperty("VectorOscilloscopeX", X, nullptr);
+                                        componentPosition.setProperty("VectorOscilloscopeY", Y, nullptr);
                                     }
                                     delete aw;
                                 }
@@ -857,7 +866,7 @@ void MainComponent::openVectorOscilloscopeComponent(int x, int y)
                             aw->addButton("Cancel", 0, juce::KeyPress(juce::KeyPress::escapeKey));
 
                             aw->enterModalState(true, juce::ModalCallbackFunction::create(
-                                [vec, aw](int result)
+                                [vec, aw, this](int result)
                                 {
                                     if (result == 1)
                                     {
@@ -869,6 +878,8 @@ void MainComponent::openVectorOscilloscopeComponent(int x, int y)
                                         vec->componentHeader.componentControl.setBounds(Width - 30, 20, 10, 10);
                                         vec->drawBounds.setBounds(0, 0, Width, Height);
                                         vec->oscilloscopeReferenceLines.setBounds(0, 0, Width, Height);
+                                        componentSize.setProperty("VectorOscilloscopeWidth", Width, nullptr);
+                                        componentSize.setProperty("VectorOscilloscopeHeight", Height, nullptr);
                                     }
                                     delete aw;
                                 }
@@ -978,8 +989,8 @@ void MainComponent::openWaveformChartComponent(int x, int y)
                                         int&& Y = aw->getTextEditorContents("Y").getIntValue();
                                         if (X <= 0 || Y <= 0) return;
                                         ch->setBounds(X, Y, ch->getWidth(), ch->getHeight());
-                                        componentSize.setProperty("WaveformChartComponentWidth", aw->getWidth(), nullptr);
-                                        componentSize.setProperty("WaveformChartComponentHeight", aw->getHeight(), nullptr);
+                                        componentPosition.setProperty("WaveformChartComponentX", X, nullptr);
+                                        componentPosition.setProperty("WaveformChartComponentY", Y, nullptr);
                                     }
                                     delete aw;
                                 }
@@ -1002,7 +1013,7 @@ void MainComponent::openWaveformChartComponent(int x, int y)
                             aw->addButton("Cancel", 0, juce::KeyPress(juce::KeyPress::escapeKey));
 
                             aw->enterModalState(true, juce::ModalCallbackFunction::create(
-                                [ch, aw](int result)
+                                [ch, aw, this](int result)
                                 {
                                     if (result == 1)
                                     {
@@ -1015,6 +1026,8 @@ void MainComponent::openWaveformChartComponent(int x, int y)
                                         ch->componentHeader.setBounds(0, 0, Width, 50);
                                         ch->componentHeader.componentControl.setBounds(Width - 30, 20, 10, 10);
                                         ch->drawBounds.setBounds(0, 0, Width, Height);
+                                        componentSize.setProperty("WaveformChartComponentWidth", Width, nullptr);
+                                        componentSize.setProperty("WaveformChartComponentHeight", Height, nullptr);
                                     }
                                     delete aw;
                                 }
@@ -1155,8 +1168,8 @@ void MainComponent::openRMSMeterComponent(int x, int y)
                                         int&& Y = aw->getTextEditorContents("Y").getIntValue();
                                         if (X <= 0 || Y <= 0) return;
                                         rms->setBounds(X, Y, rms->getWidth(), rms->getHeight());
-                                        componentSize.setProperty("RMSMeterWidth", rms->getWidth(), nullptr);
-                                        componentSize.setProperty("RMSMeterHeight", rms->getHeight(), nullptr);
+                                        componentPosition.setProperty("RMSMeterX", X, nullptr);
+                                        componentPosition.setProperty("RMSMeterY", Y, nullptr);
                                     }
                                     delete aw;
                                 }
@@ -1179,7 +1192,7 @@ void MainComponent::openRMSMeterComponent(int x, int y)
                             aw->addButton("Cancel", 0, juce::KeyPress(juce::KeyPress::escapeKey));
 
                             aw->enterModalState(true, juce::ModalCallbackFunction::create(
-                                [rms, aw](int result)
+                                [rms, aw, this](int result)
                                 {
                                     if (result == 1)
                                     {
@@ -1192,6 +1205,8 @@ void MainComponent::openRMSMeterComponent(int x, int y)
                                         rms->componentHeader.componentControl.setBounds(Width - 10, 20, 10, 10);
                                         rms->componentHeader.componentControl.setBounds(Width - 30, 20, 10, 10);
                                         rms->drawBounds.setBounds(0, 0, Width, Height);
+                                        componentSize.setProperty("RMSMeterWidth", Width, nullptr);
+                                        componentSize.setProperty("RMSMeterHeight", Height, nullptr);
                                     }
                                     delete aw;
                                 }
@@ -1246,6 +1261,22 @@ void MainComponent::valueTreePropertyChanged(juce::ValueTree& tree, const juce::
         this->mainComponentBackgroundColour = juce::Colour(CreateColoursConfiguration::getInstance().colourHexToARGBInt(
             mainCategory.getChildWithProperty("name", "Background").getProperty("hex").toString(), false));
 		repaint();
+    }
+    else if (tree.getType() == juce::Identifier("StartUpConfig"))
+    {
+        header.saveConfigButton.valueTreePropertyChanged();
+    }
+    else if (tree.getType() == juce::Identifier("Position"))
+    {
+        header.saveConfigButton.valueTreePropertyChanged();
+    }
+    else if (tree.getType() == juce::Identifier("ComponentSize"))
+    {
+        header.saveConfigButton.valueTreePropertyChanged();
+    }
+    else if (tree.getType() == juce::Identifier("MainComponentSize"))
+    {
+        header.saveConfigButton.valueTreePropertyChanged();
     }
 }
 

@@ -38,6 +38,11 @@ ColourThemeEditor::ColourThemeEditor(juce::ValueTree& categoryNode)
     setSize(500, getRequiredHeight());
 }
 
+ColourThemeEditor::~ColourThemeEditor()
+{
+    DBG("ColourThemeEditor shutdown");
+}
+
 int ColourThemeEditor::getRequiredHeight() const
 {
     const int rowHeight = 32;

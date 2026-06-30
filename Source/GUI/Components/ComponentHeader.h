@@ -24,5 +24,5 @@ public:
 	juce::Slider knob{ juce::Slider::RotaryVerticalDrag, juce::Slider::TextBoxBelow };
 	juce::Slider knobTwo{ juce::Slider::RotaryVerticalDrag, juce::Slider::TextBoxBelow };
 private:
-
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ComponentHeader);
 };

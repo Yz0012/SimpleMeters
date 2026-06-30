@@ -15,4 +15,5 @@ public:
 
 private:
 	juce::Colour boundsColour;
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(DrawBounds);
 };
