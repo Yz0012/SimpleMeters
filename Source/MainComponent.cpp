@@ -48,8 +48,8 @@ MainComponent::MainComponent()
 
             aw->setOpaque(false);
             aw->setDropShadowEnabled(false);
-            aw->addTextEditor("Width", "", "Width");
-            aw->addTextEditor("Height", "", "Height");
+            aw->addTextEditor("Width", mainComponentSize.getProperty("MainComponentWidth").toString(), "Width");
+            aw->addTextEditor("Height", mainComponentSize.getProperty("MainComponentHeight").toString(), "Height");
             aw->getTextEditor("Width")->setInputRestrictions(4, "0123456789");
             aw->getTextEditor("Height")->setInputRestrictions(4, "0123456789"); 
             aw->addButton("OK", 1, juce::KeyPress(juce::KeyPress::returnKey));
@@ -290,8 +290,8 @@ void MainComponent::openSpectrumAnalyser(int x, int y)
 
                             aw->setOpaque(false);
                             aw->setDropShadowEnabled(false);
-                            aw->addTextEditor("X", "", "X");
-                            aw->addTextEditor("Y", "", "Y");
+                            aw->addTextEditor("X", componentPosition.getProperty("SpectrumAnalyserX").toString(), "X");
+                            aw->addTextEditor("Y", componentPosition.getProperty("SpectrumAnalyserY").toString(), "Y");
                             aw->getTextEditor("X")->setInputRestrictions(4, "0123456789");
                             aw->getTextEditor("Y")->setInputRestrictions(4, "0123456789");
                             aw->addButton("OK", 1, juce::KeyPress(juce::KeyPress::returnKey));
@@ -322,8 +322,8 @@ void MainComponent::openSpectrumAnalyser(int x, int y)
 
                             aw->setOpaque(false);
                             aw->setDropShadowEnabled(false);
-                            aw->addTextEditor("Width", "", "Width");
-                            aw->addTextEditor("Height", "", "Height");
+                            aw->addTextEditor("Width", componentSize.getProperty("SpectrumAnalyserWidth").toString(), "Width");
+                            aw->addTextEditor("Height", componentSize.getProperty("SpectrumAnalyserHeight").toString(), "Height");
                             aw->getTextEditor("Width")->setInputRestrictions(3, "0123456789");
                             aw->getTextEditor("Height")->setInputRestrictions(3, "0123456789");
                             aw->addButton("OK", 1, juce::KeyPress(juce::KeyPress::returnKey));
@@ -487,8 +487,8 @@ void MainComponent::openSpectrumAnalyserMono(int x, int y)
 
                             aw->setOpaque(false);
                             aw->setDropShadowEnabled(false);
-                            aw->addTextEditor("X", "", "X");
-                            aw->addTextEditor("Y", "", "Y");
+                            aw->addTextEditor("X", componentPosition.getProperty("SpectrumAnalyserMonoX").toString(), "X");
+                            aw->addTextEditor("Y", componentPosition.getProperty("SpectrumAnalyserMonoY").toString(), "Y");
                             aw->getTextEditor("X")->setInputRestrictions(4, "0123456789");
                             aw->getTextEditor("Y")->setInputRestrictions(4, "0123456789");
                             aw->addButton("OK", 1, juce::KeyPress(juce::KeyPress::returnKey));
@@ -519,8 +519,8 @@ void MainComponent::openSpectrumAnalyserMono(int x, int y)
 
                             aw->setOpaque(false);
                             aw->setDropShadowEnabled(false);
-                            aw->addTextEditor("Width", "", "Width");
-                            aw->addTextEditor("Height", "", "Height");
+                            aw->addTextEditor("Width", componentSize.getProperty("SpectrumAnalyserMonoWidth").toString(), "Width");
+                            aw->addTextEditor("Height", componentSize.getProperty("SpectrumAnalyserMonoHeight").toString(), "Height");
                             aw->getTextEditor("Width")->setInputRestrictions(3, "0123456789");
                             aw->getTextEditor("Height")->setInputRestrictions(3, "0123456789");
                             aw->addButton("OK", 1, juce::KeyPress(juce::KeyPress::returnKey));
@@ -636,8 +636,8 @@ void MainComponent::openWaveformComponent(int x, int y)
 
                             aw->setOpaque(false);
                             aw->setDropShadowEnabled(false);
-                            aw->addTextEditor("X", "", "X");
-                            aw->addTextEditor("Y", "", "Y");
+                            aw->addTextEditor("X", componentPosition.getProperty("WaveformComponentX").toString(), "X");
+                            aw->addTextEditor("Y", componentPosition.getProperty("WaveformComponentY").toString(), "Y");
                             aw->getTextEditor("X")->setInputRestrictions(4, "0123456789");
                             aw->getTextEditor("Y")->setInputRestrictions(4, "0123456789");
                             aw->addButton("OK", 1, juce::KeyPress(juce::KeyPress::returnKey));
@@ -668,8 +668,8 @@ void MainComponent::openWaveformComponent(int x, int y)
 
                             aw->setOpaque(false);
                             aw->setDropShadowEnabled(false);
-                            aw->addTextEditor("Width", "", "Width");
-                            aw->addTextEditor("Height", "", "Height");
+                            aw->addTextEditor("Width", componentSize.getProperty("WaveformComponentWidth").toString(), "Width");
+                            aw->addTextEditor("Height", componentSize.getProperty("WaveformComponentHeight").toString(), "Height");
                             aw->getTextEditor("Width")->setInputRestrictions(3, "0123456789");
                             aw->getTextEditor("Height")->setInputRestrictions(3, "0123456789");
                             aw->addButton("OK", 1, juce::KeyPress(juce::KeyPress::returnKey));
@@ -826,8 +826,8 @@ void MainComponent::openVectorOscilloscopeComponent(int x, int y)
 
                             aw->setOpaque(false);
                             aw->setDropShadowEnabled(false);
-                            aw->addTextEditor("X", "", "X");
-                            aw->addTextEditor("Y", "", "Y");
+                            aw->addTextEditor("X", componentPosition.getProperty("VectorOscilloscopeX").toString(), "X");
+                            aw->addTextEditor("Y", componentPosition.getProperty("VectorOscilloscopeY").toString(), "Y");
                             aw->getTextEditor("X")->setInputRestrictions(4, "0123456789");
                             aw->getTextEditor("Y")->setInputRestrictions(4, "0123456789");
                             aw->addButton("OK", 1, juce::KeyPress(juce::KeyPress::returnKey));
@@ -858,8 +858,8 @@ void MainComponent::openVectorOscilloscopeComponent(int x, int y)
 
                             aw->setOpaque(false);
                             aw->setDropShadowEnabled(false);
-                            aw->addTextEditor("Width", "", "Width");
-                            aw->addTextEditor("Height", "", "Height");
+                            aw->addTextEditor("Width", componentSize.getProperty("VectorOscilloscopeWidth").toString(), "Width");
+                            aw->addTextEditor("Height", componentSize.getProperty("VectorOscilloscopeHeight").toString(), "Height");
                             aw->getTextEditor("Width")->setInputRestrictions(3, "0123456789");
                             aw->getTextEditor("Height")->setInputRestrictions(3, "0123456789");
                             aw->addButton("OK", 1, juce::KeyPress(juce::KeyPress::returnKey));
@@ -973,8 +973,8 @@ void MainComponent::openWaveformChartComponent(int x, int y)
 
                             aw->setOpaque(false);
                             aw->setDropShadowEnabled(false);
-                            aw->addTextEditor("X", "", "X");
-                            aw->addTextEditor("Y", "", "Y");
+                            aw->addTextEditor("X", componentPosition.getProperty("WaveformChartComponentX").toString(), "X");
+                            aw->addTextEditor("Y", componentPosition.getProperty("WaveformChartComponentY").toString(), "Y");
                             aw->getTextEditor("X")->setInputRestrictions(4, "0123456789");
                             aw->getTextEditor("Y")->setInputRestrictions(4, "0123456789");
                             aw->addButton("OK", 1, juce::KeyPress(juce::KeyPress::returnKey));
@@ -1005,8 +1005,8 @@ void MainComponent::openWaveformChartComponent(int x, int y)
 
                             aw->setOpaque(false);
                             aw->setDropShadowEnabled(false);
-                            aw->addTextEditor("Width", "", "Width");
-                            aw->addTextEditor("Height", "", "Height");
+                            aw->addTextEditor("Width", componentSize.getProperty("WaveformChartComponentWidth").toString(), "Width");
+                            aw->addTextEditor("Height", componentSize.getProperty("WaveformChartComponentHeight").toString(), "Height");
                             aw->getTextEditor("Width")->setInputRestrictions(3, "0123456789");
                             aw->getTextEditor("Height")->setInputRestrictions(3, "0123456789");
                             aw->addButton("OK", 1, juce::KeyPress(juce::KeyPress::returnKey));
@@ -1152,8 +1152,8 @@ void MainComponent::openRMSMeterComponent(int x, int y)
 
                             aw->setOpaque(false);
                             aw->setDropShadowEnabled(false);
-                            aw->addTextEditor("X", "", "X");
-                            aw->addTextEditor("Y", "", "Y");
+                            aw->addTextEditor("X", componentPosition.getProperty("RMSMeterX").toString(), "X");
+                            aw->addTextEditor("Y", componentPosition.getProperty("RMSMeterY").toString(), "Y");
                             aw->getTextEditor("X")->setInputRestrictions(4, "0123456789");
                             aw->getTextEditor("Y")->setInputRestrictions(4, "0123456789");
                             aw->addButton("OK", 1, juce::KeyPress(juce::KeyPress::returnKey));
@@ -1184,8 +1184,8 @@ void MainComponent::openRMSMeterComponent(int x, int y)
 
                             aw->setOpaque(false);
                             aw->setDropShadowEnabled(false);
-                            aw->addTextEditor("Width", "", "Width");
-                            aw->addTextEditor("Height", "", "Height");
+                            aw->addTextEditor("Width", componentSize.getProperty("RMSMeterWidth").toString(), "Width");
+                            aw->addTextEditor("Height", componentSize.getProperty("RMSMeterHeight").toString(), "Height");
                             aw->getTextEditor("Width")->setInputRestrictions(3, "0123456789");
                             aw->getTextEditor("Height")->setInputRestrictions(3, "0123456789");
                             aw->addButton("OK", 1, juce::KeyPress(juce::KeyPress::returnKey));
@@ -1262,19 +1262,7 @@ void MainComponent::valueTreePropertyChanged(juce::ValueTree& tree, const juce::
             mainCategory.getChildWithProperty("name", "Background").getProperty("hex").toString(), false));
 		repaint();
     }
-    else if (tree.getType() == juce::Identifier("StartUpConfig"))
-    {
-        header.saveConfigButton.valueTreePropertyChanged();
-    }
-    else if (tree.getType() == juce::Identifier("Position"))
-    {
-        header.saveConfigButton.valueTreePropertyChanged();
-    }
-    else if (tree.getType() == juce::Identifier("ComponentSize"))
-    {
-        header.saveConfigButton.valueTreePropertyChanged();
-    }
-    else if (tree.getType() == juce::Identifier("MainComponentSize"))
+    else
     {
         header.saveConfigButton.valueTreePropertyChanged();
     }
