@@ -83,8 +83,6 @@ private:
             {
                 { "Colour", {{ "name", "Background"}, { "hex", "#172027" }}},
                 { "Colour", {{ "name", "Header"},     { "hex", "#0091FF" }}},
-                { "Colour", {{ "name", "Secondary"},  { "hex", "#FF32D6" }}},
-                { "Colour", {{ "name", "Accent1"},    { "hex", "#B7ED88" }}}
             }
         },
 
