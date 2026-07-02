@@ -20,8 +20,8 @@ MainComponent::MainComponent()
     componentPosition = config.getChildWithProperty("name", "Position");
     componentSize = config.getChildWithProperty("name", "ComponentSize");
     mainComponentSize = config.getChildWithProperty("name", "MainComponentSize");
-    config.addListener(this);
     startUpComponent();
+    config.addListener(this);
 
     centreWithSize((int)mainComponentSize.getProperty("MainComponentWidth"), (int)mainComponentSize.getProperty("MainComponentHeight"));
 
