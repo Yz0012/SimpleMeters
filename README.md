@@ -7,7 +7,7 @@
 SimpleMeters is an audio analysis tool for the Windows platform.
 
 > [!NOTE]
-> This project is currently under development and is in an early stage.
+> You can use the basic features now, but most of the features haven't been added yet.
 
 # Development Progress
 
