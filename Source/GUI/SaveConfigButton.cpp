@@ -37,6 +37,7 @@ void SaveConfigButton::mouseDown(const juce::MouseEvent& event)
 	configSaved = !configSaved;
 	repaint();
 	StartUpConfiguration::getInstance().saveConfig(StartUpConfiguration::getInstance().getCurrentValueTree());
+	CreateColoursConfiguration::getInstance().saveConfig(CreateColoursConfiguration::getInstance().getCurrentValueTree());
 }
 
 void SaveConfigButton::mouseEnter(const juce::MouseEvent&)

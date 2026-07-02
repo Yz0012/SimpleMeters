@@ -4,6 +4,7 @@
 #include <JuceHeader.h>
 
 #include "../CreateConfiguration/StartUpConfiguration.h"
+#include "../CreateConfiguration/CreateColoursConfiguration.h"
 
 class SaveConfigButton : public juce::Component, public juce::SettableTooltipClient
 {
