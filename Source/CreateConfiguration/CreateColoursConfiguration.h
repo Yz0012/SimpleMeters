@@ -28,7 +28,7 @@ private:
         "ColourTheme", {},
         {
 
-            { "Category", {{ "name", "SpectrumAnalyzer" }},
+            { "SpectrumAnalyzer", {{ "name", "SpectrumAnalyzer" }},
                 {
                     { "Colour", {{ "name", "BoundaryLine"}, { "hex", "#0091FF" }}},
                     { "Colour", {{ "name", "Fill"},        { "hex", "#0091FF" }}},
@@ -39,14 +39,14 @@ private:
                 }
             },
 
-        { "Category", {{ "name", "SpectrumAnalyzerMono" }},
+        { "SpectrumAnalyzerMono", {{ "name", "SpectrumAnalyzerMono" }},
             {
                 { "Colour", {{ "name", "BoundaryLine"}, { "hex", "#0091FF" }}},
                 { "Colour", {{ "name", "Fill"},        { "hex", "#0091FF" }}}
             }
         },
 
-        { "Category", {{ "name", "Waveform" }},
+        { "Waveform", {{ "name", "Waveform" }},
             {
                 { "Colour", {{ "name", "BoundaryLineL"},          { "hex", "#0091FF" }}},
                 { "Colour", {{ "name", "GradientColorOfLinesL"},  { "hex", "#FFFFFF" }}},
@@ -55,7 +55,7 @@ private:
             }
         },
 
-        { "Category", {{ "name", "WaveformChart" }},
+        { "WaveformChart", {{ "name", "WaveformChart" }},
             {
                 { "Colour", {{ "name", "BoundaryLineL"},          { "hex", "#0091FF" }}},
                 { "Colour", {{ "name", "GradientColorOfLinesL"},  { "hex", "#FFFFFF" }}},
@@ -66,47 +66,47 @@ private:
             }
         },
 
-        { "Category", {{ "name", "VectorOscilloscopes" }},
+        { "VectorOscilloscopes", {{ "name", "VectorOscilloscopes" }},
             {
                 { "Colour", {{ "name", "Colour"},          { "hex", "#0091FF" }}}
             }
         },
 
-        { "Category", {{ "name", "RMSMeterComponent" }},
+        { "RMSMeterComponent", {{ "name", "RMSMeterComponent" }},
             {
                 { "Colour", {{ "name", "Bottom"},          { "hex", "#B7ED88" }}},
                 { "Colour", {{ "name", "Top"},          { "hex", "#FFFFFF" }}}
             }
         },
 
-        { "Category", {{ "name", "MainComponent" }},
+        { "MainComponent", {{ "name", "MainComponent" }},
             {
                 { "Colour", {{ "name", "Background"}, { "hex", "#172027" }}},
                 { "Colour", {{ "name", "Header"},     { "hex", "#0091FF" }}},
             }
         },
 
-        { "Category", {{ "name", "ComponentBounds" }},
+        { "ComponentBounds", {{ "name", "ComponentBounds" }},
             {
                 { "Colour", {{ "name", "ComponentBoundsColour"}, { "hex", "#B7ED88" }}},
             }
         },
 
-        { "Category", {{ "name", "PopupMenu" }},
+        { "PopupMenu", {{ "name", "PopupMenu" }},
             {
                 { "Colour", {{ "name", "Background"}, { "hex", "#212A32" }}},
                 { "Colour", {{ "name", "Text"},       { "hex", "#6ABD66" }}}
             }
         },
 
-        { "Category", {{ "name", "MessageWindow" }},
+        { "MessageWindow", {{ "name", "MessageWindow" }},
             {
                 { "Colour", {{ "name", "Background"}, { "hex", "#212A32" }}},
                 { "Colour", {{ "name", "Text"},       { "hex", "#6ABD66" }}}
             }
         },
 
-        { "Category", {{ "name", "Button" }},
+        { "Button", {{ "name", "Button" }},
             {
                 { "Colour", {{ "name", "Background"},        { "hex", "#212A32" }}},
                 { "Colour", {{ "name", "Text"},              { "hex", "#B7ED88" }}},
@@ -115,7 +115,7 @@ private:
             }
         },
 
-        { "Category", {{ "name", "TextEditor" }},
+        { "TextEditor", {{ "name", "TextEditor" }},
             {
                 { "Colour", {{ "name", "Background"},      { "hex", "#172027" }}},
                 { "Colour", {{ "name", "Text"},            { "hex", "#B7ED88" }}},

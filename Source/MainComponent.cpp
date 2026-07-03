@@ -9,10 +9,9 @@ MainComponent::MainComponent()
     CreateColoursConfiguration& createColoursConfiguration = CreateColoursConfiguration::getInstance();
     StartUpConfiguration& startUpConfiguration = StartUpConfiguration::getInstance();
 
-    mainCategory = createColoursConfiguration.getCurrentValueTree()
-        .getChildWithProperty("name", "MainComponent");
+    mainCategory = createColoursConfiguration.getCurrentValueTree();
     mainComponentBackgroundColour = juce::Colour(createColoursConfiguration.colourHexToARGBInt(
-        mainCategory.getChildWithProperty("name", "Background").getProperty("hex").toString(), false));
+        mainCategory.getChildWithProperty("name", "MainComponent").getChildWithProperty("name", "Background").getProperty("hex").toString(), false));
     mainCategory.addListener(this);
 
     config = startUpConfiguration.getCurrentValueTree();
@@ -1256,10 +1255,10 @@ void MainComponent::stopWASAPIDevice()
 
 void MainComponent::valueTreePropertyChanged(juce::ValueTree& tree, const juce::Identifier& property)
 {
-    if (property == juce::Identifier("hex"))
+    if (tree.getParent().getType() == juce::Identifier("MainComponent"))
     {
         this->mainComponentBackgroundColour = juce::Colour(CreateColoursConfiguration::getInstance().colourHexToARGBInt(
-            mainCategory.getChildWithProperty("name", "Background").getProperty("hex").toString(), false));
+            mainCategory.getChildWithProperty("name", "MainComponent").getChildWithProperty("name", "Background").getProperty("hex").toString(), false));
         header.saveConfigButton.valueTreePropertyChanged();
 		repaint();
     }
