@@ -372,7 +372,7 @@ void SpectrumAnalyser::drawSingleCurve(juce::Graphics& g,
             g.drawText(textLines[j],
                 static_cast<int>(textX),
                 static_cast<int>(textY + j * 14.0f),
-                120, 14,
+                180, 14,
                 juce::Justification::centredLeft, false);
         }
     }
