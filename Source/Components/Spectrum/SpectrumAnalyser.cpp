@@ -190,14 +190,14 @@ void SpectrumAnalyser::drawFrame(juce::Graphics& g, juce::Rectangle<int> bounds)
     else if (currentMode == LR)
     {
         drawSingleCurve(g, bounds, scopeData2, scopeDataStorage2, destScope2,
-            lineColorR, fillColorR);
+            lineColorSide, fillColorSide);
     }
     else if (currentMode == Stereo)
     {
         drawSingleCurve(g, bounds, scopeData, scopeDataStorage, destScope1,
             lineColor, fillColor);
         drawSingleCurve(g, bounds, scopeData2, scopeDataStorage2, destScope2,
-            lineColorSide, fillColorSide);
+            lineColorR, fillColorR);
     }
 
 }
@@ -468,6 +468,14 @@ void SpectrumAnalyser::valueTreePropertyChanged(juce::ValueTree& tree, const juc
             spectrumCat.getChildWithProperty("name", "BoundaryLine").getProperty("hex").toString(), false));
 		this->fillColor = juce::Colour(CreateColoursConfiguration::getInstance().colourHexToARGBInt(
 			spectrumCat.getChildWithProperty("name", "Fill").getProperty("hex").toString(), false));
+        this->lineColor = juce::Colour(CreateColoursConfiguration::getInstance().colourHexToARGBInt(
+            spectrumCat.getChildWithProperty("name", "BoundaryLineR").getProperty("hex").toString(), false));
+        this->fillColorR = juce::Colour(CreateColoursConfiguration::getInstance().colourHexToARGBInt(
+            spectrumCat.getChildWithProperty("name", "FillR").getProperty("hex").toString(), false));
+        this->lineColorSide = juce::Colour(CreateColoursConfiguration::getInstance().colourHexToARGBInt(
+            spectrumCat.getChildWithProperty("name", "BoundaryLineSide").getProperty("hex").toString(), false));
+        this->fillColorSide = juce::Colour(CreateColoursConfiguration::getInstance().colourHexToARGBInt(
+            spectrumCat.getChildWithProperty("name", "FillSide").getProperty("hex").toString(), false));
         repaint();
     }
 }
