@@ -1260,6 +1260,7 @@ void MainComponent::valueTreePropertyChanged(juce::ValueTree& tree, const juce::
     {
         this->mainComponentBackgroundColour = juce::Colour(CreateColoursConfiguration::getInstance().colourHexToARGBInt(
             mainCategory.getChildWithProperty("name", "Background").getProperty("hex").toString(), false));
+        header.saveConfigButton.valueTreePropertyChanged();
 		repaint();
     }
     else
