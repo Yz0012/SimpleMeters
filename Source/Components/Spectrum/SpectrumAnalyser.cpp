@@ -468,7 +468,7 @@ void SpectrumAnalyser::valueTreePropertyChanged(juce::ValueTree& tree, const juc
             spectrumCat.getChildWithProperty("name", "BoundaryLine").getProperty("hex").toString(), false));
 		this->fillColor = juce::Colour(CreateColoursConfiguration::getInstance().colourHexToARGBInt(
 			spectrumCat.getChildWithProperty("name", "Fill").getProperty("hex").toString(), false));
-        this->lineColor = juce::Colour(CreateColoursConfiguration::getInstance().colourHexToARGBInt(
+        this->lineColorR = juce::Colour(CreateColoursConfiguration::getInstance().colourHexToARGBInt(
             spectrumCat.getChildWithProperty("name", "BoundaryLineR").getProperty("hex").toString(), false));
         this->fillColorR = juce::Colour(CreateColoursConfiguration::getInstance().colourHexToARGBInt(
             spectrumCat.getChildWithProperty("name", "FillR").getProperty("hex").toString(), false));
