@@ -301,8 +301,8 @@ void MainComponent::openSpectrumAnalyser(int x, int y)
                                 {
                                     if (result == 1)
                                     {
-                                        int&& X = aw->getTextEditorContents("X").getIntValue();
-                                        int&& Y = aw->getTextEditorContents("Y").getIntValue();
+                                        int X = aw->getTextEditorContents("X").getIntValue();
+                                        int Y = aw->getTextEditorContents("Y").getIntValue();
                                         if (X <= 0 || Y <= 0) return;
 										sp->setBounds(X, Y, sp->getWidth(), sp->getHeight());
                                         componentPosition.setProperty("SpectrumAnalyserX", X, nullptr);
@@ -333,8 +333,8 @@ void MainComponent::openSpectrumAnalyser(int x, int y)
                                 {
                                     if (result == 1)
                                     {
-                                        int&& Width = aw->getTextEditorContents("Width").getIntValue();
-                                        int&& Height = aw->getTextEditorContents("Height").getIntValue();
+                                        int Width = aw->getTextEditorContents("Width").getIntValue();
+                                        int Height = aw->getTextEditorContents("Height").getIntValue();
                                         if (Width <= 100 || Height <= 100) return;
                                         sp->setBounds(sp->getX(), sp->getY(), Width, Height);
 										sp->drawArea.setBounds(50, 65, Width - 65, Height - 100);
@@ -498,8 +498,8 @@ void MainComponent::openSpectrumAnalyserMono(int x, int y)
                                 {
                                     if (result == 1)
                                     {
-                                        int&& X = aw->getTextEditorContents("X").getIntValue();
-                                        int&& Y = aw->getTextEditorContents("Y").getIntValue();
+                                        int X = aw->getTextEditorContents("X").getIntValue();
+                                        int Y = aw->getTextEditorContents("Y").getIntValue();
                                         if (X <= 0 || Y <= 0) return;
                                         sp->setBounds(X, Y, sp->getWidth(), sp->getHeight());
                                         componentPosition.setProperty("SpectrumAnalyserMonoX", X, nullptr);
@@ -530,8 +530,8 @@ void MainComponent::openSpectrumAnalyserMono(int x, int y)
                                 {
                                     if (result == 1)
                                     {
-                                        int&& Width = aw->getTextEditorContents("Width").getIntValue();
-                                        int&& Height = aw->getTextEditorContents("Height").getIntValue();
+                                        int Width = aw->getTextEditorContents("Width").getIntValue();
+                                        int Height = aw->getTextEditorContents("Height").getIntValue();
                                         if (Width <= 100 || Height <= 100) return;
                                         sp->setBounds(sp->getX(), sp->getY(), Width, Height);
                                         sp->drawArea.setBounds(50, 65, Width - 65, Height - 100);
@@ -647,8 +647,8 @@ void MainComponent::openWaveformComponent(int x, int y)
                                 {
                                     if (result == 1)
                                     {
-                                        int&& X = aw->getTextEditorContents("X").getIntValue();
-                                        int&& Y = aw->getTextEditorContents("Y").getIntValue();
+                                        int X = aw->getTextEditorContents("X").getIntValue();
+                                        int Y = aw->getTextEditorContents("Y").getIntValue();
                                         if (X <= 0 || Y <= 0) return;
                                         wf->setBounds(X, Y, wf->getWidth(), wf->getHeight());
                                         componentPosition.setProperty("WaveformComponentX", X, nullptr);
@@ -679,8 +679,8 @@ void MainComponent::openWaveformComponent(int x, int y)
                                 {
                                     if (result == 1)
                                     {
-                                        int&& Width = aw->getTextEditorContents("Width").getIntValue();
-                                        int&& Height = aw->getTextEditorContents("Height").getIntValue();
+                                        int Width = aw->getTextEditorContents("Width").getIntValue();
+                                        int Height = aw->getTextEditorContents("Height").getIntValue();
                                         if (Width <= 100 || Height <= 100) return;
                                         wf->setBounds(wf->getX(), wf->getY(), Width, Height);
                                         wf->drawArea.setBounds(50, 50, Width - 50, Height - 70);
@@ -837,8 +837,8 @@ void MainComponent::openVectorOscilloscopeComponent(int x, int y)
                                 {
                                     if (result == 1)
                                     {
-                                        int&& X = aw->getTextEditorContents("X").getIntValue();
-                                        int&& Y = aw->getTextEditorContents("Y").getIntValue();
+                                        int X = aw->getTextEditorContents("X").getIntValue();
+                                        int Y = aw->getTextEditorContents("Y").getIntValue();
                                         if (X <= 0 || Y <= 0) return;
                                         vec->setBounds(X, Y, vec->getWidth(), vec->getHeight());
                                         componentPosition.setProperty("VectorOscilloscopeX", X, nullptr);
@@ -869,8 +869,8 @@ void MainComponent::openVectorOscilloscopeComponent(int x, int y)
                                 {
                                     if (result == 1)
                                     {
-                                        int&& Width = aw->getTextEditorContents("Width").getIntValue();
-                                        int&& Height = aw->getTextEditorContents("Height").getIntValue();
+                                        int Width = aw->getTextEditorContents("Width").getIntValue();
+                                        int Height = aw->getTextEditorContents("Height").getIntValue();
                                         if (Width <= 100 || Height <= 100) return;
                                         vec->setBounds(vec->getX(), vec->getY(), Width, Height);
                                         vec->componentHeader.setBounds(0, 0, Width, 50);
@@ -984,8 +984,8 @@ void MainComponent::openWaveformChartComponent(int x, int y)
                                 {
                                     if (result == 1)
                                     {
-                                        int&& X = aw->getTextEditorContents("X").getIntValue();
-                                        int&& Y = aw->getTextEditorContents("Y").getIntValue();
+                                        int X = aw->getTextEditorContents("X").getIntValue();
+                                        int Y = aw->getTextEditorContents("Y").getIntValue();
                                         if (X <= 0 || Y <= 0) return;
                                         ch->setBounds(X, Y, ch->getWidth(), ch->getHeight());
                                         componentPosition.setProperty("WaveformChartComponentX", X, nullptr);
@@ -1016,8 +1016,8 @@ void MainComponent::openWaveformChartComponent(int x, int y)
                                 {
                                     if (result == 1)
                                     {
-                                        int&& Width = aw->getTextEditorContents("Width").getIntValue();
-                                        int&& Height = aw->getTextEditorContents("Height").getIntValue();
+                                        int Width = aw->getTextEditorContents("Width").getIntValue();
+                                        int Height = aw->getTextEditorContents("Height").getIntValue();
                                         if (Width <= 100 || Height <= 100) return;
                                         ch->setBounds(ch->getX(), ch->getY(), Width, Height);
                                         ch->drawArea.setBounds(45, 50, Width - 45, Height - 70);
@@ -1163,8 +1163,8 @@ void MainComponent::openRMSMeterComponent(int x, int y)
                                 {
                                     if (result == 1)
                                     {
-                                        int&& X = aw->getTextEditorContents("X").getIntValue();
-                                        int&& Y = aw->getTextEditorContents("Y").getIntValue();
+                                        int X = aw->getTextEditorContents("X").getIntValue();
+                                        int Y = aw->getTextEditorContents("Y").getIntValue();
                                         if (X <= 0 || Y <= 0) return;
                                         rms->setBounds(X, Y, rms->getWidth(), rms->getHeight());
                                         componentPosition.setProperty("RMSMeterX", X, nullptr);
@@ -1195,8 +1195,8 @@ void MainComponent::openRMSMeterComponent(int x, int y)
                                 {
                                     if (result == 1)
                                     {
-                                        int&& Width = aw->getTextEditorContents("Width").getIntValue();
-                                        int&& Height = aw->getTextEditorContents("Height").getIntValue();
+                                        int Width = aw->getTextEditorContents("Width").getIntValue();
+                                        int Height = aw->getTextEditorContents("Height").getIntValue();
                                         if (Width <= 100 || Height <= 100) return;
                                         rms->setBounds(rms->getX(), rms->getY(), Width, Height);
                                         rms->ticksComponent.setBounds(0, 0, Width, Height);
